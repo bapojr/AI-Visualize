@@ -591,12 +591,21 @@ a {
 
 .hero-highlights span {
   padding: 9px 14px;
-  border-radius: var(--radius-pill);
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(102, 120, 255, 0.14);
-  color: var(--ink-900);
+  border: 1px solid rgba(22, 37, 72, 0.08);
+  color: #000000;
   font-size: 13px;
   font-weight: 600;
+}
+
+.hero-highlights .pill.active,
+.hero-highlights span.active {
+  border-radius: 6px;
+  border: 1px solid var(--Blue-9, #0062FF);
+  background: var(--Gray-1, #FFF);
+  color: var(--Blue-9, #0062FF);
+  box-shadow: none;
 }
 
 .category-bar,
@@ -645,12 +654,34 @@ a {
   font-weight: 700;
 }
 
+.hero-highlights.pill-row .pill,
+.hero-highlights.category-pills .pill,
+#desktopCategoryPills.pill-row .pill,
+#desktopCategoryPills.category-pills .pill {
+  border-radius: 6px;
+  border: 1px solid rgba(22, 37, 72, 0.08);
+  background: var(--Gray-1, #FFF);
+  color: #000000;
+  box-shadow: none;
+}
+
 .pill.active,
 .tool.active {
   color: var(--white);
   background: linear-gradient(135deg, #6678ff 0%, #7f83ff 48%, #42cfd0 100%);
   border-color: transparent;
   box-shadow: 0 14px 24px rgba(102, 120, 255, 0.22);
+}
+
+.hero-highlights.pill-row .pill.active,
+.hero-highlights.category-pills .pill.active,
+#desktopCategoryPills.pill-row .pill.active,
+#desktopCategoryPills.category-pills .pill.active {
+  border-radius: 6px;
+  border: 1px solid var(--Blue-9, #0062FF);
+  background: var(--Gray-1, #FFF);
+  color: var(--Blue-9, #0062FF);
+  box-shadow: none;
 }
 
 .history-strip {
