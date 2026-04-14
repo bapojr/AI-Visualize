@@ -1416,16 +1416,16 @@ a {
 }
 
 .overlay.dropdown {
-  top: 232px;
-  left: max(24px, calc(50vw - 340px));
+  top: 286px;
+  left: calc(50vw + 146px);
   width: 360px;
-  border-radius: 20px;
-  padding: 12px;
+  height: 420px;
+  border-radius: 16px;
+  padding: 10px;
   background: #ffffff;
   border: 1px solid #cad5e7;
-  box-shadow:
-    0 24px 48px rgba(19, 22, 27, 0.12),
-    0 8px 16px rgba(19, 22, 27, 0.06);
+  box-shadow: none;
+  overflow: hidden;
 }
 
 .overlay.toast {
@@ -1578,7 +1578,7 @@ a {
 .dropdown-search input {
   width: 100%;
   height: 42px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid #cad5e7;
   padding: 0 12px;
   background: #ffffff;
@@ -1615,7 +1615,11 @@ a {
 
 .menu-item:hover,
 .dropdown-item:hover {
-  background: rgba(0, 98, 255, 0.04);
+  background: rgba(0, 98, 255, 0.05);
+}
+
+.dropdown-item.active:hover {
+  background: #0062ff;
 }
 
 .menu-divider {
@@ -1630,6 +1634,12 @@ a {
 
 .dropdown-search {
   margin-bottom: 10px;
+}
+
+.dropdown-list {
+  max-height: 346px;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .dropdown-group-title {
@@ -1652,9 +1662,10 @@ a {
 }
 
 .dropdown-item.active {
-  background: #ffffff;
-  border-color: #cad5e7;
-  box-shadow: 0 6px 14px rgba(19, 22, 27, 0.06);
+  background: #0062ff;
+  border-color: #0062ff;
+  color: #ffffff;
+  box-shadow: none;
 }
 
 .success-icon {
