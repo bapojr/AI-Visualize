@@ -518,8 +518,8 @@ a {
 .attachment-icon-button {
   width: 42px;
   height: 42px;
-  border-radius: 14px;
-  border: 1px solid rgba(102, 120, 255, 0.18);
+  border-radius: 6px;
+  border: 1px solid #e4eaf7;
   background: linear-gradient(135deg, rgba(102, 120, 255, 0.08), rgba(66, 207, 208, 0.08));
   color: var(--ink-800);
   display: inline-flex;
@@ -541,7 +541,7 @@ a {
 .landing-submit {
   width: 52px;
   height: 52px;
-  border-radius: 50%;
+  border-radius: 6px;
   background: #b7cdf8;
   color: #edf3ff;
   box-shadow: none;
