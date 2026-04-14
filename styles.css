@@ -1434,17 +1434,17 @@ a {
 
 .overlay.dropdown {
   top: auto;
-  bottom: 178px;
-  left: calc(50vw + 188px);
-  width: 320px;
+  bottom: 190px;
+  left: calc(50vw + 94px);
+  width: 280px;
   height: 420px;
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 8px;
   background: #ffffff;
   border: 0;
   box-shadow:
-    0 24px 48px rgba(19, 22, 27, 0.08),
-    0 8px 18px rgba(19, 22, 27, 0.05);
+    4px 4px 16px 0 rgba(0, 0, 0, 0.08),
+    16px 8px 32px 16px rgba(0, 0, 0, 0.02);
   overflow: hidden;
 }
 
