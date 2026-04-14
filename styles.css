@@ -478,15 +478,16 @@ a {
 .chatbox-left {
   display: flex;
   align-items: center;
+  gap: 24px;
+  flex: 1;
 }
 
 .chatbox-upload-copy {
-  flex: 1;
   color: var(--ink-500);
   font-size: 13px;
   line-height: 1.5;
-  text-align: center;
-  padding: 0 12px;
+  text-align: left;
+  padding: 0;
 }
 
 .landing-chat {
