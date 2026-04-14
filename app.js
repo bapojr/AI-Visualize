@@ -459,9 +459,8 @@ function renderSuggestions() {
     container.innerHTML = "";
     suggestionPills.forEach((text) => {
       const button = document.createElement("button");
-      const isDesktopConversation = id === "desktopSuggestions";
-      button.className = isDesktopConversation ? "conversation-question" : "pill";
-      button.textContent = isDesktopConversation ? text.replace(/^/, "") : text;
+      button.className = "pill";
+      button.textContent = text;
       button.addEventListener("click", () => {
         const target = id === "desktopSuggestions"
           ? document.getElementById("conversationPromptBar")
