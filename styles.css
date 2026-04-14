@@ -452,15 +452,22 @@ a {
   resize: vertical;
   background: transparent;
   outline: none;
-  color: var(--ink-950);
+  color: #9da3ae;
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 16px;
+  font-weight: 400;
   line-height: 1.75;
-  padding: 4px 8px 0 8px;
+  padding: 4px 8px 0;
 }
 
 .chatbox textarea::placeholder {
-  color: var(--ink-500);
+  color: #9da3ae;
+  opacity: 1;
+}
+
+.chatbox.has-value textarea {
+  color: #13161b;
+  font-weight: 500;
 }
 
 .chatbox-divider {
@@ -492,7 +499,7 @@ a {
 }
 
 .chatbox-upload-copy {
-  color: var(--ink-500);
+  color: #9da3ae;
   font-size: 13px;
   line-height: 1.5;
   text-align: left;

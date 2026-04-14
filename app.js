@@ -192,8 +192,7 @@ const state = {
     galleryCount: 4,
     subject: "Default",
   },
-  prompt:
-    "Create a scientific infographic explaining the mechanism of CRISPR-Cas9 with labeled steps, clean callouts, and a clinical blue accent palette.",
+  prompt: "",
   selectedVariant: 1,
   activeOverlay: null,
   editorState: "text",
@@ -597,6 +596,12 @@ function toggleSubmitStates() {
   const mobileValue = document.getElementById("landingPromptMobile")?.value.trim() || "";
   const desktopButton = document.getElementById("landingSubmitDesktop");
   const mobileButton = document.getElementById("landingSubmitMobile");
+  document
+    .getElementById("desktopLandingChatbox")
+    ?.classList.toggle("has-value", Boolean(desktopValue));
+  document
+    .getElementById("mobileLandingChatbox")
+    ?.classList.toggle("has-value", Boolean(mobileValue));
   if (desktopButton) desktopButton.disabled = !desktopValue;
   if (mobileButton) mobileButton.disabled = !mobileValue;
 }

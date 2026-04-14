@@ -30,13 +30,11 @@
                       Create infographics, posters, and graphical abstracts from a simple prompt.
                     </p>
                   </div>
-                  <div class="chatbox landing-chat">
-                    <div class="chatbox-topline">
-                      <div class="chatbox-kicker">Describe what you want to visualize</div>
-                    </div>
+                  <div class="chatbox landing-chat" id="desktopLandingChatbox">
                     <textarea
                       id="landingPromptDesktop"
-                      placeholder="Create a scientific infographic explaining the mechanism of CRISPR-Cas9 with labeled steps, clean callouts, and a clinical blue accent palette."
+                      placeholder="Describe what you want to visualize"
+                      autofocus
                     ></textarea>
                     <div class="chatbox-divider"></div>
                     <div class="chatbox-footer">
@@ -401,10 +399,10 @@
               <div class="hero-inner mobile-width">
                 <h1>Visualize your research, instantly</h1>
                 <p>Build scientific visuals from a simple brief on mobile.</p>
-                <div class="chatbox mobile-chat">
+                <div class="chatbox mobile-chat" id="mobileLandingChatbox">
                   <textarea
                     id="landingPromptMobile"
-                    placeholder="Describe what you want to visualise"
+                    placeholder="Describe what you want to visualize"
                   ></textarea>
                   <div class="chatbox-divider"></div>
                   <button class="subject-pill wide" data-open-overlay="subject-dropdown">
