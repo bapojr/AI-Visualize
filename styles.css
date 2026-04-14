@@ -79,6 +79,16 @@ a {
 
 .landing-flat-shell {
   background: #f6f7fb;
+  position: relative;
+  isolation: isolate;
+}
+
+.landing-flat-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #f6f7fb !important;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .screen {
@@ -103,6 +113,14 @@ a {
   z-index: 10;
   background: #f6f7fb;
   border-bottom: 1px solid rgba(22, 37, 72, 0.07);
+}
+
+.landing-flat-shell > .top-nav,
+.landing-flat-shell > main,
+.landing-flat-shell .hero,
+.landing-flat-shell .category-bar {
+  position: relative;
+  z-index: 1;
 }
 
 .brand-lockup,
