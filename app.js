@@ -502,11 +502,6 @@ function renderSubjectList(filter = "") {
     );
     if (!matched.length) return;
 
-    const title = document.createElement("div");
-    title.className = "dropdown-group-title";
-    title.textContent = group;
-    list.appendChild(title);
-
     matched.forEach((item) => {
       const button = document.createElement("button");
       const isActive = item === state.desktop.subject || item === state.mobile.subject;
