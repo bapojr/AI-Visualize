@@ -123,6 +123,55 @@ a {
   z-index: 1;
 }
 
+.landing-stage {
+  background: #f6f7fb !important;
+  padding: 48px 24px 24px;
+}
+
+.landing-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+}
+
+.landing-intro {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+}
+
+.landing-intro h1 {
+  margin: 0;
+  max-width: 780px;
+  font-family: "Instrument Serif", serif;
+  font-size: 64px;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  font-weight: 400;
+}
+
+.landing-intro p {
+  max-width: 560px;
+  margin: 0;
+  color: var(--ink-500);
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.landing-meta {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.landing-format-bar {
+  padding-top: 18px;
+}
+
 .brand-lockup,
 .editor-left,
 .nav-actions,
