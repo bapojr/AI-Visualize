@@ -466,7 +466,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 6px 12px;
+  padding: 0 6px 14px;
 }
 
 .chatbox-right {
@@ -475,12 +475,38 @@ a {
   gap: 10px;
 }
 
+.chatbox-left {
+  display: flex;
+  align-items: center;
+}
+
+.chatbox-upload-copy {
+  flex: 1;
+  color: var(--ink-500);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  padding: 0 12px;
+}
+
 .landing-chat {
   max-width: 986px;
 }
 
 .landing-chat .chatbox-left {
   gap: 10px;
+}
+
+.attachment-icon-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid rgba(22, 37, 72, 0.1);
+  background: #ffffff;
+  color: var(--ink-500);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .landing-chat-action {
@@ -512,30 +538,6 @@ a {
   opacity: 1;
   background: #f5f4f2;
   color: rgba(74, 95, 135, 0.5);
-}
-
-.chatbox-upload-strip {
-  margin-top: 0;
-  padding: 12px 22px;
-  background: #eef2f7;
-  border-top: 1px solid rgba(22, 37, 72, 0.08);
-  color: var(--ink-500);
-  font-size: 13px;
-  line-height: 1.5;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.upload-strip-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  color: var(--ink-500);
-  font-size: 16px;
-  flex-shrink: 0;
 }
 
 .subject-pill {
