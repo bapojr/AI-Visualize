@@ -295,7 +295,7 @@ function createTemplateCard(template) {
   card.className = `template-card template-card-image accent-${template.accent}`;
   card.innerHTML = `
     <div class="template-thumb template-image-thumb">
-      <div class="template-corner-badge">Illustration AI</div>
+      <div class="template-corner-badge">${template.category === "Graphical Abstract" ? "GA" : template.category}</div>
       <img src="${template.image}" alt="${template.title}" class="template-real-image" />
     </div>
   `;
