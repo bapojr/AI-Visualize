@@ -1137,8 +1137,8 @@ a {
 }
 
 .message-user {
-  display: grid;
-  justify-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .bubble {
@@ -1160,14 +1160,24 @@ a {
   box-shadow: var(--shadow-soft);
 }
 
+.message-user .bubble {
+  margin-left: auto;
+}
+
 .timestamp {
   margin-top: 10px;
   font-size: 13px;
+  text-align: right;
+  width: 720px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .message-ai {
   display: grid;
   gap: 18px;
+  width: 720px;
+  margin: 0 auto;
 }
 
 .ai-header {
@@ -1175,7 +1185,7 @@ a {
   align-items: center;
   gap: 12px;
   max-width: 664px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .paperpal-inline-mark {
@@ -1221,7 +1231,9 @@ a {
   display: grid;
   grid-template-columns: 1fr;
   gap: 14px;
-  justify-items: center;
+  justify-items: start;
+  width: 720px;
+  margin: 0 auto;
 }
 
 .variant-card {
@@ -1389,6 +1401,79 @@ a {
   max-width: 664px;
   width: 100%;
   background: #ffffff;
+  justify-content: flex-start;
+  text-align: left;
+  box-shadow: none;
+}
+
+.message-user,
+.message-ai {
+  width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.message-ai .bubble-output {
+  margin-right: auto;
+}
+
+.suggestions-rail {
+  position: relative;
+  width: 720px;
+  margin: 0 auto;
+}
+
+.suggestions-horizontal {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-right: 72px;
+  scrollbar-width: none;
+}
+
+.suggestions-horizontal::-webkit-scrollbar {
+  display: none;
+}
+
+.suggestions-horizontal .pill {
+  flex: 0 0 auto;
+  border-radius: 12px;
+  border: 1px solid var(--Gray-5, #E4EAF7);
+  background: #FFF;
+  height: 40px;
+  color: var(--Gray-11, #5D6A81);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  padding: 0 16px;
+  box-shadow: none;
+}
+
+.suggestions-fade {
+  position: absolute;
+  top: 0;
+  right: 44px;
+  width: 72px;
+  height: 40px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #ffffff 72%);
+  pointer-events: none;
+}
+
+.suggestions-arrow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--Gray-5, #E4EAF7);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--Gray-11, #5D6A81);
+  font-size: 16px;
 }
 
 .editor-topbar {
