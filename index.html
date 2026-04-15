@@ -19,18 +19,39 @@
     <div id="app">
       <div class="desktop-shell">
         <section class="screen active" data-screen="landing-desktop">
-          <div class="landing-flat-shell" style="background:#f6f7fb !important;">
-            <div class="landing-flat-backdrop"></div>
-            <main>
-              <section class="landing-stage">
-                <div class="landing-inner">
-                  <div class="landing-intro">
-                    <h1>Visualize research with AI.</h1>
-                    <p>
-                      Create infographics, posters, and graphical abstracts from a simple prompt.
-                    </p>
-                  </div>
-                  <div class="chatbox landing-chat" id="desktopLandingChatbox">
+          <div class="first-user-shell">
+            <aside class="landing-sidebar">
+              <div class="landing-sidebar-top">
+                <div class="paperpal-sidebar-logo" aria-label="Paperpal">
+                  <span class="paperpal-logo-mark">P</span>
+                  <span class="paperpal-logo-word">Paperpal</span>
+                </div>
+                <button class="landing-sidebar-toggle" aria-label="Collapse sidebar">▥</button>
+              </div>
+              <button class="sidebar-new-visualization" data-scroll-chat>
+                <span>+</span>
+                New visualization
+              </button>
+              <div class="sidebar-spacer"></div>
+              <button class="sidebar-settings">
+                <span>⚙</span>
+                Settings
+              </button>
+              <button class="sidebar-auth-cta">Log in or sign up</button>
+            </aside>
+            <div class="landing-main-content">
+              <div class="landing-flat-shell" style="background:#f6f7fb !important;">
+                <div class="landing-flat-backdrop"></div>
+                <main>
+                  <section class="landing-stage">
+                    <div class="landing-inner">
+                      <div class="landing-intro">
+                        <h1>Visualize research with AI.</h1>
+                        <p>
+                          Create infographics, posters, and graphical abstracts from a simple prompt.
+                        </p>
+                      </div>
+                      <div class="chatbox landing-chat" id="desktopLandingChatbox">
                     <textarea
                       id="landingPromptDesktop"
                       placeholder="Describe what you want to visualize"
@@ -101,27 +122,29 @@
                       </div>
                     </div>
                   </div>
-                  <div class="landing-meta">
-                    <div class="category-pills hero-highlights" id="desktopCategoryPills"></div>
+                      <div class="landing-meta">
+                        <div class="category-pills hero-highlights" id="desktopCategoryPills"></div>
+                      </div>
+                    </div>
+                  </section>
+                </main>
+              </div>
+
+              <section class="history-strip hidden" id="historyStripDesktop">
+                <div class="section-kicker">Recent Visualizations</div>
+                <div class="history-row" id="historyDesktop"></div>
+              </section>
+
+              <section class="gallery-section">
+                <div class="section-head">
+                  <div>
+                    <h2>See what you can do with AI</h2>
                   </div>
                 </div>
+                <div class="gallery-grid" id="desktopGallery"></div>
               </section>
-            </main>
-          </div>
-
-          <section class="history-strip hidden" id="historyStripDesktop">
-            <div class="section-kicker">Recent Visualizations</div>
-            <div class="history-row" id="historyDesktop"></div>
-          </section>
-
-          <section class="gallery-section">
-            <div class="section-head">
-              <div>
-                <h2>See what you can do with AI</h2>
-              </div>
             </div>
-            <div class="gallery-grid" id="desktopGallery"></div>
-          </section>
+          </div>
         </section>
 
         <section class="screen" data-screen="conversation-desktop">
