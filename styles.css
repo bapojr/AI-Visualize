@@ -1420,24 +1420,44 @@ a {
 .suggestions-fade {
   position: absolute;
   top: 0;
-  right: 44px;
   width: 72px;
   height: 40px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.suggestions-fade-right {
+  right: 0;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0), #ffffff 72%);
+}
+
+.suggestions-fade-left {
+  left: 0;
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0), #ffffff 72%);
   pointer-events: none;
 }
 
 .suggestions-arrow {
   position: absolute;
   top: 0;
-  right: 0;
-  width: 40px;
+  width: 32px;
   height: 40px;
-  border: 1px solid var(--Gray-5, #E4EAF7);
-  border-radius: 12px;
-  background: #ffffff;
-  color: var(--Gray-11, #5D6A81);
-  font-size: 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.suggestions-arrow-left {
+  left: 0;
+}
+
+.suggestions-arrow-right {
+  right: 0;
 }
 
 .editor-topbar {

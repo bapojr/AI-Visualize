@@ -740,7 +740,7 @@ function initActions() {
     document.querySelector(".landing-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
-  document.querySelector(".suggestions-arrow")?.addEventListener("click", () => {
+  document.querySelector(".suggestions-arrow-right")?.addEventListener("click", () => {
     const rail = document.getElementById("desktopSuggestions");
     const firstPill = rail?.querySelector(".pill");
     if (!rail || !firstPill) return;
@@ -748,6 +748,18 @@ function initActions() {
     const gap = parseFloat(styles.columnGap || styles.gap || "12") || 12;
     rail.scrollBy({
       left: firstPill.offsetWidth + gap,
+      behavior: "smooth",
+    });
+  });
+
+  document.querySelector(".suggestions-arrow-left")?.addEventListener("click", () => {
+    const rail = document.getElementById("desktopSuggestions");
+    const firstPill = rail?.querySelector(".pill");
+    if (!rail || !firstPill) return;
+    const styles = window.getComputedStyle(rail);
+    const gap = parseFloat(styles.columnGap || styles.gap || "12") || 12;
+    rail.scrollBy({
+      left: -(firstPill.offsetWidth + gap),
       behavior: "smooth",
     });
   });
