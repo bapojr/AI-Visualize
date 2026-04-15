@@ -493,6 +493,7 @@ function createHistoryNode(item, compact = false, isActive = false) {
 
   if (compact) {
     const latestTemplate = state.generatedResultTemplate || templateCatalog[0];
+    button.className = `${button.className} orientation-${latestTemplate.orientation}`;
     button.innerHTML = `
       <div class="thumb-preview accent-${item.accent}">
         <img src="${latestTemplate.image}" alt="${latestTemplate.title}" class="history-thumb-image" />

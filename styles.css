@@ -718,8 +718,9 @@ a {
 }
 
 .history-thumb {
-  min-width: 170px;
-  padding: 12px;
+  min-width: 91px;
+  width: 91px;
+  padding: 8px;
 }
 
 .thumb-preview,
@@ -737,11 +738,34 @@ a {
 .history-thumb-image {
   width: 100%;
   height: 100%;
-  min-height: 72px;
-  object-fit: cover;
-  object-position: center top;
+  min-height: 75px;
   border-radius: 14px;
   display: block;
+}
+
+.history-thumb.orientation-portrait .history-thumb-image {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 75px;
+  object-fit: contain;
+}
+
+.history-thumb.orientation-landscape .history-thumb-image {
+  width: 100%;
+  max-width: 75px;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.history-thumb .thumb-preview {
+  width: 75px;
+  height: 75px;
+  min-height: 75px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
 }
 
 .thumb-preview::before,
