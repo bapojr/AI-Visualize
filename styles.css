@@ -400,15 +400,19 @@ a {
 .landing-intro h1 {
   margin: 0;
   max-width: 780px;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 32px;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
+  font-family: "IBM Plex Serif", serif;
+  font-size: 40px;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
   font-weight: 500;
   color: var(--Blue-12, #051E57);
 }
 
-.landing-intro h1 span {
+.hero-title-line {
+  display: block;
+}
+
+.landing-intro h1 strong {
   font-weight: 600;
 }
 
