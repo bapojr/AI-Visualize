@@ -1826,6 +1826,95 @@ a {
   max-width: 900px;
 }
 
+.editor-image-action-stack {
+  position: absolute;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  z-index: 6;
+}
+
+.editor-image-toolbar {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #ffffff;
+  border: 1px solid #e4eaf7;
+  border-radius: 18px;
+  box-shadow:
+    4px 4px 16px 0 rgba(0, 0, 0, 0.08),
+    16px 8px 32px 16px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+.editor-image-tool {
+  height: 48px;
+  border: 0;
+  background: transparent;
+  color: #5d6a81;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: normal;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-right: 1px solid #e4eaf7;
+  white-space: nowrap;
+}
+
+.editor-image-tool:last-child {
+  border-right: 0;
+}
+
+.editor-image-tool:hover,
+.editor-image-tool.active {
+  color: #051e57;
+  background: #f8f9fd;
+}
+
+.editor-image-tool.danger {
+  min-width: 58px;
+}
+
+.editor-image-more-menu {
+  min-width: 240px;
+  background: #ffffff;
+  border: 1px solid #e4eaf7;
+  border-radius: 18px;
+  box-shadow:
+    4px 4px 16px 0 rgba(0, 0, 0, 0.08),
+    16px 8px 32px 16px rgba(0, 0, 0, 0.02);
+  padding: 8px;
+  display: grid;
+  gap: 4px;
+  justify-self: end;
+}
+
+.editor-image-more-item {
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #5d6a81;
+  text-align: left;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0 14px;
+}
+
+.editor-image-more-item:hover {
+  background: #f8f9fd;
+  color: #051e57;
+}
+
 .canvas-card.mobile {
   min-height: auto;
 }

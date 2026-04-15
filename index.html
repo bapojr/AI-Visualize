@@ -285,6 +285,23 @@
                     <img id="editorCanvasImage" alt="Selected generated visual" class="editor-canvas-image" />
                   </div>
                 </div>
+                <div class="editor-image-action-stack hidden" id="editorImageActionStack">
+                  <div class="editor-image-more-menu hidden" id="editorImageMoreMenu">
+                    <button class="editor-image-more-item">Vectorize</button>
+                    <button class="editor-image-more-item">Crop</button>
+                    <button class="editor-image-more-item">Extract text</button>
+                  </div>
+                  <div class="editor-image-toolbar" id="editorImageToolbar">
+                    <button class="editor-image-tool active" data-open-overlay="chat-panel">Edit via chat</button>
+                    <button class="editor-image-tool" data-open-overlay="segment-overlay">Segment object</button>
+                    <button class="editor-image-tool" data-go-screen="editor-select-area">Select area</button>
+                    <button class="editor-image-tool" data-open-overlay="remove-bg">Remove background</button>
+                    <button class="editor-image-tool editor-image-tool-more" id="editorImageMoreTrigger">
+                      More <span>&#9662;</span>
+                    </button>
+                    <button class="editor-image-tool danger">&#128465;</button>
+                  </div>
+                </div>
                 <div class="canvas-controls">
                   <span id="canvasZoomPill">100%</span>
                   <button class="icon-ghost small">#</button>

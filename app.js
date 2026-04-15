@@ -750,6 +750,32 @@ function bindCanvasSelection() {
       updateEditorToolbar(state.editorState);
     }
   });
+
+  const editorImage = document.getElementById("editorCanvasImage");
+  const imageToolbar = document.getElementById("editorImageActionStack");
+  const moreMenu = document.getElementById("editorImageMoreMenu");
+  const moreTrigger = document.getElementById("editorImageMoreTrigger");
+
+  editorImage?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    imageToolbar?.classList.remove("hidden");
+  });
+
+  moreTrigger?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    moreMenu?.classList.toggle("hidden");
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!imageToolbar) return;
+    if (
+      !event.target.closest("#editorImageActionStack") &&
+      !event.target.closest("#editorCanvasImage")
+    ) {
+      imageToolbar.classList.add("hidden");
+      moreMenu?.classList.add("hidden");
+    }
+  });
 }
 
 function bindSelectGroups() {
