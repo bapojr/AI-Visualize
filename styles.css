@@ -392,7 +392,7 @@ a {
 
 .landing-intro {
   display: grid;
-  gap: 10px;
+  gap: 0;
   justify-items: center;
   text-align: center;
 }
@@ -400,12 +400,16 @@ a {
 .landing-intro h1 {
   margin: 0;
   max-width: 780px;
-  font-family: "IBM Plex Serif", serif;
-  font-size: 64px;
-  line-height: 0.98;
-  letter-spacing: -0.04em;
-  font-weight: 400;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 32px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 500;
   color: var(--Blue-12, #051E57);
+}
+
+.landing-intro h1 span {
+  font-weight: 600;
 }
 
 .landing-intro p {
