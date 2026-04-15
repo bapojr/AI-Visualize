@@ -1355,6 +1355,37 @@ a {
   }
 }
 
+@keyframes previewWorkspaceFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes previewLeftPaneIn {
+  0% {
+    opacity: 0;
+    transform: translateX(44px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes previewRightPaneIn {
+  0% {
+    opacity: 0;
+    transform: translateX(88px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .variant-topline,
 .preview-topline {
   position: relative;
@@ -1937,6 +1968,7 @@ a {
   align-content: stretch;
   align-items: stretch;
   border-radius: 0;
+  animation: previewWorkspaceFadeIn 260ms ease both;
 }
 
 .overlay.modal {
@@ -2051,6 +2083,14 @@ a {
   background: #ffffff;
   border: 1px solid rgba(228, 234, 247, 0.92);
   overflow: hidden;
+}
+
+.preview-conversation-pane {
+  animation: previewLeftPaneIn 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.preview-image-pane {
+  animation: previewRightPaneIn 340ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .preview-conversation-shell {
@@ -2208,6 +2248,7 @@ a {
 
 .preview-image-topbar .btn {
   order: 1;
+  margin-left: auto;
 }
 
 .preview-image-topbar .overlay-close {
