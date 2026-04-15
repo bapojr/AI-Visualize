@@ -333,9 +333,9 @@ function showToast() {
 
 function createTemplateCard(template) {
   const card = document.createElement("button");
-  card.className = `template-card template-card-image accent-${template.accent}`;
+  card.className = `template-card template-card-image orientation-${template.orientation} accent-${template.accent}`;
   card.innerHTML = `
-    <div class="template-thumb template-image-thumb">
+    <div class="template-thumb template-image-thumb orientation-${template.orientation}">
       <div class="template-corner-badge">${template.category === "Graphical Abstract" ? "GA" : template.category}</div>
       <img src="${template.image}" alt="${template.title}" class="template-real-image" />
     </div>
