@@ -133,26 +133,26 @@ const historyItems = [
   {
     title: "Current version",
     time: "Just now",
-    note: "Enhanced label clarity and callout spacing",
+    note: "Change the background to blue",
     accent: "blueprint",
+    image: "poster-diabetes.png",
+    templateId: "poster-diabetes",
   },
   {
     title: "Colors refined",
     time: "2 min ago",
-    note: "Shifted palette toward natural medical tones",
+    note: "Create a clean scientific education poster treatment",
     accent: "clinical",
+    image: "poster-alzheimers.png",
+    templateId: "poster-alzheimers",
   },
   {
     title: "Poster layout pass",
     time: "5 min ago",
-    note: "Reordered modules and rebalanced hierarchy",
+    note: "Make the colors more natural and simplify the labels",
     accent: "mint",
-  },
-  {
-    title: "Initial generation",
-    time: "8 min ago",
-    note: "Base visual from original prompt",
-    accent: "amber",
+    image: "ga-inflammation.png",
+    templateId: "ga-inflammation",
   },
 ];
 
@@ -494,11 +494,12 @@ function createHistoryNode(item, compact = false, isActive = false) {
     `;
   } else {
     button.innerHTML = `
-      <div class="history-mini accent-${item.accent}"></div>
-      <div>
-        <strong>${item.title}</strong>
+      <div class="history-entry-image-wrap">
+        <img src="${item.image}" alt="${item.note}" class="history-entry-image" />
+      </div>
+      <div class="history-entry-copy">
+        <div class="history-entry-note">${item.note}</div>
         <div class="thumb-time">${item.time}</div>
-        <div class="thumb-time">${item.note}</div>
       </div>
     `;
   }
@@ -507,9 +508,13 @@ function createHistoryNode(item, compact = false, isActive = false) {
     if (compact) {
       setScreen("conversation-desktop");
     } else {
+      const nextTemplate = templateCatalog.find((template) => template.id === item.templateId) || templateCatalog[0];
       state.selectedVariant = 1;
+      state.generatedResultTemplate = nextTemplate;
+      state.currentEditorTemplate = nextTemplate;
+      renderEditorCanvas();
       updatePreviewVisuals();
-    }
+      }
   });
 
   return button;
