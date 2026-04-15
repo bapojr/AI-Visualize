@@ -700,6 +700,18 @@
       </div>
     </aside>
 
+    <div class="overlay panel gallery-preview-modal hidden" id="gallery-preview-modal">
+      <div class="gallery-preview-topbar">
+        <button class="btn btn-primary" id="openGalleryPreviewInEditor" data-go-screen="editor-desktop" data-close-overlay>
+          Open in editor
+        </button>
+        <button class="overlay-close" data-close-overlay aria-label="Close preview">&times;</button>
+      </div>
+      <div class="gallery-preview-stage">
+        <div class="gallery-preview-image" id="galleryPreviewImage"></div>
+      </div>
+    </div>
+
     <aside class="overlay panel hidden" id="chat-panel">
       <div class="overlay-head">
         <h3>Edit via chat</h3>

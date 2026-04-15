@@ -2456,6 +2456,57 @@ a {
   animation: previewWorkspaceFadeIn 260ms ease both;
 }
 
+#gallery-preview-modal.gallery-preview-modal {
+  top: 50%;
+  left: 50%;
+  right: auto;
+  height: auto;
+  width: min(1080px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  transform: translate(-50%, -50%);
+  padding: 0;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 28px 80px rgba(17, 25, 42, 0.18);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0;
+  overflow: hidden;
+}
+
+.gallery-preview-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 0;
+}
+
+.gallery-preview-stage {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: 16px 20px 20px;
+}
+
+.gallery-preview-image {
+  width: 100%;
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+}
+
+.gallery-preview-image img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 170px);
+  width: auto;
+  height: auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 36px rgba(17, 25, 42, 0.08);
+}
+
 .overlay.modal {
   top: 50%;
   left: 50%;

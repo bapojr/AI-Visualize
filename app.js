@@ -291,6 +291,7 @@ const mobileScreens = document.querySelectorAll(".mobile-shell .screen");
 const overlayBackdrop = document.getElementById("overlayBackdrop");
 const overlayIds = [
   "preview-panel",
+  "gallery-preview-modal",
   "chat-panel",
   "history-modal",
   "export-modal",
@@ -424,6 +425,12 @@ function showToast() {
   setTimeout(() => toast.classList.add("hidden"), 1800);
 }
 
+function renderGalleryPreview(template) {
+  const preview = document.getElementById("galleryPreviewImage");
+  if (!preview || !template) return;
+  preview.innerHTML = `<img src="${template.image}" alt="${template.title}" class="preview-real-image" />`;
+}
+
 function createTemplateCard(template) {
   const card = document.createElement("button");
   card.className = `template-card template-card-image orientation-${template.orientation} accent-${template.accent}`;
@@ -435,11 +442,10 @@ function createTemplateCard(template) {
   `;
 
   card.addEventListener("click", () => {
-    state.prompt = `Create a ${template.category.toLowerCase()} inspired by ${template.title}, keeping the layout clean, scientific, and publication-ready.`;
-    document.getElementById("landingPromptDesktop").value = state.prompt;
-    document.getElementById("landingPromptMobile").value = state.prompt;
-    toggleSubmitStates();
-    document.querySelector(".landing-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    state.generatedResultTemplate = template;
+    state.currentEditorTemplate = template;
+    renderGalleryPreview(template);
+    showOverlay("gallery-preview-modal");
   });
 
   return card;
