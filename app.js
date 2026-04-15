@@ -529,11 +529,7 @@ function createHistoryNode(item, compact = false, isActive = false) {
 }
 
 function renderHistory() {
-  const historyDesktop = document.getElementById("historyDesktop");
-  if (historyDesktop) {
-    historyDesktop.innerHTML = "";
-    historyItems.forEach((item) => historyDesktop.appendChild(createHistoryNode(item, true)));
-  }
+  renderSidebarRecent();
 
   [
     "editorHistoryList",
@@ -551,7 +547,41 @@ function renderHistory() {
 }
 
 function renderLandingHistoryVisibility() {
-  document.getElementById("historyStripDesktop")?.classList.toggle("hidden", !state.hasHistory);
+  renderSidebarRecent();
+}
+
+function createSidebarRecentNode(item, index) {
+  const button = document.createElement("button");
+  button.className = "sidebar-recent-item";
+  button.type = "button";
+  button.textContent = item.sidebarTitle || "Untitled";
+  button.addEventListener("click", () => {
+    const nextTemplate = templateCatalog.find((template) => template.id === item.templateId) || templateCatalog[0];
+    state.generatedResultTemplate = nextTemplate;
+    state.currentEditorTemplate = nextTemplate;
+    updatePreviewVisuals();
+    setScreen("conversation-desktop");
+  });
+  return button;
+}
+
+function renderSidebarRecent() {
+  const container = document.getElementById("sidebarRecentList");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (!state.hasHistory) {
+    const empty = document.createElement("div");
+    empty.className = "sidebar-empty-state";
+    empty.textContent = "No items yet";
+    container.appendChild(empty);
+    return;
+  }
+
+  historyItems.forEach((item, index) => {
+    container.appendChild(createSidebarRecentNode(item, index));
+  });
 }
 
 function createVariantCard(item) {
