@@ -1741,8 +1741,10 @@ a {
 .editor-main {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr) 320px;
-  min-height: calc(100vh - 124px);
+  height: calc(100vh - 68px);
+  min-height: calc(100vh - 68px);
   background: #ffffff;
+  overflow: hidden;
 }
 
 .editor-sidepanel {
@@ -1752,6 +1754,7 @@ a {
   display: grid;
   align-content: start;
   gap: 24px;
+  overflow: auto;
 }
 
 .editor-sidepanel-tabs {
@@ -1815,6 +1818,8 @@ a {
   flex-direction: column;
   justify-content: space-between;
   background: #ffffff;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .canvas-stage {
@@ -2284,6 +2289,10 @@ a {
   background: #ffffff;
   border-left: 1px solid rgba(22, 37, 72, 0.08);
   padding: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
 }
 
 .history-panel.collapsed {
@@ -2300,6 +2309,8 @@ a {
   gap: 16px;
   padding: 18px 16px 24px;
   align-content: start;
+  overflow: auto;
+  min-height: 0;
 }
 
 .history-entry {
