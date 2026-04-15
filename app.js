@@ -503,9 +503,36 @@ function updatePreviewVisuals() {
   const preview = document.getElementById("previewPanelImage");
   const mobilePreview = document.getElementById("mobilePreviewImage");
   const conversationAiOutput = document.getElementById("conversationAiOutput");
+  const previewConversationUserPrompt = document.getElementById("previewConversationUserPrompt");
+  const previewConversationAiOutput = document.getElementById("previewConversationAiOutput");
+  const previewConversationImage = document.getElementById("previewConversationImage");
+  const previewConversationPills = document.getElementById("previewConversationPills");
 
   if (conversationAiOutput) {
     conversationAiOutput.textContent = `Here is a generated ${activeVariant.category.toLowerCase()} direction for ${activeVariant.subject.toLowerCase()}. You can continue refining the visual, ask for a different layout, or generate another direction.`;
+  }
+
+  if (previewConversationUserPrompt) {
+    previewConversationUserPrompt.textContent =
+      state.prompt || document.getElementById("conversationUserPrompt")?.textContent || "";
+  }
+
+  if (previewConversationAiOutput) {
+    previewConversationAiOutput.textContent = `Here is a generated ${activeVariant.category.toLowerCase()} direction for ${activeVariant.subject.toLowerCase()}. You can continue refining the visual, ask for a different layout, or generate another direction.`;
+  }
+
+  if (previewConversationImage) {
+    previewConversationImage.innerHTML = `<img src="${activeVariant.image}" alt="${activeVariant.title}" class="preview-real-image" />`;
+  }
+
+  if (previewConversationPills) {
+    previewConversationPills.innerHTML = "";
+    suggestionPills.forEach((text) => {
+      const button = document.createElement("button");
+      button.className = "pill";
+      button.textContent = text;
+      previewConversationPills.appendChild(button);
+    });
   }
 
   if (preview) {
@@ -517,11 +544,6 @@ function updatePreviewVisuals() {
     mobilePreview.className = `preview-image mobile-large accent-${activeVariant.accent}`;
     mobilePreview.innerHTML = `<img src="${activeVariant.image}" alt="${activeVariant.title}" class="variant-real-image preview-real-image" />`;
   }
-
-  const previewTitle = document.getElementById("previewTitle");
-  const previewSummary = document.getElementById("previewSummary");
-  if (previewTitle) previewTitle.textContent = activeVariant.title;
-  if (previewSummary) previewSummary.textContent = activeVariant.summary;
 
   [document.getElementById("previewDots"), document.getElementById("mobilePreviewDots")].forEach((container) => {
     if (!container) return;
