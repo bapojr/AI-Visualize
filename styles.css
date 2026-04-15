@@ -2100,6 +2100,14 @@ a {
   gap: 12px;
 }
 
+.preview-image-topbar .btn {
+  order: 1;
+}
+
+.preview-image-topbar .overlay-close {
+  order: 2;
+}
+
 .preview-image-stage {
   min-height: 0;
   display: grid;
