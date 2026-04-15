@@ -1840,21 +1840,25 @@ a {
 .editor-segment {
   position: absolute;
   pointer-events: auto;
-  border: 1.5px solid rgba(0, 98, 255, 0.28);
-  background: rgba(0, 98, 255, 0.06);
+  border: 1.5px solid transparent;
+  background: transparent;
   border-radius: 10px;
   transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
 }
 
-.editor-segment:hover {
-  border-color: rgba(0, 98, 255, 0.7);
-  background: rgba(0, 98, 255, 0.1);
+.editor-segment[data-segment-type="text"] {
+  cursor: text;
+}
+
+.editor-segment[data-segment-type="graphic"],
+.editor-segment[data-segment-type="callout"] {
+  cursor: pointer;
 }
 
 .editor-segment.active {
-  border-color: #0062ff;
-  background: rgba(0, 98, 255, 0.12);
-  box-shadow: 0 0 0 2px rgba(0, 98, 255, 0.14);
+  border-color: #1c4dc0;
+  background: rgba(28, 77, 192, 0.04);
+  box-shadow: 0 0 0 1px rgba(28, 77, 192, 0.08);
 }
 
 .editor-segment-label {
@@ -1881,6 +1885,11 @@ a {
 .editor-segment.active .editor-segment-label {
   opacity: 1;
   transform: translateY(0);
+}
+
+.editor-canvas-stage-content.is-frame-selected {
+  border-radius: 14px;
+  box-shadow: 0 0 0 2px #1c4dc0;
 }
 
 .editor-image-action-stack {
@@ -1934,6 +1943,75 @@ a {
 .editor-image-tool.active {
   color: #051e57;
   background: #f8f9fd;
+}
+
+.editor-text-action-stack {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  z-index: 7;
+}
+
+.editor-text-toolbar {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #ffffff;
+  border: 1px solid #e4eaf7;
+  border-radius: 18px;
+  box-shadow:
+    4px 4px 16px 0 rgba(0, 0, 0, 0.08),
+    16px 8px 32px 16px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+.editor-text-tool {
+  height: 48px;
+  min-width: 48px;
+  border: 0;
+  border-right: 1px solid #e4eaf7;
+  background: transparent;
+  color: #5d6a81;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.editor-text-tool:last-child {
+  border-right: 0;
+}
+
+.editor-text-tool:hover,
+.editor-text-tool.active {
+  color: #051e57;
+  background: #f8f9fd;
+}
+
+.editor-text-chip {
+  min-width: auto;
+}
+
+.editor-text-tool.strong {
+  font-weight: 700;
+}
+
+.editor-text-tool.italic {
+  font-style: italic;
+}
+
+.editor-text-tool.underline {
+  text-decoration: underline;
+}
+
+.editor-text-tool.strike {
+  text-decoration: line-through;
 }
 
 .editor-image-tool.danger {

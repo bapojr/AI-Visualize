@@ -275,6 +275,8 @@ const state = {
   currentEditorTemplate: templateCatalog[0],
   editorBackground: "#FFFFFF",
   selectedEditorSegmentId: null,
+  selectedEditorSegmentType: null,
+  isEditorFrameSelected: false,
   hasHistory: false,
   mixedOrder: shuffle([...templateCatalog]),
   generatedResultTemplate: templateCatalog[0],
@@ -775,8 +777,10 @@ function renderEditorCanvas() {
   const canvas = document.getElementById("editorCanvas");
   const image = document.getElementById("editorCanvasImage");
   const mediaShell = document.getElementById("editorCanvasMediaShell");
+  const stageContent = document.getElementById("editorCanvasStageContent");
   const segmentation = document.getElementById("editorImageSegmentation");
   const actionStack = document.getElementById("editorImageActionStack");
+  const textActionStack = document.getElementById("editorTextActionStack");
   if (!canvas || !image) return;
 
   canvas.classList.add("image-mode");
@@ -786,6 +790,7 @@ function renderEditorCanvas() {
   if (mediaShell) {
     mediaShell.style.background = state.editorBackground;
   }
+  stageContent?.classList.toggle("is-frame-selected", state.isEditorFrameSelected);
   if (segmentation) {
     segmentation.innerHTML = "";
     (segmentationRegions[activeTemplate.id] || []).forEach((region) => {
@@ -797,11 +802,13 @@ function renderEditorCanvas() {
       button.style.height = `${region.h}%`;
       button.dataset.segmentId = region.id;
       button.dataset.segmentType = region.type;
+      button.setAttribute("aria-label", region.label);
       button.innerHTML = `<span class="editor-segment-label">${region.label}</span>`;
       segmentation.appendChild(button);
     });
   }
   actionStack?.classList.add("hidden");
+  textActionStack?.classList.add("hidden");
   updateZoom();
 }
 
@@ -843,18 +850,38 @@ function bindCanvasSelection() {
   });
 
   const editorImage = document.getElementById("editorCanvasImage");
+  const stageContent = document.getElementById("editorCanvasStageContent");
   const imageToolbar = document.getElementById("editorImageActionStack");
+  const textToolbar = document.getElementById("editorTextActionStack");
   const moreMenu = document.getElementById("editorImageMoreMenu");
   const moreTrigger = document.getElementById("editorImageMoreTrigger");
   const segmentation = document.getElementById("editorImageSegmentation");
 
+  const clearEditorSelection = () => {
+    state.selectedEditorSegmentId = null;
+    state.selectedEditorSegmentType = null;
+    state.isEditorFrameSelected = false;
+    stageContent?.classList.remove("is-frame-selected");
+    segmentation?.querySelectorAll(".editor-segment").forEach((segment) => {
+      segment.classList.remove("active");
+    });
+    imageToolbar?.classList.add("hidden");
+    textToolbar?.classList.add("hidden");
+    moreMenu?.classList.add("hidden");
+  };
+
   editorImage?.addEventListener("click", (event) => {
     event.stopPropagation();
     state.selectedEditorSegmentId = null;
+    state.selectedEditorSegmentType = "frame";
+    state.isEditorFrameSelected = true;
+    stageContent?.classList.add("is-frame-selected");
     segmentation?.querySelectorAll(".editor-segment").forEach((segment) => {
       segment.classList.remove("active");
     });
     imageToolbar?.classList.remove("hidden");
+    textToolbar?.classList.add("hidden");
+    moreMenu?.classList.add("hidden");
   });
 
   moreTrigger?.addEventListener("click", (event) => {
@@ -866,10 +893,11 @@ function bindCanvasSelection() {
     if (!imageToolbar) return;
     if (
       !event.target.closest("#editorImageActionStack") &&
+      !event.target.closest("#editorTextActionStack") &&
+      !event.target.closest("#editorCanvasStageContent") &&
       !event.target.closest("#editorCanvasImage")
     ) {
-      imageToolbar.classList.add("hidden");
-      moreMenu?.classList.add("hidden");
+      clearEditorSelection();
     }
   });
 
@@ -878,10 +906,20 @@ function bindCanvasSelection() {
     if (!segment) return;
     event.stopPropagation();
     state.selectedEditorSegmentId = segment.dataset.segmentId;
+    state.selectedEditorSegmentType = segment.dataset.segmentType;
+    state.isEditorFrameSelected = false;
+    stageContent?.classList.remove("is-frame-selected");
     segmentation.querySelectorAll(".editor-segment").forEach((item) => {
       item.classList.toggle("active", item === segment);
     });
-    imageToolbar?.classList.remove("hidden");
+    moreMenu?.classList.add("hidden");
+    if (segment.dataset.segmentType === "text") {
+      textToolbar?.classList.remove("hidden");
+      imageToolbar?.classList.add("hidden");
+    } else {
+      imageToolbar?.classList.remove("hidden");
+      textToolbar?.classList.add("hidden");
+    }
   });
 }
 
@@ -1056,7 +1094,7 @@ function updateZoom() {
   const zoomLabel = `${state.zoom}%`;
   document.getElementById("zoomValue").textContent = zoomLabel;
   document.getElementById("canvasZoomPill").textContent = zoomLabel;
-  document.getElementById("editorCanvasImage")?.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
+  document.getElementById("editorCanvasStageContent")?.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
 }
 
 function bindEditorBackgroundSwatches() {
