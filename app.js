@@ -740,6 +740,18 @@ function initActions() {
     document.querySelector(".landing-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
+  document.querySelector(".suggestions-arrow")?.addEventListener("click", () => {
+    const rail = document.getElementById("desktopSuggestions");
+    const firstPill = rail?.querySelector(".pill");
+    if (!rail || !firstPill) return;
+    const styles = window.getComputedStyle(rail);
+    const gap = parseFloat(styles.columnGap || styles.gap || "12") || 12;
+    rail.scrollBy({
+      left: firstPill.offsetWidth + gap,
+      behavior: "smooth",
+    });
+  });
+
   document.getElementById("zoomInBtn")?.addEventListener("click", () => {
     state.zoom += 10;
     updateZoom();
