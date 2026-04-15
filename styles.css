@@ -2086,7 +2086,7 @@ a {
 }
 
 .preview-conversation-pane {
-  animation: previewLeftPaneIn 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: previewLeftPaneIn 460ms cubic-bezier(0.16, 0.84, 0.24, 1) both;
 }
 
 .preview-image-pane {
