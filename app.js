@@ -301,6 +301,7 @@ const overlayIds = [
   "segment-overlay",
   "rename-visualization-modal",
   "subject-dropdown",
+  "ratio-dropdown",
   "mobile-drawer",
   "mobile-preview",
   "mobile-history",
@@ -1027,6 +1028,17 @@ function initActions() {
     }
 
     if (event.target.hasAttribute("data-close-overlay")) {
+      hideOverlay();
+    }
+
+    const ratioOption = event.target.closest("[data-ratio-option]");
+    if (ratioOption) {
+      document.querySelectorAll("[data-ratio-option]").forEach((node) => {
+        node.classList.toggle("active", node === ratioOption);
+      });
+      document.querySelectorAll(".ratio-pill-text").forEach((node) => {
+        node.textContent = ratioOption.dataset.ratioOption;
+      });
       hideOverlay();
     }
 

@@ -3112,6 +3112,13 @@ a {
   overflow: hidden;
 }
 
+#ratio-dropdown {
+  left: calc(50vw + 4px);
+  width: 220px;
+  height: auto;
+  max-height: 320px;
+}
+
 .overlay.toast {
   bottom: 24px;
   left: 50%;
@@ -3589,6 +3596,13 @@ a {
   padding-right: 2px;
 }
 
+.ratio-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-height: none;
+  padding-right: 0;
+}
+
 .dropdown-item {
   min-height: 48px;
   border-radius: 14px;
@@ -3599,6 +3613,14 @@ a {
   color: #13161b;
   font-weight: 600;
   background: #ffffff;
+}
+
+.ratio-list .dropdown-item {
+  justify-content: center;
+  text-align: center;
+  min-height: 44px;
+  border: 1px solid #cad5e7;
+  border-radius: 12px;
 }
 
 .dropdown-item.active {
