@@ -1077,6 +1077,9 @@ function initActions() {
   document.querySelector(".sidebar-auth-cta")?.addEventListener("click", () => {
     document.querySelector(".landing-sidebar")?.classList.add("is-signed-in");
   });
+  document.getElementById("sidebarLogoToggle")?.addEventListener("click", () => {
+    document.querySelector(".first-user-shell")?.classList.toggle("sidebar-collapsed");
+  });
   document.getElementById("subjectSearch")?.addEventListener("input", (event) => {
     renderSubjectList(event.target.value);
   });

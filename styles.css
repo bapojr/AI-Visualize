@@ -104,6 +104,11 @@ a {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
   background: #f6f7fb;
+  transition: grid-template-columns 220ms ease;
+}
+
+.first-user-shell.sidebar-collapsed {
+  grid-template-columns: 88px minmax(0, 1fr);
 }
 
 .landing-sidebar {
@@ -116,6 +121,7 @@ a {
   padding: 28px 20px 22px;
   background: #ffffff;
   border-right: 1px solid #e4eaf7;
+  transition: padding 220ms ease, gap 220ms ease;
 }
 
 .signed-in-only {
@@ -133,21 +139,42 @@ a {
 .landing-sidebar-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 16px;
 }
 
 .paperpal-sidebar-logo {
   display: inline-flex;
   align-items: center;
-  width: 143px;
-  height: 45px;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: #5d6a81;
+}
+
+.paperpal-sidebar-logo:hover {
+  color: #13161b;
 }
 
 .paperpal-sidebar-logo svg {
   display: block;
-  width: 143px;
-  height: 45px;
+  width: 32px;
+  height: 32px;
+}
+
+.sidebar-logo-closed {
+  display: none;
+}
+
+.first-user-shell.sidebar-collapsed .sidebar-logo-open {
+  display: none;
+}
+
+.first-user-shell.sidebar-collapsed .sidebar-logo-closed {
+  display: inline-flex;
 }
 
 .landing-sidebar-toggle,
@@ -182,6 +209,8 @@ a {
   font-size: 16px;
   font-weight: 500;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .sidebar-new-visualization:hover,
@@ -319,6 +348,35 @@ a {
   justify-content: center;
   font-size: 17px;
   font-weight: 700;
+}
+
+.first-user-shell.sidebar-collapsed .landing-sidebar {
+  padding: 28px 14px 22px;
+  gap: 18px;
+}
+
+.first-user-shell.sidebar-collapsed .landing-sidebar-top {
+  justify-content: center;
+}
+
+.first-user-shell.sidebar-collapsed .sidebar-new-visualization,
+.first-user-shell.sidebar-collapsed .sidebar-settings {
+  width: 100%;
+  justify-content: center;
+  padding: 0;
+  gap: 0;
+  font-size: 0;
+}
+
+.first-user-shell.sidebar-collapsed .sidebar-new-visualization span,
+.first-user-shell.sidebar-collapsed .sidebar-settings span {
+  margin: 0;
+}
+
+.first-user-shell.sidebar-collapsed .signed-in-only,
+.first-user-shell.sidebar-collapsed .sidebar-auth-cta,
+.first-user-shell.sidebar-collapsed .sidebar-divider {
+  display: none !important;
 }
 
 .sidebar-auth-cta {
