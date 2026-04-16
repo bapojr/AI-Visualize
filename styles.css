@@ -3099,10 +3099,11 @@ a {
 
 #ratio-dropdown {
   left: calc(50vw + 4px);
-  width: 316px;
+  width: 332px;
   height: auto;
-  max-height: 360px;
-  padding: 14px;
+  max-height: none;
+  padding: 16px;
+  overflow: hidden;
 }
 
 .ratio-dropdown-head {
@@ -3591,9 +3592,12 @@ a {
 }
 
 .ratio-list {
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px 16px;
+  grid-template-columns: repeat(4, 56px);
+  grid-auto-rows: min-content;
+  justify-content: space-between;
+  gap: 18px 16px;
   max-height: none;
+  overflow: visible;
   padding-right: 0;
   align-items: start;
 }
@@ -3619,11 +3623,10 @@ a {
 }
 
 .ratio-option {
-  place-self: start;
+  place-self: start center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
   color: #5d6a81;
   font-size: 14px;
   font-weight: 600;
