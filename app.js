@@ -399,7 +399,27 @@ function setScreen(name) {
   }
 }
 
-function showOverlay(id) {
+function positionOverlayToTrigger(overlay, trigger) {
+  if (!overlay || !trigger) return;
+  const rect = trigger.getBoundingClientRect();
+  const overlayRect = overlay.getBoundingClientRect();
+  const gap = 8;
+  const viewportPadding = 16;
+  let left = rect.left + rect.width / 2 - overlayRect.width / 2;
+  left = Math.max(viewportPadding, Math.min(left, window.innerWidth - overlayRect.width - viewportPadding));
+  let top = rect.bottom + gap;
+
+  if (top + overlayRect.height > window.innerHeight - viewportPadding) {
+    top = rect.top - overlayRect.height - gap;
+  }
+
+  overlay.style.left = `${left}px`;
+  overlay.style.top = `${Math.max(viewportPadding, top)}px`;
+  overlay.style.bottom = "auto";
+  overlay.style.transform = "none";
+}
+
+function showOverlay(id, trigger = null) {
   hideOverlay();
   const overlay = document.getElementById(id);
   if (!overlay) return;
@@ -414,6 +434,9 @@ function showOverlay(id) {
     }
   }
   overlay.classList.remove("hidden");
+  if (trigger && overlay.classList.contains("dropdown")) {
+    positionOverlayToTrigger(overlay, trigger);
+  }
   overlayBackdrop.classList.remove("hidden");
   overlayBackdrop.classList.toggle("preview-active", id === "preview-panel");
   state.activeOverlay = id;
@@ -1043,7 +1066,7 @@ function initActions() {
 
     const open = event.target.closest("[data-open-overlay]");
     if (open) {
-      showOverlay(open.dataset.openOverlay);
+      showOverlay(open.dataset.openOverlay, open);
     }
 
     if (event.target.hasAttribute("data-close-overlay")) {
