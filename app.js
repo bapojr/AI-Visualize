@@ -260,12 +260,18 @@ const state = {
     activeCategory: null,
     galleryCount: 9,
     subject: "Default",
+    format: "Infographics",
+    model: "GPT Image 1",
+    ratio: "Ratio",
   },
   mobile: {
     activeScreen: "landing-mobile",
     activeCategory: null,
     galleryCount: 4,
     subject: "Default",
+    format: "Infographics",
+    model: "GPT Image 1",
+    ratio: "Ratio",
   },
   prompt: "",
   selectedVariant: 1,
@@ -302,6 +308,8 @@ const overlayIds = [
   "rename-visualization-modal",
   "subject-dropdown",
   "ratio-dropdown",
+  "format-dropdown",
+  "model-dropdown",
   "mobile-drawer",
   "mobile-preview",
   "mobile-history",
@@ -1039,6 +1047,34 @@ function initActions() {
       document.querySelectorAll(".ratio-pill-text").forEach((node) => {
         node.textContent = ratioOption.dataset.ratioOption;
       });
+      state.desktop.ratio = ratioOption.dataset.ratioOption;
+      state.mobile.ratio = ratioOption.dataset.ratioOption;
+      hideOverlay();
+    }
+
+    const formatOption = event.target.closest("[data-format-option]");
+    if (formatOption) {
+      document.querySelectorAll("[data-format-option]").forEach((node) => {
+        node.classList.toggle("active", node === formatOption);
+      });
+      document.querySelectorAll(".format-pill-text").forEach((node) => {
+        node.textContent = formatOption.dataset.formatOption;
+      });
+      state.desktop.format = formatOption.dataset.formatOption;
+      state.mobile.format = formatOption.dataset.formatOption;
+      hideOverlay();
+    }
+
+    const modelOption = event.target.closest("[data-model-option]");
+    if (modelOption) {
+      document.querySelectorAll("[data-model-option]").forEach((node) => {
+        node.classList.toggle("active", node === modelOption);
+      });
+      document.querySelectorAll(".model-pill-text").forEach((node) => {
+        node.textContent = modelOption.dataset.modelOption;
+      });
+      state.desktop.model = modelOption.dataset.modelOption;
+      state.mobile.model = modelOption.dataset.modelOption;
       hideOverlay();
     }
 

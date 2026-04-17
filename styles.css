@@ -895,6 +895,7 @@ a {
   text-align: left;
   padding: 0;
   white-space: nowrap;
+  display: none;
 }
 
 .landing-chat {
@@ -907,10 +908,6 @@ a {
 .gallery-section {
   width: min(860px, calc(100% - 48px));
   max-width: 860px;
-}
-
-.landing-chat .chatbox-left {
-  gap: 10px;
 }
 
 .attachment-icon-button {
@@ -938,6 +935,18 @@ a {
 
 .ratio-pill {
   gap: 8px;
+}
+
+.model-pill {
+  max-width: 220px;
+}
+
+.model-pill .model-pill-text {
+  display: block;
+  max-width: 168px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ratio-pill-icon {
@@ -1999,6 +2008,14 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+}
+
+.conversation-chatbox-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: auto;
 }
 
 .bubble-output {
@@ -3191,21 +3208,25 @@ a {
   overflow: hidden;
 }
 
-#ratio-dropdown {
+#ratio-dropdown,
+#format-dropdown,
+#model-dropdown {
   left: calc(50vw + 4px);
-  width: 332px;
+  width: 280px;
   height: auto;
-  max-height: none;
-  padding: 16px;
-  overflow: hidden;
+  max-height: 360px;
+  padding: 8px;
+  overflow-y: auto;
 }
 
-.ratio-dropdown-head {
-  margin-bottom: 14px;
-  color: #13161b;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 16px;
-  font-weight: 600;
+.simple-dropdown-list {
+  display: grid;
+  gap: 4px;
+}
+
+.simple-dropdown-list .dropdown-item {
+  justify-content: flex-start;
+  border-radius: 10px;
 }
 
 .overlay.toast {
