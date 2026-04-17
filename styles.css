@@ -1280,6 +1280,10 @@ a {
   font-weight: 500;
 }
 
+.section-head .hero-highlights {
+  margin-top: 24px;
+}
+
 .section-copy {
   margin: 8px 0 0;
   max-width: 560px;
