@@ -216,7 +216,7 @@ a {
   color: #13161b;
 }
 
-.sidebar-new-visualization span,
+.sidebar-new-visualization-icon,
 .sidebar-settings span {
   width: 28px;
   height: 28px;
@@ -241,6 +241,10 @@ a {
   display: block;
   width: 11px;
   height: 16px;
+}
+
+.first-user-shell:not(.sidebar-collapsed) .sidebar-new-visualization-compact {
+  display: none !important;
 }
 
 .sidebar-divider {
@@ -383,7 +387,7 @@ a {
   font-size: 0;
 }
 
-.first-user-shell.sidebar-collapsed .sidebar-new-visualization span,
+.first-user-shell.sidebar-collapsed .sidebar-new-visualization-icon,
 .first-user-shell.sidebar-collapsed .sidebar-settings span {
   margin: 0;
 }
