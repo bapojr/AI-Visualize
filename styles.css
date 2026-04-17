@@ -3254,6 +3254,14 @@ a {
   overflow-y: auto;
 }
 
+#style-dropdown {
+  width: 280px;
+  height: auto;
+  max-height: none;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+
 .simple-dropdown-list {
   display: grid;
   gap: 4px;
