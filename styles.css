@@ -218,15 +218,21 @@ a {
 
 .sidebar-new-visualization-icon,
 .sidebar-settings span {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: #edf3ff;
-  color: #0062ff;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  color: #13161b;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.sidebar-new-visualization-icon svg,
+.sidebar-settings span svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .sidebar-new-visualization-compact {
