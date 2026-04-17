@@ -409,7 +409,7 @@ function positionOverlayToTrigger(overlay, trigger) {
   left = Math.max(viewportPadding, Math.min(left, window.innerWidth - overlayRect.width - viewportPadding));
   let top = rect.bottom + gap;
 
-  if (top + overlayRect.height > window.innerHeight - viewportPadding && overlay.id !== "style-dropdown") {
+  if (top + overlayRect.height > window.innerHeight - viewportPadding) {
     top = rect.top - overlayRect.height - gap;
   }
 
