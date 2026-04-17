@@ -775,6 +775,7 @@ a {
 }
 
 .start-scratch-card {
+  appearance: none;
   width: min(860px, 100%);
   min-height: 82px;
   margin: 16px auto 0;
@@ -787,6 +788,8 @@ a {
   gap: 16px;
   box-shadow: 0 12px 32px rgba(49, 85, 153, 0.08);
   font-family: "IBM Plex Sans", sans-serif;
+  cursor: pointer;
+  text-align: left;
 }
 
 .start-scratch-icon {

@@ -290,6 +290,7 @@ const state = {
   pendingGeneratedResultTemplate: null,
   isGeneratingImage: false,
   generationTimer: null,
+  isBlankEditor: false,
 };
 
 const desktopScreens = document.querySelectorAll(".desktop-shell .screen");
@@ -572,9 +573,11 @@ function renderHistory() {
     const container = document.getElementById(id);
     if (!container) return;
     container.innerHTML = "";
-    historyItems.forEach((item, index) => {
-      container.appendChild(createHistoryNode(item, false, index === 0));
-    });
+    if (!state.isBlankEditor) {
+      historyItems.forEach((item, index) => {
+        container.appendChild(createHistoryNode(item, false, index === 0));
+      });
+    }
   });
 }
 
@@ -876,7 +879,6 @@ function updateEditorToolbar(kind) {
 
 function renderEditorCanvas() {
   const activeTemplate = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
-  state.currentEditorTemplate = activeTemplate;
 
   const canvas = document.getElementById("editorCanvas");
   const image = document.getElementById("editorCanvasImage");
@@ -888,12 +890,26 @@ function renderEditorCanvas() {
   if (!canvas || !image) return;
 
   canvas.classList.add("image-mode");
-  image.src = activeTemplate.image;
-  image.alt = activeTemplate.title;
-  image.className = `editor-canvas-image orientation-${activeTemplate.orientation}`;
   if (mediaShell) {
     mediaShell.style.background = state.editorBackground;
   }
+
+  if (state.isBlankEditor) {
+    image.removeAttribute("src");
+    image.alt = "";
+    image.className = "editor-canvas-image hidden";
+    stageContent?.classList.remove("is-frame-selected");
+    if (segmentation) segmentation.innerHTML = "";
+    actionStack?.classList.add("hidden");
+    textActionStack?.classList.add("hidden");
+    updateZoom();
+    return;
+  }
+
+  state.currentEditorTemplate = activeTemplate;
+  image.src = activeTemplate.image;
+  image.alt = activeTemplate.title;
+  image.className = `editor-canvas-image orientation-${activeTemplate.orientation}`;
   stageContent?.classList.toggle("is-frame-selected", state.isEditorFrameSelected);
   if (segmentation) {
     segmentation.innerHTML = "";
@@ -1039,6 +1055,7 @@ function bindSelectGroups() {
 }
 
 function handlePromptSubmit(destination) {
+  state.isBlankEditor = false;
   state.hasHistory = true;
   renderLandingHistoryVisibility();
   setScreen(destination);
@@ -1052,6 +1069,13 @@ function initActions() {
     const go = event.target.closest("[data-go-screen]");
     if (go) {
       const destination = go.dataset.goScreen;
+      if (
+        destination === "editor-desktop" &&
+        !go.closest('[data-screen="editor-desktop"], [data-screen="editor-select-area"], [data-screen="editor-collapsed-history"]')
+      ) {
+        state.isBlankEditor = false;
+        renderHistory();
+      }
       setScreen(destination);
       if (destination.includes("conversation")) {
         state.hasHistory = true;
@@ -1162,6 +1186,15 @@ function initActions() {
   document.getElementById("landingSubmitDesktop")?.addEventListener("click", () => {
     if (!document.getElementById("landingPromptDesktop").value.trim()) return;
     handlePromptSubmit("conversation-desktop");
+  });
+
+  document.getElementById("startFromScratchButton")?.addEventListener("click", () => {
+    state.isBlankEditor = true;
+    state.selectedEditorSegmentId = null;
+    state.selectedEditorSegmentType = null;
+    state.isEditorFrameSelected = false;
+    renderHistory();
+    setScreen("editor-desktop");
   });
 
   document.getElementById("landingSubmitMobile")?.addEventListener("click", () => {
