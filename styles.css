@@ -1680,21 +1680,24 @@ a {
 }
 
 .bubble {
-  display: flex;
-  max-width: 500px;
-  width: 100%;
+  display: inline-flex;
+  max-width: 120px;
+  width: fit-content;
   padding: 16px;
   justify-content: center;
   align-items: center;
   gap: 10px;
   border-radius: 12px;
-  background: var(--Gray-2, #F8F9FD);
+  background: #ffffff;
   color: var(--Gray-12, #13161B);
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
-  line-height: normal;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   box-shadow: var(--shadow-soft);
 }
 
