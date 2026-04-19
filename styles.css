@@ -3141,7 +3141,7 @@ a {
   background: var(--Gray-2, #F8F9FD);
   box-shadow: none;
   display: grid;
-  grid-template-columns: minmax(360px, 33.16fr) minmax(680px, 66.84fr);
+  grid-template-columns: minmax(680px, 66.84fr) minmax(360px, 33.16fr);
   gap: clamp(20px, 1.8vw, 32px);
   align-content: stretch;
   align-items: stretch;
