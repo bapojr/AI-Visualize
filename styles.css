@@ -3378,7 +3378,7 @@ a {
 
 .preview-thread-bubble {
   width: fit-content;
-  max-width: 40px;
+  max-width: 120px;
   padding: 16px;
   border-radius: 12px;
   background: var(--Gray-2, #F8F9FD);
@@ -3389,8 +3389,8 @@ a {
   font-weight: 500;
   line-height: 1.45;
   white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .preview-thread-ai {
