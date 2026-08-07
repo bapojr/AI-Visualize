@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=12" />
+    <link rel="stylesheet" href="styles.css?v=17" />
   </head>
   <body>
     <div id="app">
@@ -202,107 +202,95 @@
               <button class="sidebar-auth-cta">Log in or sign up</button>
             </aside>
             <div class="landing-main-content">
-              <div class="landing-flat-shell" style="background:#f6f7fb !important;">
+              <div class="landing-flat-shell" style="background:#fff !important;">
                 <div class="landing-flat-backdrop"></div>
                 <main>
                   <section class="landing-stage">
                     <div class="landing-inner">
                       <div class="landing-intro">
-                        <h1>
-                          <span class="hero-title-line">See the science:</span>
-                          <span class="hero-title-line"><strong>STEM</strong> visualized instantly.</span>
-                        </h1>
-                      </div>
-                      <button class="start-scratch-card" id="startFromScratchButton" type="button" aria-label="Start from scratch">
-                        <span class="start-scratch-icon">+</span>
-                        <div>
-                          <h2>Start from scratch</h2>
-                          <p>Blank canvas</p>
+                        <div class="illustrate-tag" aria-label="New Paperpal Illustrate">
+                          <span class="illustrate-tag-new">NEW</span>
+                          <span>Paperpal Illustrate</span>
                         </div>
-                      </button>
+                        <h1>
+                          Create a publication ready, editable,
+                          <strong>Graphical Abstract</strong>
+                        </h1>
+                        <p>
+                          Turn complex Life Sciences and medical research into editable visuals. Generate from your<br />
+                          Paperpal document, refine with chat, and export as an editable SVG for full control.
+                        </p>
+                        <button class="how-it-works-button" type="button">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 16C10.1217 16 12.1566 15.1571 13.6569 13.6569C15.1571 12.1566 16 10.1217 16 8C16 5.87827 15.1571 3.84344 13.6569 2.34315C12.1566 0.842855 10.1217 0 8 0C5.87827 0 3.84344 0.842855 2.34315 2.34315C0.842855 3.84344 0 5.87827 0 8C0 10.1217 0.842855 12.1566 2.34315 13.6569C3.84344 15.1571 5.87827 16 8 16ZM8 5.5C7.44687 5.5 7 5.94687 7 6.5C7 6.91563 6.66563 7.25 6.25 7.25C5.83437 7.25 5.5 6.91563 5.5 6.5C5.5 5.11875 6.61875 4 8 4C9.38125 4 10.5 5.11875 10.5 6.5C10.5 7.975 9.375 8.6 8.75 8.82812V8.94687C8.75 9.3625 8.41563 9.69687 8 9.69687C7.58437 9.69687 7.25 9.3625 7.25 8.94687V8.69375C7.25 8.05313 7.7125 7.59375 8.19063 7.4375C8.39063 7.37188 8.60312 7.26562 8.75937 7.11562C8.89375 6.98437 9 6.80313 9 6.50313C9 5.95 8.55313 5.50313 8 5.50313V5.5ZM7 11.5C7 11.2348 7.10536 10.9804 7.29289 10.7929C7.48043 10.6054 7.73478 10.5 8 10.5C8.26522 10.5 8.51957 10.6054 8.70711 10.7929C8.89464 10.9804 9 11.2348 9 11.5C9 11.7652 8.89464 12.0196 8.70711 12.2071C8.51957 12.3946 8.26522 12.5 8 12.5C7.73478 12.5 7.48043 12.3946 7.29289 12.2071C7.10536 12.0196 7 11.7652 7 11.5Z" fill="#0054F1"/>
+                          </svg>
+                          <span>See how it works</span>
+                        </button>
+                      </div>
                       <div class="chatbox landing-chat" id="desktopLandingChatbox">
-                    <textarea
-                      id="landingPromptDesktop"
-                      placeholder="Describe what you want to visualize"
-                      autofocus
-                    ></textarea>
-                    <div class="chatbox-divider"></div>
-                    <div class="chatbox-footer">
-                      <div class="chatbox-left">
-                        <button class="attachment-icon-button" aria-label="Attach file">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="15"
-                            height="17"
-                            viewBox="0 0 15 17"
-                            fill="none"
-                            aria-hidden="true"
-                          >
-                            <path d="M7.34023 1.24453C8.99961 -0.414844 11.6902 -0.414844 13.3496 1.24453C15.009 2.90391 15.009 5.59453 13.3496 7.25391L8.04648 12.5602C6.97149 13.6352 5.23086 13.6352 4.15586 12.5602C3.08086 11.4852 3.08086 9.74453 4.15586 8.66953L9.10898 3.71953C9.40273 3.42578 9.87774 3.42578 10.1684 3.71953C10.459 4.01328 10.4621 4.48828 10.1684 4.77891L5.21836 9.72891C4.73086 10.2164 4.73086 11.007 5.21836 11.4977C5.70586 11.9883 6.49648 11.9852 6.98711 11.4977L12.2902 6.19453C13.3652 5.11953 13.3652 3.37891 12.2902 2.30391C11.2152 1.22891 9.47461 1.22891 8.40273 2.30391L2.74648 7.96016C1.08711 9.61953 1.08711 12.3102 2.74648 13.9695C4.40586 15.6289 7.09649 15.6289 8.75586 13.9695L13.1746 9.55391C13.4684 9.26016 13.9434 9.26016 14.234 9.55391C14.5246 9.84766 14.5277 10.3227 14.234 10.6133L9.81524 15.032C7.56836 17.2789 3.92773 17.2789 1.68398 15.032C-0.559765 12.7852 -0.56289 9.14453 1.68398 6.90078L7.34023 1.24453Z" fill="black"/>
-                          </svg>
-                        </button>
-                        <button class="chatbox-utility-button prompt-helper-button" id="landingPromptHelper" aria-label="Prompt helper" disabled>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" fill="none" aria-hidden="true">
-                            <path d="M9.26562 9.09688C10.0312 8.2875 10.5 7.2 10.5 6C10.5 3.51562 8.48438 1.5 6 1.5C3.51562 1.5 1.5 3.51562 1.5 6C1.5 7.2 1.96875 8.2875 2.73438 9.09688C3.4 9.79688 4.1375 10.7844 4.4 12H7.6C7.8625 10.7812 8.6 9.79688 9.26562 9.09688ZM10.3531 10.1281C9.61562 10.9063 9 11.8563 9 12.9281V13.5C9 14.8813 7.88125 16 6.5 16H5.5C4.11875 16 3 14.8813 3 13.5V12.9281C3 11.8563 2.38438 10.9063 1.64688 10.1281C0.625 9.05313 0 7.6 0 6C0 2.6875 2.6875 0 6 0C9.3125 0 12 2.6875 12 6C12 7.6 11.375 9.05313 10.3531 10.1281ZM4.5 5.75C4.5 6.16563 4.16563 6.5 3.75 6.5C3.33437 6.5 3 6.16563 3 5.75C3 4.23125 4.23125 3 5.75 3C6.16563 3 6.5 3.33437 6.5 3.75C6.5 4.16563 6.16563 4.5 5.75 4.5C5.05937 4.5 4.5 5.05937 4.5 5.75Z" fill="currentColor"/>
-                          </svg>
-                        </button>
+                        <textarea
+                          id="landingPromptDesktop"
+                          aria-label="Describe what you want to visualize"
+                          autofocus
+                        ></textarea>
+                        <span class="landing-typing-placeholder" id="landingTypingPlaceholder" aria-hidden="true"></span>
+                        <div class="chatbox-footer">
+                          <div class="chatbox-left">
+                            <button class="landing-plus-button" type="button" aria-label="Attach file">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="12" viewBox="0 0 11 12" fill="none" aria-hidden="true">
+                                <path d="M5.625 1.5C5.625 1.29375 5.45625 1.125 5.25 1.125C5.04375 1.125 4.875 1.29375 4.875 1.5V5.625H0.75C0.54375 5.625 0.375 5.79375 0.375 6C0.375 6.20625 0.54375 6.375 0.75 6.375H4.875V10.5C4.875 10.7063 5.04375 10.875 5.25 10.875C5.45625 10.875 5.625 10.7063 5.625 10.5V6.375H9.75C9.95625 6.375 10.125 6.20625 10.125 6C10.125 5.79375 9.95625 5.625 9.75 5.625H5.625V1.5Z" fill="#13161B"/>
+                              </svg>
+                            </button>
+                          </div>
+                          <div class="chatbox-right">
+                            <button class="landing-control-button gallery-trigger" type="button" aria-label="Gallery">
+                              <svg class="landing-gallery-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                                <path d="M2.625 2.1875C2.38437 2.1875 2.1875 2.38437 2.1875 2.625V11.375C2.1875 11.6156 2.38437 11.8125 2.625 11.8125H11.375C11.6156 11.8125 11.8125 11.6156 11.8125 11.375V2.625C11.8125 2.38437 11.6156 2.1875 11.375 2.1875H2.625ZM0.875 2.625C0.875 1.65977 1.65977 0.875 2.625 0.875H11.375C12.3402 0.875 13.125 1.65977 13.125 2.625V11.375C13.125 12.3402 12.3402 13.125 11.375 13.125H2.625C1.65977 13.125 0.875 12.3402 0.875 11.375V2.625ZM4.375 3.5C4.60706 3.5 4.82962 3.59219 4.99372 3.75628C5.15781 3.92038 5.25 4.14294 5.25 4.375C5.25 4.60706 5.15781 4.82962 4.99372 4.99372C4.82962 5.15781 4.60706 5.25 4.375 5.25C4.14294 5.25 3.92038 5.15781 3.75628 4.99372C3.59219 4.82962 3.5 4.60706 3.5 4.375C3.5 4.14294 3.59219 3.92038 3.75628 3.75628C3.92038 3.59219 4.14294 3.5 4.375 3.5ZM8.09375 5.46875C8.32617 5.46875 8.54219 5.5918 8.65977 5.79141L10.8473 9.51016C10.9676 9.7125 10.9676 9.96406 10.85 10.1691C10.7324 10.3742 10.5164 10.5 10.2812 10.5H3.71875C3.47539 10.5 3.24844 10.3633 3.13633 10.1473C3.02422 9.93125 3.04063 9.66875 3.18008 9.46914L4.71133 7.28164C4.83438 7.10664 5.03398 7.00273 5.25 7.00273C5.46602 7.00273 5.66562 7.10664 5.78867 7.28164L6.25898 7.9543L7.53047 5.79414C7.64805 5.59453 7.86406 5.47148 8.09648 5.47148L8.09375 5.46875Z" fill="#13161B"/>
+                              </svg>
+                              <span>Gallery</span>
+                              <span class="landing-info-icon" aria-hidden="true"></span>
+                            </button>
+                            <button class="landing-control-button landing-ratio-button ratio-trigger" type="button" data-open-overlay="ratio-dropdown" aria-label="Ratio">
+                              <svg class="landing-control-leading-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                                <path d="M12 2.25C12 1.83516 11.6648 1.5 11.25 1.5H10.5V0.75C10.5 0.335156 10.1648 0 9.75 0C9.33516 0 9 0.335156 9 0.75V1.5H3V0.75C3 0.335156 2.66484 0 2.25 0C1.83516 0 1.5 0.335156 1.5 0.75V1.5H0.75C0.335156 1.5 0 1.83516 0 2.25C0 2.66484 0.335156 3 0.75 3H1.5V9H0.75C0.335156 9 0 9.33516 0 9.75C0 10.1648 0.335156 10.5 0.75 10.5H1.5V11.25C1.5 11.6648 1.83516 12 2.25 12C2.66484 12 3 11.6648 3 11.25V10.5H9V11.25C9 11.6648 9.33516 12 9.75 12C10.1648 12 10.5 11.6648 10.5 11.25V10.5H11.25C11.6648 10.5 12 10.1648 12 9.75C12 9.33516 11.6648 9 11.25 9H10.5V3H11.25C11.6648 3 12 2.66484 12 2.25ZM3 9V3H9V9H3Z" fill="#13161B"/>
+                              </svg>
+                              <span class="ratio-trigger-text">Ratio</span>
+                              <svg class="landing-control-chevron" xmlns="http://www.w3.org/2000/svg" width="11" height="12" viewBox="0 0 11 12" fill="none" aria-hidden="true">
+                                <path d="M4.72012 9.52998C5.01309 9.82295 5.48887 9.82295 5.78184 9.52998L10.2818 5.02998C10.5748 4.73701 10.5748 4.26123 10.2818 3.96826C9.98887 3.67529 9.51309 3.67529 9.22012 3.96826L5.2498 7.93857L1.27949 3.97061C0.986523 3.67764 0.510742 3.67764 0.217773 3.97061C-0.0751953 4.26357 -0.0751953 4.73936 0.217773 5.03232L4.71777 9.53232L4.72012 9.52998Z" fill="#13161B"/>
+                              </svg>
+                            </button>
+                            <button class="landing-control-button landing-style-button" type="button" data-open-overlay="style-dropdown" aria-label="Styles">
+                              <svg class="landing-control-leading-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                                <path d="M3 1.125H5.625V3.1875C5.625 4.12031 6.37969 4.875 7.3125 4.875H9.375V10.5C9.375 10.7063 9.20625 10.875 9 10.875H3C2.79375 10.875 2.625 10.7063 2.625 10.5V1.5C2.625 1.29375 2.79375 1.125 3 1.125ZM6.75 1.59141L8.90859 3.75H7.3125C7.00078 3.75 6.75 3.49922 6.75 3.1875V1.59141ZM3 0C2.17266 0 1.5 0.672656 1.5 1.5V10.5C1.5 11.3273 2.17266 12 3 12H9C9.82734 12 10.5 11.3273 10.5 10.5V4.37109C10.5 3.97266 10.343 3.59062 10.0617 3.30937L7.18828 0.438281C6.90703 0.157031 6.52734 0 6.12891 0H3ZM4.3125 6C4.00078 6 3.75 6.25078 3.75 6.5625C3.75 6.87422 4.00078 7.125 4.3125 7.125H7.6875C7.99922 7.125 8.25 6.87422 8.25 6.5625C8.25 6.25078 7.99922 6 7.6875 6H4.3125ZM4.3125 8.25C4.00078 8.25 3.75 8.50078 3.75 8.8125C3.75 9.12422 4.00078 9.375 4.3125 9.375H7.6875C7.99922 9.375 8.25 9.12422 8.25 8.8125C8.25 8.50078 7.99922 8.25 7.6875 8.25H4.3125Z" fill="#13161B"/>
+                              </svg>
+                              <span>Styles</span>
+                              <svg class="landing-control-chevron" xmlns="http://www.w3.org/2000/svg" width="11" height="12" viewBox="0 0 11 12" fill="none" aria-hidden="true">
+                                <path d="M4.72012 9.52998C5.01309 9.82295 5.48887 9.82295 5.78184 9.52998L10.2818 5.02998C10.5748 4.73701 10.5748 4.26123 10.2818 3.96826C9.98887 3.67529 9.51309 3.67529 9.22012 3.96826L5.2498 7.93857L1.27949 3.97061C0.986523 3.67764 0.510742 3.67764 0.217773 3.97061C-0.0751953 4.26357 -0.0751953 4.73936 0.217773 5.03232L4.71777 9.53232L4.72012 9.52998Z" fill="#13161B"/>
+                              </svg>
+                            </button>
+                            <button class="landing-control-button landing-model-button" type="button" data-open-overlay="model-dropdown" aria-label="AI model">
+                              <svg class="landing-control-leading-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                                <path d="M5.82618 1.12472C5.93854 1.05955 6.07337 1.05955 6.18573 1.12472L9.77674 3.19888L6.00595 5.3764L2.23517 3.19888L5.82618 1.12472ZM1.69584 4.13371L5.46663 6.31124V10.6663L1.87561 8.59214C1.76325 8.52697 1.69584 8.41011 1.69584 8.27978V4.13146V4.13371ZM6.54528 10.6663V6.31124L10.3161 4.13371V8.28202C10.3161 8.41011 10.2486 8.52921 10.1363 8.59438L6.54528 10.6663ZM6.72505 0.192135C6.28011 -0.064045 5.73179 -0.064045 5.28685 0.192135L1.33629 2.47079C0.891345 2.72697 0.617188 3.20337 0.617188 3.71573V8.27753C0.617188 8.79214 0.891345 9.26629 1.33629 9.52247L5.28685 11.8079C5.73179 12.064 6.28011 12.064 6.72505 11.8079L10.6779 9.52697C11.1228 9.27079 11.397 8.79438 11.397 8.28202V3.72022C11.397 3.20562 11.1228 2.73146 10.6779 2.47528L6.72505 0.189888V0.192135Z" fill="#13161B"/>
+                              </svg>
+                              <span class="model-trigger-text">GPT Image 1</span>
+                              <svg class="landing-control-chevron" xmlns="http://www.w3.org/2000/svg" width="11" height="12" viewBox="0 0 11 12" fill="none" aria-hidden="true">
+                                <path d="M4.72012 9.52998C5.01309 9.82295 5.48887 9.82295 5.78184 9.52998L10.2818 5.02998C10.5748 4.73701 10.5748 4.26123 10.2818 3.96826C9.98887 3.67529 9.51309 3.67529 9.22012 3.96826L5.2498 7.93857L1.27949 3.97061C0.986523 3.67764 0.510742 3.67764 0.217773 3.97061C-0.0751953 4.26357 -0.0751953 4.73936 0.217773 5.03232L4.71777 9.53232L4.72012 9.52998Z" fill="#13161B"/>
+                              </svg>
+                            </button>
+                            <button
+                              class="btn btn-icon landing-submit"
+                              id="landingSubmitDesktop"
+                              data-go-screen="conversation-desktop"
+                              disabled
+                              aria-label="Generate illustration"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M14.4996 1.75C14.4996 1.33437 14.834 1 15.2496 1C15.6652 1 15.9996 1.33437 15.9996 1.75V7C15.9996 8.51875 14.7684 9.75 13.2496 9.75H2.55898L5.27773 12.4688C5.57148 12.7625 5.57148 13.2375 5.27773 13.5281C4.98398 13.8187 4.50898 13.8219 4.21836 13.5281L0.218359 9.53125C-0.0753906 9.2375 -0.0753906 8.7625 0.218359 8.47188L4.21836 4.46875C4.51211 4.175 4.98711 4.175 5.27773 4.46875C5.56836 4.7625 5.57148 5.2375 5.27773 5.52812L2.55898 8.24687L13.2496 8.25C13.9402 8.25 14.4996 7.69063 14.4996 7V1.75Z" fill="currentColor"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div class="chatbox-right">
-                        <button class="chatbox-icon-trigger ratio-trigger" type="button" data-open-overlay="ratio-dropdown" aria-label="Ratio">
-                          <span class="ratio-trigger-text">1:1</span>
-                        </button>
-                        <button class="chatbox-icon-trigger" type="button" data-open-overlay="style-dropdown" aria-label="Styles">
-                          <span class="ratio-pill-icon" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" fill="none">
-                              <g clip-path="url(#styleIconClipDesktop)">
-                                <path d="M5.5 1.5H2C1.725 1.5 1.5 1.725 1.5 2V14C1.5 14.275 1.725 14.5 2 14.5H10C10.275 14.5 10.5 14.275 10.5 14V6.5H7.75C6.50625 6.5 5.5 5.49375 5.5 4.25V1.5ZM9.87813 5L7 2.12188V4.25C7 4.66563 7.33437 5 7.75 5H9.87813ZM0 2C0 0.896875 0.896875 0 2 0H6.17188C6.70312 0 7.2125 0.209375 7.5875 0.584375L11.4156 4.41563C11.7906 4.79063 12 5.3 12 5.83125V14C12 15.1031 11.1031 16 10 16H2C0.896875 16 0 15.1031 0 14V2ZM8.10625 13.5H3.89375C3.4 13.5 3 13.1 3 12.6062C3 12.4062 3.06562 12.2156 3.1875 12.0562L5.3 9.34062C5.46875 9.125 5.72813 9 6 9C6.27187 9 6.53125 9.125 6.7 9.34062L8.8125 12.0594C8.93438 12.2156 9 12.4094 9 12.6094C9 13.1031 8.6 13.5031 8.10625 13.5031V13.5ZM3.5 7C3.76522 7 4.01957 7.10536 4.20711 7.29289C4.39464 7.48043 4.5 7.73478 4.5 8C4.5 8.26522 4.39464 8.51957 4.20711 8.70711C4.01957 8.89464 3.76522 9 3.5 9C3.23478 9 2.98043 8.89464 2.79289 8.70711C2.60536 8.51957 2.5 8.26522 2.5 8C2.5 7.73478 2.60536 7.48043 2.79289 7.29289C2.98043 7.10536 3.23478 7 3.5 7Z" fill="black"/>
-                              </g>
-                              <defs>
-                                <clipPath id="styleIconClipDesktop">
-                                  <rect width="12" height="16" fill="white"/>
-                                </clipPath>
-                              </defs>
-                            </svg>
-                          </span>
-                        </button>
-                        <button class="chatbox-icon-trigger" type="button" data-open-overlay="model-dropdown" aria-label="AI model">
-                          <span class="ratio-pill-icon" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="17" viewBox="0 0 15 17" fill="none">
-                              <path d="M7.24375 1.56406C7.4 1.47344 7.5875 1.47344 7.74375 1.56406L12.7375 4.44844L7.49375 7.47656L2.25 4.44844L7.24375 1.56406ZM1.5 5.74844L6.74375 8.77656V14.8328L1.75 11.9484C1.59375 11.8578 1.5 11.6953 1.5 11.5141V5.74531V5.74844ZM8.24375 14.8328V8.77656L13.4875 5.74844V11.5172C13.4875 11.6953 13.3938 11.8609 13.2375 11.9516L8.24375 14.8328ZM8.49375 0.267187C7.875 -0.0890625 7.1125 -0.0890625 6.49375 0.267187L1 3.43594C0.38125 3.79219 0 4.45469 0 5.16719V11.5109C0 12.2266 0.38125 12.8859 1 13.2422L6.49375 16.4203C7.1125 16.7766 7.875 16.7766 8.49375 16.4203L13.9906 13.2484C14.6094 12.8922 14.9906 12.2297 14.9906 11.5172V5.17344C14.9906 4.45781 14.6094 3.79844 13.9906 3.44219L8.49375 0.264062V0.267187Z" fill="black"/>
-                            </svg>
-                          </span>
-                        </button>
-                        
-                        <button
-                          class="btn btn-icon landing-submit"
-                          id="landingSubmitDesktop"
-                          data-go-screen="conversation-desktop"
-                          disabled
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 16 16"
-                            fill="none"
-                            aria-hidden="true"
-                          >
-                            <g clip-path="url(#submitArrowClipDesktop)">
-                              <path
-                                d="M14.4996 1.75C14.4996 1.33437 14.834 1 15.2496 1C15.6652 1 15.9996 1.33437 15.9996 1.75V7C15.9996 8.51875 14.7684 9.75 13.2496 9.75H2.55898L5.27773 12.4688C5.57148 12.7625 5.57148 13.2375 5.27773 13.5281C4.98398 13.8187 4.50898 13.8219 4.21836 13.5281L0.218359 9.53125C-0.0753906 9.2375 -0.0753906 8.7625 0.218359 8.47188L4.21836 4.46875C4.51211 4.175 4.98711 4.175 5.27773 4.46875C5.56836 4.7625 5.57148 5.2375 5.27773 5.52812L2.55898 8.24687L13.2496 8.25C13.9402 8.25 14.4996 7.69063 14.4996 7V1.75Z"
-                                fill="currentColor"
-                              />
-                            </g>
-                            <defs>
-                              <clipPath id="submitArrowClipDesktop">
-                                <rect width="16" height="16" fill="white" />
-                              </clipPath>
-                            </defs>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
                     </div>
                   </section>
                 </main>
@@ -1263,6 +1251,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=10"></script>
+    <script src="app.js?v=11"></script>
   </body>
 </html>

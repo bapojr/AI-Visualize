@@ -198,6 +198,12 @@ const sidebarRecentItems = [
   },
 ];
 
+const landingPromptExamples = [
+  "Create a graphical abstract on...",
+  "Create an infographic on...",
+  "Create a poster on...",
+];
+
 const suggestionPills = [
   "More designs",
   "Make the colors more natural",
@@ -1004,6 +1010,39 @@ function toggleSubmitStates() {
   }
 }
 
+function initLandingPromptTyping() {
+  const placeholder = document.getElementById("landingTypingPlaceholder");
+  if (!placeholder) return;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    placeholder.textContent = landingPromptExamples[0];
+    return;
+  }
+
+  let exampleIndex = 0;
+  let characterIndex = 0;
+
+  const typeNextCharacter = () => {
+    const example = landingPromptExamples[exampleIndex];
+    placeholder.textContent = example.slice(0, characterIndex + 1);
+    characterIndex += 1;
+
+    if (characterIndex < example.length) {
+      window.setTimeout(typeNextCharacter, 55);
+      return;
+    }
+
+    window.setTimeout(() => {
+      exampleIndex = (exampleIndex + 1) % landingPromptExamples.length;
+      characterIndex = 0;
+      placeholder.textContent = "";
+      window.setTimeout(typeNextCharacter, 280);
+    }, 1400);
+  };
+
+  typeNextCharacter();
+}
+
 function updateEditorToolbar(kind) {
   const toolbar = document.getElementById("editorContextToolbar");
   if (!toolbar) return;
@@ -1290,6 +1329,9 @@ function initActions() {
       document.querySelectorAll("[data-model-option]").forEach((node) => {
         node.classList.toggle("active", node === modelOption);
       });
+      document.querySelectorAll(".model-trigger-text").forEach((node) => {
+        node.textContent = modelOption.dataset.modelOption;
+      });
       state.desktop.model = modelOption.dataset.modelOption;
       state.mobile.model = modelOption.dataset.modelOption;
       hideOverlay();
@@ -1506,6 +1548,7 @@ function init() {
   renderEditorTitle();
   updateSuggestionsRailState();
   toggleSubmitStates();
+  initLandingPromptTyping();
   updateEditorToolbar("text");
   bindCanvasSelection();
   bindSelectGroups();
