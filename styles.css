@@ -4578,6 +4578,15 @@ a {
 }
 
 /* Keep the landing-sidebar specification last in the cascade. */
+.landing-sidebar,
+.landing-sidebar-top,
+.sidebar-primary-nav,
+.sidebar-recent,
+.sidebar-credits,
+.sidebar-profile {
+  background-color: #FAFAFA;
+}
+
 .first-user-shell.sidebar-collapsed .sidebar-recent,
 .first-user-shell.sidebar-collapsed .sidebar-profile {
   display: none !important;
