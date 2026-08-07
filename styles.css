@@ -4986,6 +4986,49 @@ a {
 }
 
 /* Keep the landing-sidebar specification last in the cascade. */
+.gallery-section .section-head h2 {
+  margin: 0;
+  color: var(--Gray-12, #13161b);
+  font-feature-settings: "liga" off, "clig" off;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 32px;
+}
+
+.gallery-section .section-head .hero-highlights {
+  display: flex;
+  margin-top: 24px;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+#desktopCategoryPills.category-pills .pill {
+  display: flex;
+  height: auto;
+  min-height: 40px;
+  padding: 10px;
+  align-items: center;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-12, #13161b);
+  box-shadow: none;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+#desktopCategoryPills.category-pills .pill.active {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Gray-1, #fff);
+  color: var(--Blue-9, #0062ff);
+  box-shadow: none;
+}
+
 .landing-flat-backdrop,
 .landing-stage {
   background: #fff !important;

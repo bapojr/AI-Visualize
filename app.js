@@ -1,4 +1,5 @@
 const categories = ["Infographics", "Posters", "Graphical Abstract"];
+const desktopCategories = ["All", "Infographics", "Posters", "Graphical Abstract", "Diagram"];
 
 const templateCatalog = [
   {
@@ -665,13 +666,16 @@ function renderCategoryPills(targetId, scope) {
   if (!container) return;
   container.innerHTML = "";
 
-  categories.forEach((category) => {
+  const availableCategories = scope === "desktop" ? desktopCategories : categories;
+
+  availableCategories.forEach((category) => {
     const button = document.createElement("button");
-    const isActive = state[scope].activeCategory === category;
+    const categoryValue = category === "All" ? null : category;
+    const isActive = state[scope].activeCategory === categoryValue;
     button.className = `pill ${isActive ? "active" : ""}`;
     button.textContent = category;
     button.addEventListener("click", () => {
-      state[scope].activeCategory = isActive ? null : category;
+      state[scope].activeCategory = scope === "desktop" ? categoryValue : isActive ? null : categoryValue;
       renderCategoryPills("desktopCategoryPills", "desktop");
       renderCategoryPills("mobileCategoryPills", "mobile");
       renderGalleries();
