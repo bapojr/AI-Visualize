@@ -310,6 +310,9 @@ const state = {
   pendingGeneratedResultTemplate: null,
   isGeneratingImage: false,
   generationTimer: null,
+  generationRequestId: 0,
+  generationController: null,
+  generationNotice: "",
   isBlankEditor: false,
 };
 
@@ -376,26 +379,126 @@ function templateForPrompt(prompt = "") {
   return null;
 }
 
-function startImageGeneration() {
-  const nextTemplate = templateForPrompt(state.prompt) || randomTemplateItem();
-  state.pendingGeneratedResultTemplate = nextTemplate;
+function activeGenerationSettings() {
+  return isMobileViewport() ? state.mobile : state.desktop;
+}
+
+function generationFormat() {
+  const activeCategory = activeGenerationSettings().activeCategory;
+  return activeCategory || "Scientific visual";
+}
+
+function generatedImageOrientation(ratio = "1:1") {
+  if (["16:9", "21:9", "4:3", "3:2"].includes(ratio)) return "landscape";
+  if (["9:16", "3:4", "2:3"].includes(ratio)) return "portrait";
+  return "landscape";
+}
+
+function generatedTemplateFromResponse(result, settings) {
+  const format = generationFormat();
+  const title = state.prompt.length > 72
+    ? `${state.prompt.slice(0, 69).trim()}...`
+    : state.prompt;
+
+  return {
+    id: `gpt-image-2-${Date.now()}`,
+    title: title || "AI-generated scientific visual",
+    category: format,
+    type: "AI-generated",
+    accent: "blueprint",
+    subject: settings.subject === "Default" ? "Research Communication" : settings.subject,
+    image: result.image,
+    orientation: generatedImageOrientation(settings.ratio),
+    summary: "A publication-ready scientific visual generated from your prompt with GPT Image 2.",
+  };
+}
+
+async function requestGeneratedImage(settings, signal) {
+  const response = await fetch("/api/generate-image", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      prompt: state.prompt,
+      format: generationFormat(),
+      subject: settings.subject,
+      style: settings.style,
+      ratio: settings.ratio,
+    }),
+    signal,
+  });
+
+  const contentType = response.headers.get("content-type") || "";
+  const result = contentType.includes("application/json")
+    ? await response.json()
+    : null;
+
+  if (!response.ok || !result?.image) {
+    throw new Error(result?.error || `Image generation failed (${response.status}).`);
+  }
+
+  return result;
+}
+
+async function startImageGeneration() {
+  const settings = activeGenerationSettings();
+  const localTemplate = templateForPrompt(state.prompt);
+  const fallbackTemplate = localTemplate || randomTemplateItem();
+  const requestId = state.generationRequestId + 1;
+
+  state.generationRequestId = requestId;
+  state.pendingGeneratedResultTemplate = fallbackTemplate;
   state.isGeneratingImage = true;
+  state.generationNotice = "";
 
   if (state.generationTimer) {
     clearTimeout(state.generationTimer);
+    state.generationTimer = null;
+  }
+
+  if (state.generationController) {
+    state.generationController.abort();
   }
 
   renderVariants();
   updatePreviewVisuals();
 
-  state.generationTimer = setTimeout(() => {
-    state.generatedResultTemplate = state.pendingGeneratedResultTemplate || nextTemplate;
+  // Preserve the dedicated GLP-1 demo route while live generation handles all other prompts.
+  if (localTemplate) {
+    state.generationTimer = setTimeout(() => {
+      if (requestId !== state.generationRequestId) return;
+      state.generatedResultTemplate = localTemplate;
+      state.pendingGeneratedResultTemplate = null;
+      state.isGeneratingImage = false;
+      renderVariants();
+      updatePreviewVisuals();
+      state.generationTimer = null;
+    }, 1200);
+    return;
+  }
+
+  const controller = new AbortController();
+  state.generationController = controller;
+
+  try {
+    const result = await requestGeneratedImage(settings, controller.signal);
+    if (requestId !== state.generationRequestId) return;
+    state.generatedResultTemplate = generatedTemplateFromResponse(result, settings);
+  } catch (error) {
+    if (error.name === "AbortError" || requestId !== state.generationRequestId) return;
+    console.warn("GPT Image 2 generation unavailable; using a demo visual:", error);
+    state.generatedResultTemplate = fallbackTemplate;
+    state.generationNotice =
+      "Live image generation is not configured on this deployment yet, so a demo visual is shown.";
+  } finally {
+    if (requestId !== state.generationRequestId) return;
     state.pendingGeneratedResultTemplate = null;
     state.isGeneratingImage = false;
+    state.generationController = null;
     renderVariants();
     updatePreviewVisuals();
-    state.generationTimer = null;
-  }, 5000);
+  }
 }
 
 function getGalleryItems(category) {
@@ -776,7 +879,8 @@ function updatePreviewVisuals() {
   if (conversationAiOutput) {
     conversationAiOutput.textContent = state.isGeneratingImage
       ? `Generating a ${activeVariant.category.toLowerCase()} direction for ${activeVariant.subject.toLowerCase()}. This will be ready in a moment.`
-      : `Here is a generated ${activeVariant.category.toLowerCase()} direction for ${activeVariant.subject.toLowerCase()}. You can continue refining the visual, ask for a different layout, or generate another direction.`;
+      : state.generationNotice ||
+        `Here is a generated ${activeVariant.category.toLowerCase()} direction for ${activeVariant.subject.toLowerCase()}. You can continue refining the visual, ask for a different layout, or generate another direction.`;
   }
 
   if (previewConversationUserPrompt) {
@@ -787,7 +891,8 @@ function updatePreviewVisuals() {
   if (previewConversationAiOutput) {
     previewConversationAiOutput.textContent = state.isGeneratingImage
       ? `Generating a ${activeVariant.category.toLowerCase()} direction for ${activeVariant.subject.toLowerCase()}. This will be ready in a moment.`
-      : `Here is a generated ${activeVariant.category.toLowerCase()} direction for ${activeVariant.subject.toLowerCase()}. You can continue refining the visual, ask for a different layout, or generate another direction.`;
+      : state.generationNotice ||
+        `Here is a generated ${activeVariant.category.toLowerCase()} direction for ${activeVariant.subject.toLowerCase()}. You can continue refining the visual, ask for a different layout, or generate another direction.`;
   }
 
   if (previewConversationImage) {
