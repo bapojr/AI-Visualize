@@ -13,16 +13,17 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=8" />
+    <link rel="stylesheet" href="styles.css?v=11" />
   </head>
   <body>
     <div id="app">
       <div class="desktop-shell">
         <section class="screen active" data-screen="landing-desktop">
           <div class="first-user-shell">
-            <aside class="landing-sidebar">
+            <aside class="landing-sidebar is-signed-in">
               <div class="landing-sidebar-top">
                 <div class="paperpal-sidebar-logo" aria-label="Paperpal">
+                  <img src="assets/sidebar/paperpal-logo.svg" alt="Paperpal" />
                   <svg xmlns="http://www.w3.org/2000/svg" width="143" height="45" viewBox="0 0 143 45" fill="none" aria-hidden="true">
                     <g clip-path="url(#clip0_27_667)">
                       <path opacity="0.1" d="M15.1103 45.0001C22.0619 45.0001 27.6973 44.5778 27.6973 44.0567C27.6973 43.5357 22.0619 43.1133 15.1103 43.1133C8.15878 43.1133 2.52344 43.5357 2.52344 44.0567C2.52344 44.5778 8.15878 45.0001 15.1103 45.0001Z" fill="#0052E6"/>
@@ -71,7 +72,11 @@
                     </defs>
                   </svg>
                 </div>
+                <button class="sidebar-notification" type="button" aria-label="Notifications">
+                  <img src="assets/sidebar/notification.svg" alt="" aria-hidden="true" />
+                </button>
                 <button class="landing-sidebar-toggle" id="sidebarLogoToggle" aria-label="Toggle sidebar">
+                  <img class="sidebar-toggle-icon" src="assets/sidebar/sidebar.svg" alt="" aria-hidden="true" />
                   <span class="sidebar-logo-open">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
                       <path d="M14.4002 7.9999V23.9999H6.4002C5.5152 23.9999 4.8002 23.2849 4.8002 22.3999V9.5999C4.8002 8.7149 5.5152 7.9999 6.4002 7.9999H14.4002ZM15.2002 6.3999H6.4002C4.6352 6.3999 3.2002 7.8349 3.2002 9.5999V22.3999C3.2002 24.1649 4.6352 25.5999 6.4002 25.5999H25.6002C27.3652 25.5999 28.8002 24.1649 28.8002 22.3999V9.5999C28.8002 7.8349 27.3652 6.3999 25.6002 6.3999H15.2002ZM16.0002 7.9999H25.6002C26.4852 7.9999 27.2002 8.7149 27.2002 9.5999V22.3999C27.2002 23.2849 26.4852 23.9999 25.6002 23.9999H16.0002V7.9999ZM7.2002 11.1999C7.2002 11.6399 7.5602 11.9999 8.0002 11.9999H11.2002C11.6402 11.9999 12.0002 11.6399 12.0002 11.1999C12.0002 10.7599 11.6402 10.3999 11.2002 10.3999H8.0002C7.5602 10.3999 7.2002 10.7599 7.2002 11.1999ZM7.2002 14.3999C7.2002 14.8399 7.5602 15.1999 8.0002 15.1999H11.2002C11.6402 15.1999 12.0002 14.8399 12.0002 14.3999C12.0002 13.9599 11.6402 13.5999 11.2002 13.5999H8.0002C7.5602 13.5999 7.2002 13.9599 7.2002 14.3999ZM7.2002 17.5999C7.2002 18.0399 7.5602 18.3999 8.0002 18.3999H11.2002C11.6402 18.3999 12.0002 18.0399 12.0002 17.5999C12.0002 17.1599 11.6402 16.7999 11.2002 16.7999H8.0002C7.5602 16.7999 7.2002 17.1599 7.2002 17.5999Z" fill="#5D6A81"/>
@@ -84,7 +89,9 @@
                   </span>
                 </button>
               </div>
+              <nav class="sidebar-primary-nav" aria-label="Primary">
               <button class="sidebar-new-visualization" data-scroll-chat>
+                <img class="sidebar-nav-icon" src="assets/sidebar/start.svg" alt="" aria-hidden="true" />
                 <span class="sidebar-new-visualization-icon" aria-hidden="true">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16" fill="none">
                     <path d="M7.75 1.75C7.75 1.33437 7.41563 1 7 1C6.58437 1 6.25 1.33437 6.25 1.75V7.25H0.75C0.334375 7.25 0 7.58437 0 8C0 8.41563 0.334375 8.75 0.75 8.75H6.25V14.25C6.25 14.6656 6.58437 15 7 15C7.41563 15 7.75 14.6656 7.75 14.25V8.75H13.25C13.6656 8.75 14 8.41563 14 8C14 7.58437 13.6656 7.25 13.25 7.25H7.75V1.75Z" fill="black"/>
@@ -122,12 +129,24 @@
                     </defs>
                   </svg>
                 </span>
-                New visualization
+                <span class="sidebar-nav-label">Start New Illustration</span>
               </button>
+              <button class="sidebar-nav-item" type="button" aria-current="page">
+                <img class="sidebar-nav-icon" src="assets/sidebar/home.svg" alt="" aria-hidden="true" />
+                <span class="sidebar-nav-label">Home</span>
+              </button>
+              <button class="sidebar-nav-item" type="button">
+                <img class="sidebar-nav-icon" src="assets/sidebar/apps.svg" alt="" aria-hidden="true" />
+                <span class="sidebar-nav-label">Apps</span>
+              </button>
+              </nav>
               <div class="sidebar-divider signed-in-only"></div>
               <section class="sidebar-recent signed-in-only" aria-label="Recent visualizations">
                 <div class="sidebar-recent-head">
-                  <h2>Recent</h2>
+                  <h2>Recent Illustrations</h2>
+                  <button class="sidebar-search-button" type="button" aria-label="Search recent illustrations">
+                    <img src="assets/sidebar/search.svg" alt="" aria-hidden="true" />
+                  </button>
                   <button class="sidebar-see-all" type="button">
                     See all
                     <svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
@@ -147,18 +166,10 @@
                 </div>
               </section>
               <div class="sidebar-spacer"></div>
-              <section class="sidebar-credits" aria-label="Credits">
-                <div class="sidebar-credits-head">
-                  <div class="sidebar-credits-label">
-                    <span class="sidebar-credits-icon" aria-hidden="true">⚡</span>
-                    <span>Credits</span>
-                  </div>
-                  <span class="sidebar-credits-value">50 / 50</span>
-                </div>
-                <div class="sidebar-credits-bar" aria-hidden="true">
-                  <span class="sidebar-credits-bar-fill"></span>
-                </div>
-                <button class="sidebar-credits-cta" type="button">Upgrade</button>
+              <section class="sidebar-credits" aria-label="Usage">
+                <span class="sidebar-usage-ring" aria-hidden="true"></span>
+                <span class="sidebar-usage-label">Usage: 50%</span>
+                <img class="sidebar-usage-info" src="assets/sidebar/info.svg" alt="" aria-hidden="true" />
               </section>
               <button class="sidebar-settings">
                 <span aria-hidden="true">
@@ -176,8 +187,17 @@
                 Settings
               </button>
               <div class="sidebar-profile signed-in-only">
-                <span class="sidebar-avatar">S</span>
-                <span>sushrut.bapro</span>
+                <span class="sidebar-avatar">K</span>
+                <span class="sidebar-profile-copy">
+                  <strong>Kaustubh Mokashi</strong>
+                  <small>Free</small>
+                </span>
+                <button class="sidebar-profile-upgrade" type="button">Upgrade</button>
+                <button class="sidebar-profile-toggle" type="button" aria-label="Open account menu">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="7" viewBox="0 0 12 7" fill="none" aria-hidden="true">
+                    <path d="M1 6L6 1L11 6" stroke="#13161B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
               </div>
               <button class="sidebar-auth-cta">Log in or sign up</button>
             </aside>
@@ -1243,6 +1263,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=10"></script>
   </body>
 </html>

@@ -167,6 +167,37 @@ const historyItems = [
   },
 ];
 
+const sidebarRecentItems = [
+  {
+    sidebarTitle: "Comprehensive Analysis of Quantum Entanglement",
+    templateId: "infographic-crispr",
+  },
+  {
+    sidebarTitle: "The Impact of Climate Change on Marine Biodiversity",
+    templateId: "infographic-climate",
+  },
+  {
+    sidebarTitle: "Advanced Computational Models for Predictive Analysis",
+    templateId: "poster-diabetes",
+  },
+  {
+    sidebarTitle: "Exploring Dark Matter: Theoretical Frameworks",
+    templateId: "poster-alzheimers",
+  },
+  {
+    sidebarTitle: "Innovations in Renewable Energy Storage Technologies",
+    templateId: "infographic-plants",
+  },
+  {
+    sidebarTitle: "Neuroscientific Insights into Cognitive Function",
+    templateId: "poster-alzheimers",
+  },
+  {
+    sidebarTitle: "The Role of CRISPR-Cas9 in Genome Editing",
+    templateId: "infographic-crispr",
+  },
+];
+
 const suggestionPills = [
   "More designs",
   "Make the colors more natural",
@@ -729,6 +760,7 @@ function createSidebarRecentNode(item, index) {
   button.className = "sidebar-recent-item";
   button.type = "button";
   button.textContent = item.sidebarTitle || "Untitled";
+  button.title = item.sidebarTitle || "Untitled";
   button.addEventListener("click", () => {
     const nextTemplate = templateCatalog.find((template) => template.id === item.templateId) || templateCatalog[0];
     state.generatedResultTemplate = nextTemplate;
@@ -745,15 +777,7 @@ function renderSidebarRecent() {
 
   container.innerHTML = "";
 
-  if (!state.hasHistory) {
-    const empty = document.createElement("div");
-    empty.className = "sidebar-empty-state";
-    empty.textContent = "No items yet";
-    container.appendChild(empty);
-    return;
-  }
-
-  historyItems.forEach((item, index) => {
+  sidebarRecentItems.forEach((item, index) => {
     container.appendChild(createSidebarRecentNode(item, index));
   });
 }
