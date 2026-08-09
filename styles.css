@@ -3953,15 +3953,12 @@ a {
 }
 
 .editor-gallery-trigger {
-  min-width: 82px;
-  width: 82px;
-  padding-right: 5px;
-  padding-left: 5px;
-  gap: 4px;
-}
-
-.editor-gallery-trigger .landing-info-icon {
-  margin-left: 0;
+  width: 32px;
+  min-width: 32px;
+  padding: 0;
+  flex: 0 0 32px;
+  justify-content: center;
+  gap: 0;
 }
 
 .editor-chat-compact-control,
