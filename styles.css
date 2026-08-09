@@ -5699,53 +5699,76 @@ a {
   position: absolute;
   left: 50%;
   bottom: 88px;
+  width: min(665px, calc(100% - 32px));
   transform: translateX(-50%);
-  display: grid;
-  justify-items: center;
-  gap: 10px;
+  display: block;
   z-index: 6;
 }
 
 .editor-image-toolbar {
-  height: 48px;
   display: flex;
+  width: 100%;
+  height: 40px;
+  padding: 4px 12px;
   align-items: center;
-  gap: 0;
-  background: #ffffff;
-  border: 1px solid #e4eaf7;
-  border-radius: 18px;
-  box-shadow:
-    4px 4px 16px 0 rgba(0, 0, 0, 0.08),
-    16px 8px 32px 16px rgba(0, 0, 0, 0.02);
-  overflow: hidden;
+  justify-content: space-between;
+  gap: 8px;
+  overflow-x: auto;
+  border: 0;
+  border-radius: 25px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+  scrollbar-width: none;
+}
+
+.editor-image-toolbar::-webkit-scrollbar {
+  display: none;
 }
 
 .editor-image-tool {
-  height: 48px;
-  border: 0;
-  background: transparent;
-  color: #5d6a81;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: normal;
-  padding: 0 18px;
   display: inline-flex;
+  height: 32px;
+  padding: 0 6px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-right: 1px solid #e4eaf7;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
   white-space: nowrap;
 }
 
-.editor-image-tool:last-child {
-  border-right: 0;
+.editor-image-tool svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .editor-image-tool:hover,
-.editor-image-tool.active {
-  color: #051e57;
-  background: #f8f9fd;
+.editor-image-tool:focus-visible {
+  border-color: var(--Blue-5, #c9d8fa);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-image-tool.active,
+.editor-image-tool[aria-pressed="true"] {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
 }
 
 .editor-text-action-stack {
@@ -5835,42 +5858,6 @@ a {
 
 .editor-text-tool.strike {
   text-decoration: line-through;
-}
-
-.editor-image-tool.danger {
-  min-width: 58px;
-}
-
-.editor-image-more-menu {
-  min-width: 240px;
-  background: #ffffff;
-  border: 1px solid #e4eaf7;
-  border-radius: 18px;
-  box-shadow:
-    4px 4px 16px 0 rgba(0, 0, 0, 0.08),
-    16px 8px 32px 16px rgba(0, 0, 0, 0.02);
-  padding: 8px;
-  display: grid;
-  gap: 4px;
-  justify-self: end;
-}
-
-.editor-image-more-item {
-  height: 44px;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  color: #5d6a81;
-  text-align: left;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  padding: 0 14px;
-}
-
-.editor-image-more-item:hover {
-  background: #f8f9fd;
-  color: #051e57;
 }
 
 .canvas-card.mobile {

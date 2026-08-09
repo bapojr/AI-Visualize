@@ -1235,10 +1235,18 @@ function bindCanvasSelection() {
   const editorImage = document.getElementById("editorCanvasImage");
   const stageContent = document.getElementById("editorCanvasStageContent");
   const imageToolbar = document.getElementById("editorImageActionStack");
+  const imageActionToolbar = document.getElementById("editorImageToolbar");
   const textToolbar = document.getElementById("editorTextActionStack");
-  const moreMenu = document.getElementById("editorImageMoreMenu");
-  const moreTrigger = document.getElementById("editorImageMoreTrigger");
+  const useReference = document.getElementById("editorUseReference");
+  const extractText = document.getElementById("editorExtractText");
   const segmentation = document.getElementById("editorImageSegmentation");
+
+  const resetImageToolbarState = () => {
+    imageActionToolbar?.querySelectorAll(".editor-image-tool").forEach((button) => {
+      button.classList.remove("active");
+      button.setAttribute("aria-pressed", "false");
+    });
+  };
 
   const selectWholeImage = () => {
     state.selectedEditorSegmentId = null;
@@ -1252,7 +1260,7 @@ function bindCanvasSelection() {
     document.activeElement?.closest?.(".editor-segment")?.blur();
     imageToolbar?.classList.remove("hidden");
     textToolbar?.classList.add("hidden");
-    moreMenu?.classList.add("hidden");
+    resetImageToolbarState();
     setCanvasTool(state.canvasTool);
   };
 
@@ -1267,7 +1275,7 @@ function bindCanvasSelection() {
     document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
     imageToolbar?.classList.add("hidden");
     textToolbar?.classList.add("hidden");
-    moreMenu?.classList.add("hidden");
+    resetImageToolbarState();
     setCanvasTool(state.canvasTool);
   };
 
@@ -1276,9 +1284,19 @@ function bindCanvasSelection() {
     selectWholeImage();
   });
 
-  moreTrigger?.addEventListener("click", (event) => {
+  imageActionToolbar?.addEventListener("click", (event) => {
+    const action = event.target.closest(".editor-image-tool");
+    if (!action) return;
+    const wasPressed = action.getAttribute("aria-pressed") === "true";
+    resetImageToolbarState();
+    const pressed = action === useReference ? !wasPressed : true;
+    action.classList.toggle("active", pressed);
+    action.setAttribute("aria-pressed", String(pressed));
+  });
+
+  extractText?.addEventListener("click", (event) => {
     event.stopPropagation();
-    moreMenu?.classList.toggle("hidden");
+    segmentation?.querySelector('.editor-segment[data-segment-type="text"]')?.click();
   });
 
   document.addEventListener("click", (event) => {
@@ -1312,7 +1330,7 @@ function bindCanvasSelection() {
     document.querySelectorAll(".editor-object-item").forEach((item) => {
       item.classList.toggle("selected", item.dataset.editorObjectId === segment.dataset.segmentId);
     });
-    moreMenu?.classList.add("hidden");
+    resetImageToolbarState();
     if (segment.dataset.segmentType === "text") {
       textToolbar?.classList.remove("hidden");
       imageToolbar?.classList.add("hidden");

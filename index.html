@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=45" />
+    <link rel="stylesheet" href="styles.css?v=46" />
   </head>
   <body>
     <div id="app">
@@ -1127,20 +1127,27 @@
                   </div>
                 </div>
                 <div class="editor-image-action-stack hidden" id="editorImageActionStack">
-                  <div class="editor-image-more-menu hidden" id="editorImageMoreMenu">
-                    <button class="editor-image-more-item">Vectorize</button>
-                    <button class="editor-image-more-item">Crop</button>
-                    <button class="editor-image-more-item">Extract text</button>
-                  </div>
                   <div class="editor-image-toolbar" id="editorImageToolbar">
-                    <button class="editor-image-tool active" data-open-overlay="chat-panel">Edit via chat</button>
-                    <button class="editor-image-tool" data-open-overlay="segment-overlay">Segment object</button>
-                    <button class="editor-image-tool" data-go-screen="editor-select-area">Select area</button>
-                    <button class="editor-image-tool" data-open-overlay="remove-bg">Remove background</button>
-                    <button class="editor-image-tool editor-image-tool-more" id="editorImageMoreTrigger">
-                      More <span>&#9662;</span>
+                    <button class="editor-image-tool" type="button" data-open-overlay="segment-overlay" aria-pressed="false">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.8877 1.73124 14.2688 2.11229c.296.29602.296.77469 0 1.06756l-.9164.91954-1.4518-1.45175.9164-.9164c.296-.29602.7747-.29602 1.0674 0h.0032ZM6.6069 7.9445l4.2261-4.2293 1.4518 1.45175-4.2293 4.22615a.7558.7558 0 0 1-.3275.1921l-1.8423.5259.5259-1.84224a.7558.7558 0 0 1 .1922-.32751l.0031.00315ZM11.7494.66368 5.5362 6.87379a2.267 2.267 0 0 0-.5763.97938l-.9007 3.14913a.7558.7558 0 0 0 .9353.9353l3.1492-.9006a2.267 2.267 0 0 0 .9794-.5763l6.2132-6.21015a2.2674 2.2674 0 0 0 0-3.20582l-.381-.38105a2.2674 2.2674 0 0 0-3.2059 0ZM2.7712 1.89185A2.7712 2.7712 0 0 0 0 4.66309v8.56571A2.7712 2.7712 0 0 0 2.7712 16h8.5657a2.7712 2.7712 0 0 0 2.7713-2.7712V9.70172a.7558.7558 0 0 0-1.5116 0v3.52708c0 .6959-.5637 1.2596-1.2597 1.2596H2.7712c-.696 0-1.2596-.5637-1.2596-1.2596V4.66309c0-.69596.5636-1.25966 1.2596-1.25966h3.5271a.7558.7558 0 0 0 0-1.51158H2.7712Z" fill="currentColor"/></svg>
+                      <span>Edit Region</span>
                     </button>
-                    <button class="editor-image-tool danger">&#128465;</button>
+                    <button class="editor-image-tool" id="editorUseReference" type="button" aria-pressed="false">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2941.75c0 .4156-.3147.75-.7059.75-.65 0-1.1764.5594-1.1764 1.25 0 .4156-.3147.75-.7059.75S0 3.1656 0 2.75C0 1.2313 1.1588 0 2.5882 0c.3912 0 .7059.3344.7059.75ZM0 5.75C0 5.3344.3147 5 .7059 5s.7059.3344.7059.75v2.5c0 .4156-.3147.75-.7059.75S0 8.6656 0 8.25v-2.5Zm.7059 4.75c.3912 0 .7059.3344.7059.75 0 .6906.5264 1.25 1.1764 1.25h3.6088c.0823.525.2294 1.0281.4353 1.5H2.5882C1.1588 14 0 12.7687 0 11.25c0-.4156.3147-.75.7059-.75ZM13.1765 5.6875A5.341 5.341 0 0 0 11.7647 5.5V2.75c0-.6906-.5265-1.25-1.1765-1.25-.3911 0-.7058-.3344-.7058-.75s.3147-.75.7058-.75c1.4294 0 2.5883 1.2313 2.5883 2.75v2.9375ZM7.7647 1.5H5.4118c-.3912 0-.7059-.3344-.7059-.75S5.0206 0 5.4118 0h2.3529c.3912 0 .7059.3344.7059.75s-.3147.75-.7059.75Zm-.2353 10c0-2.4853 1.8962-4.5 4.2353-4.5C14.1038 7 16 9.0147 16 11.5S14.1038 16 11.7647 16c-2.3391 0-4.2353-2.0147-4.2353-4.5Zm4.2353-2.5c-.2588 0-.4706.225-.4706.5V11H9.8824c-.2589 0-.4706.225-.4706.5s.2117.5.4706.5h1.4117v1.5c0 .275.2118.5.4706.5.2588 0 .4706-.225.4706-.5V12h1.4118c.2588 0 .4705-.225.4705-.5s-.2117-.5-.4705-.5h-1.4118V9.5c0-.275-.2118-.5-.4706-.5Z" fill="currentColor"/></svg>
+                      <span>Use as reference</span>
+                    </button>
+                    <button class="editor-image-tool" type="button" data-open-overlay="remove-bg" aria-pressed="false">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="2"/><path d="M5 8h6"/></svg>
+                      <span>Remove background</span>
+                    </button>
+                    <button class="editor-image-tool" id="editorExtractText" type="button" aria-pressed="false">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1.5h6.5L13 5v9.5H3z"/><path d="M9.5 1.5V5H13M5 8h6M8 8v4M6.5 12h3"/></svg>
+                      <span>Extract text</span>
+                    </button>
+                    <button class="editor-image-tool" type="button" data-go-screen="editor-select-area" aria-pressed="false">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 1v10h10M1 5h10v10"/></svg>
+                      <span>Crop</span>
+                    </button>
                   </div>
                 </div>
                 <div class="editor-text-action-stack hidden" id="editorTextActionStack">
@@ -1845,6 +1852,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=33"></script>
+    <script src="app.js?v=34"></script>
   </body>
 </html>
