@@ -1101,6 +1101,8 @@ function renderEditorCanvas() {
 
   const canvas = document.getElementById("editorCanvas");
   const image = document.getElementById("editorCanvasImage");
+  const canvasShell = document.querySelector("#editorDesktopScreen .canvas-shell");
+  const canvasStage = document.getElementById("editorCanvasStage");
   const mediaShell = document.getElementById("editorCanvasMediaShell");
   const stageContent = document.getElementById("editorCanvasStageContent");
   const segmentation = document.getElementById("editorImageSegmentation");
@@ -1109,9 +1111,9 @@ function renderEditorCanvas() {
   if (!canvas || !image) return;
 
   canvas.classList.add("image-mode");
-  if (mediaShell) {
-    mediaShell.style.background = state.editorBackground;
-  }
+  [canvasShell, canvasStage, mediaShell].forEach((layer) => {
+    if (layer) layer.style.background = state.editorBackground;
+  });
 
   if (state.isBlankEditor) {
     image.removeAttribute("src");
@@ -1268,6 +1270,8 @@ function setCanvasTool(tool) {
   state.canvasTool = tool;
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
+  const canvasSettings = document.getElementById("editorCanvasSettings");
+  if (canvasSettings) canvasSettings.hidden = !["select", "hand"].includes(tool);
 
   document.querySelectorAll(".canvas-tool-button[data-canvas-tool]").forEach((button) => {
     button.classList.toggle("active", button.dataset.canvasTool === tool);
@@ -1905,14 +1909,24 @@ function updateZoom() {
 }
 
 function bindEditorBackgroundSwatches() {
+  const colorPicker = document.getElementById("editorCanvasColorPicker");
+  const setBackground = (color, activeControl) => {
+    state.editorBackground = color || "#F5F7F9";
+    document.querySelectorAll(".editor-bg-swatch, .editor-bg-custom-swatch").forEach((swatch) => {
+      swatch.classList.toggle("active", swatch === activeControl);
+    });
+    if (colorPicker && activeControl !== colorPicker.parentElement) colorPicker.value = state.editorBackground;
+    renderEditorCanvas();
+  };
+
   document.querySelectorAll(".editor-bg-swatch").forEach((button) => {
     button.addEventListener("click", () => {
-      state.editorBackground = button.dataset.color || "#F5F7F9";
-      document.querySelectorAll(".editor-bg-swatch").forEach((swatch) => {
-        swatch.classList.toggle("active", swatch === button);
-      });
-      renderEditorCanvas();
+      setBackground(button.dataset.color, button);
     });
+  });
+
+  colorPicker?.addEventListener("input", () => {
+    setBackground(colorPicker.value, colorPicker.parentElement);
   });
 }
 

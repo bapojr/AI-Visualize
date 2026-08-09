@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=33" />
+    <link rel="stylesheet" href="styles.css?v=34" />
   </head>
   <body>
     <div id="app">
@@ -502,7 +502,34 @@
                   <img src="assets/sidebar/sidebar.svg" alt="" aria-hidden="true" />
                 </button>
               </div>
-              <div class="editor-panel-view active" id="editorLeftEditView" role="tabpanel" aria-labelledby="editorLeftEditTab" data-editor-panel-view="left" data-panel-view="edit"></div>
+              <div class="editor-panel-view active" id="editorLeftEditView" role="tabpanel" aria-labelledby="editorLeftEditTab" data-editor-panel-view="left" data-panel-view="edit">
+                <div class="editor-canvas-settings" id="editorCanvasSettings">
+                  <div class="editor-canvas-settings-heading">Canvas</div>
+                  <section class="editor-canvas-settings-section" aria-labelledby="editorCanvasBackgroundHeading">
+                    <h2 id="editorCanvasBackgroundHeading">Background</h2>
+                    <div class="editor-background-swatches" role="group" aria-label="Canvas background colors">
+                      <button class="editor-bg-swatch active" type="button" data-color="#F5F7F9" aria-label="Default gray background" style="--swatch-color: #F5F7F9"></button>
+                      <button class="editor-bg-swatch" type="button" data-color="#FFFFFF" aria-label="White background" style="--swatch-color: #FFFFFF"></button>
+                      <button class="editor-bg-swatch" type="button" data-color="#FDECEF" aria-label="Pink background" style="--swatch-color: #FDECEF"></button>
+                      <button class="editor-bg-swatch" type="button" data-color="#FFF1E8" aria-label="Peach background" style="--swatch-color: #FFF1E8"></button>
+                      <button class="editor-bg-swatch" type="button" data-color="#FFF8E8" aria-label="Cream background" style="--swatch-color: #FFF8E8"></button>
+                      <button class="editor-bg-swatch" type="button" data-color="#EFFBE8" aria-label="Green background" style="--swatch-color: #EFFBE8"></button>
+                      <button class="editor-bg-swatch" type="button" data-color="#EDF3FF" aria-label="Blue background" style="--swatch-color: #EDF3FF"></button>
+                      <button class="editor-bg-swatch" type="button" data-color="#F3EEFF" aria-label="Lavender background" style="--swatch-color: #F3EEFF"></button>
+                      <label class="editor-bg-custom-swatch" aria-label="Choose a custom canvas background color">
+                        <input id="editorCanvasColorPicker" type="color" value="#F5F7F9" aria-label="Custom canvas background color" />
+                      </label>
+                    </div>
+                  </section>
+                  <section class="editor-canvas-settings-section editor-copy-section" aria-labelledby="editorCanvasCopyHeading">
+                    <h2 id="editorCanvasCopyHeading">Copy as</h2>
+                    <div class="editor-copy-actions">
+                      <button type="button" data-editor-copy-format="png">Copy as PNG</button>
+                      <button type="button" data-editor-copy-format="svg">Copy as SVG</button>
+                    </div>
+                  </section>
+                </div>
+              </div>
               <div class="editor-panel-view" id="editorLeftLibraryView" role="tabpanel" aria-labelledby="editorLeftLibraryTab" data-editor-panel-view="left" data-panel-view="library" hidden></div>
             </aside>
             <section class="canvas-shell">
@@ -1314,6 +1341,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=22"></script>
+    <script src="app.js?v=23"></script>
   </body>
 </html>
