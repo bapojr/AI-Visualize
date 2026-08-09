@@ -1360,6 +1360,7 @@ function bindCanvasToolbar() {
 
     const icon = option.querySelector("svg")?.cloneNode(true);
     if (toolButton && icon) toolButton.replaceChildren(icon);
+    toolButton?.classList.toggle("is-line-glyph", !isShape && value === "line");
     toolButton?.setAttribute("data-tooltip", label);
     toolButton?.setAttribute("aria-label", label);
     document.querySelector(`[data-canvas-menu-toggle="${type}"]`)?.setAttribute("aria-label", `${label} options`);

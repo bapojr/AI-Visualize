@@ -3718,6 +3718,11 @@ a {
   height: 16px;
 }
 
+#canvasLineToolButton.is-line-glyph svg {
+  width: 16px;
+  height: 2px;
+}
+
 .canvas-tool-button:hover {
   background: var(--Blue-3, #edf3ff);
   color: var(--Blue-10, #0054f1);
