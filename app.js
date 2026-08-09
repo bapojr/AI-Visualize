@@ -347,6 +347,15 @@ const state = {
   shapeEdges: "sharp",
   shapeOpacity: 100,
   canvasLine: "line",
+  lineStroke: "#13161B",
+  lineStrokeCustom: false,
+  lineStrokeWidth: 1,
+  lineStrokeStyle: "solid",
+  lineEdges: "sharp",
+  lineOpacity: 100,
+  arrowType: "straight",
+  arrowStarthead: "none",
+  arrowEndhead: "arrow",
   canvasPanX: 0,
   canvasPanY: 0,
   editorLeftPanelCollapsed: false,
@@ -1314,6 +1323,63 @@ function syncShapeSettingsPanel() {
   if (opacity) opacity.value = `${state.shapeOpacity}`;
 }
 
+function applyLineAppearance(object) {
+  if (!object) return;
+  object.style.setProperty("--line-color", state.lineStroke);
+  object.style.setProperty("--line-width", `${state.lineStrokeWidth}px`);
+  object.style.setProperty("--line-style", state.lineStrokeStyle);
+  object.style.setProperty("--line-radius", state.lineEdges === "rounded" ? "999px" : "0");
+  object.style.opacity = `${state.lineOpacity / 100}`;
+  ["straight", "curved", "elbow"].forEach((type) => {
+    object.classList.toggle(`canvas-arrow-type-${type}`, state.canvasLine === "arrow" && state.arrowType === type);
+  });
+  ["arrow", "circle"].forEach((head) => {
+    object.classList.toggle(`canvas-arrow-start-${head}`, state.canvasLine === "arrow" && state.arrowStarthead === head);
+    object.classList.toggle(`canvas-arrow-end-${head}`, state.canvasLine === "arrow" && state.arrowEndhead === head);
+  });
+}
+
+function syncLineSettingsPanel() {
+  const isArrow = state.canvasLine === "arrow";
+  const heading = document.getElementById("editorLineSettingsHeading");
+  if (heading) heading.textContent = isArrow ? "Arrow" : "Line";
+  const edgesGroup = document.getElementById("editorLineEdgesGroup");
+  if (edgesGroup) edgesGroup.hidden = isArrow;
+  const arrowTypeGroup = document.getElementById("editorArrowTypeGroup");
+  if (arrowTypeGroup) arrowTypeGroup.hidden = !isArrow;
+  const arrowheadGroup = document.getElementById("editorArrowheadGroup");
+  if (arrowheadGroup) arrowheadGroup.hidden = !isArrow;
+
+  document.querySelectorAll("[data-line-stroke]").forEach((button) => {
+    button.classList.toggle("active", !state.lineStrokeCustom && button.dataset.lineStroke === state.lineStroke);
+  });
+  document.querySelector('[data-line-custom="stroke"]')?.classList.toggle("active", state.lineStrokeCustom);
+  document.querySelectorAll("[data-line-width]").forEach((button) => {
+    button.classList.toggle("active", Number(button.dataset.lineWidth) === state.lineStrokeWidth);
+  });
+  document.querySelectorAll("[data-line-style]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.lineStyle === state.lineStrokeStyle);
+  });
+  document.querySelectorAll("[data-line-edges]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.lineEdges === state.lineEdges);
+  });
+  document.querySelectorAll("[data-arrow-type]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.arrowType === state.arrowType);
+  });
+
+  const starthead = document.getElementById("editorArrowStarthead");
+  const endhead = document.getElementById("editorArrowEndhead");
+  if (starthead) starthead.value = state.arrowStarthead;
+  if (endhead) endhead.value = state.arrowEndhead;
+  document.querySelectorAll("[data-arrowhead-preview]").forEach((preview) => {
+    const isStart = preview.dataset.arrowheadPreview === "start";
+    const value = isStart ? state.arrowStarthead : state.arrowEndhead;
+    preview.className = `editor-arrowhead-preview${isStart ? " is-start" : ""}${value === "none" ? "" : ` is-${value}`}`;
+  });
+  const opacity = document.getElementById("editorLineOpacity");
+  if (opacity) opacity.value = `${state.lineOpacity}`;
+}
+
 function setCanvasTool(tool) {
   state.canvasTool = tool;
   const stage = document.getElementById("editorCanvasStage");
@@ -1323,6 +1389,9 @@ function setCanvasTool(tool) {
   const shapeSettings = document.getElementById("editorShapeSettings");
   if (shapeSettings) shapeSettings.hidden = tool !== "shape";
   if (tool === "shape") syncShapeSettingsPanel();
+  const lineSettings = document.getElementById("editorLineSettings");
+  if (lineSettings) lineSettings.hidden = tool !== "line";
+  if (tool === "line") syncLineSettingsPanel();
 
   document.querySelectorAll(".canvas-tool-button[data-canvas-tool]").forEach((button) => {
     button.classList.toggle("active", button.dataset.canvasTool === tool);
@@ -1568,6 +1637,7 @@ function bindCanvasToolbar() {
         applyShapeAppearance(object);
       } else if (state.canvasTool === "line") {
         object.className = `canvas-object canvas-line-object${state.canvasLine === "arrow" ? " canvas-arrow-object" : ""}`;
+        applyLineAppearance(object);
       } else {
         object.className = `canvas-object canvas-${state.canvasTool}-object`;
       }
@@ -2042,6 +2112,66 @@ function bindEditorShapeSettings() {
   syncShapeSettingsPanel();
 }
 
+function bindEditorLineSettings() {
+  const updateSelectedLine = () => {
+    document.querySelectorAll(".canvas-line-object.is-selected").forEach(applyLineAppearance);
+    syncLineSettingsPanel();
+  };
+
+  document.querySelectorAll("[data-line-stroke]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.lineStroke = button.dataset.lineStroke;
+      state.lineStrokeCustom = false;
+      updateSelectedLine();
+    });
+  });
+  document.querySelectorAll("[data-line-width]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.lineStrokeWidth = Number(button.dataset.lineWidth);
+      updateSelectedLine();
+    });
+  });
+  document.querySelectorAll("[data-line-style]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.lineStrokeStyle = button.dataset.lineStyle;
+      updateSelectedLine();
+    });
+  });
+  document.querySelectorAll("[data-line-edges]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.lineEdges = button.dataset.lineEdges;
+      updateSelectedLine();
+    });
+  });
+  document.querySelectorAll("[data-arrow-type]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.arrowType = button.dataset.arrowType;
+      updateSelectedLine();
+    });
+  });
+
+  const strokePicker = document.getElementById("editorLineStrokePicker");
+  strokePicker?.addEventListener("input", () => {
+    state.lineStroke = strokePicker.value;
+    state.lineStrokeCustom = true;
+    updateSelectedLine();
+  });
+  document.getElementById("editorArrowStarthead")?.addEventListener("change", (event) => {
+    state.arrowStarthead = event.target.value;
+    updateSelectedLine();
+  });
+  document.getElementById("editorArrowEndhead")?.addEventListener("change", (event) => {
+    state.arrowEndhead = event.target.value;
+    updateSelectedLine();
+  });
+  document.getElementById("editorLineOpacity")?.addEventListener("input", (event) => {
+    state.lineOpacity = Number(event.target.value);
+    updateSelectedLine();
+  });
+
+  syncLineSettingsPanel();
+}
+
 function init() {
   renderCategoryPills("desktopCategoryPills", "desktop");
   renderCategoryPills("mobileCategoryPills", "mobile");
@@ -2065,6 +2195,7 @@ function init() {
   bindSelectGroups();
   bindEditorBackgroundSwatches();
   bindEditorShapeSettings();
+  bindEditorLineSettings();
   initActions();
   syncConversationPrompt();
   syncMobileConversationPrompt();

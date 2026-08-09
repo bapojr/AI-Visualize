@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=36" />
+    <link rel="stylesheet" href="styles.css?v=37" />
   </head>
   <body>
     <div id="app">
@@ -589,6 +589,90 @@
                   <section class="editor-shape-settings-section editor-shape-opacity-section" aria-labelledby="editorShapeOpacityHeading">
                     <h2 id="editorShapeOpacityHeading">Opacity</h2>
                     <input id="editorShapeOpacity" type="range" min="0" max="100" value="100" aria-label="Shape opacity" />
+                    <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
+                  </section>
+                </div>
+                <div class="editor-line-settings" id="editorLineSettings" hidden>
+                  <div class="editor-canvas-settings-heading" id="editorLineSettingsHeading">Line</div>
+                  <section class="editor-shape-settings-section editor-line-stroke-section" aria-labelledby="editorLineStrokeHeading">
+                    <h2 id="editorLineStrokeHeading">Stroke</h2>
+                    <div class="editor-shape-swatches" role="group" aria-label="Line stroke colors">
+                      <button class="editor-shape-swatch is-none" type="button" data-line-stroke="transparent" aria-label="No line stroke"></button>
+                      <button class="editor-shape-swatch active" type="button" data-line-stroke="#13161B" aria-label="Black line stroke" style="--swatch-color: #13161B"></button>
+                      <button class="editor-shape-swatch" type="button" data-line-stroke="#F72D45" aria-label="Red line stroke" style="--swatch-color: #F72D45"></button>
+                      <button class="editor-shape-swatch" type="button" data-line-stroke="#FF6B11" aria-label="Orange line stroke" style="--swatch-color: #FF6B11"></button>
+                      <button class="editor-shape-swatch" type="button" data-line-stroke="#FFB700" aria-label="Yellow line stroke" style="--swatch-color: #FFB700"></button>
+                      <button class="editor-shape-swatch" type="button" data-line-stroke="#46C800" aria-label="Green line stroke" style="--swatch-color: #46C800"></button>
+                      <button class="editor-shape-swatch" type="button" data-line-stroke="#477FE5" aria-label="Blue line stroke" style="--swatch-color: #477FE5"></button>
+                      <button class="editor-shape-swatch" type="button" data-line-stroke="#7D5CE0" aria-label="Purple line stroke" style="--swatch-color: #7D5CE0"></button>
+                      <label class="editor-shape-custom-swatch" data-line-custom="stroke" aria-label="Choose a custom line stroke color">
+                        <input id="editorLineStrokePicker" type="color" value="#13161B" aria-label="Custom line stroke color" />
+                      </label>
+                    </div>
+                    <div class="editor-shape-control-group">
+                      <h3>Width</h3>
+                      <div class="editor-shape-option-row" role="group" aria-label="Line width">
+                        <button class="editor-shape-icon-option active" type="button" data-line-width="1" aria-label="Thin line"><span class="shape-width-icon thin"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-line-width="2" aria-label="Medium line"><span class="shape-width-icon medium"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-line-width="4" aria-label="Thick line"><span class="shape-width-icon thick"></span></button>
+                      </div>
+                    </div>
+                    <div class="editor-shape-control-group">
+                      <h3>Style</h3>
+                      <div class="editor-shape-option-row" role="group" aria-label="Line style">
+                        <button class="editor-shape-icon-option active" type="button" data-line-style="solid" aria-label="Solid line"><span class="shape-style-icon solid"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-line-style="dashed" aria-label="Dashed line"><span class="shape-style-icon dashed"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-line-style="dotted" aria-label="Dotted line"><span class="shape-style-icon dotted"></span></button>
+                      </div>
+                    </div>
+                    <div class="editor-shape-control-group" id="editorLineEdgesGroup">
+                      <h3>Edges</h3>
+                      <div class="editor-shape-option-row" role="group" aria-label="Line edges">
+                        <button class="editor-shape-icon-option active" type="button" data-line-edges="sharp" aria-label="Sharp line edges"><span class="shape-edge-icon sharp"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-line-edges="rounded" aria-label="Rounded line edges"><span class="shape-edge-icon rounded"></span></button>
+                      </div>
+                    </div>
+                    <div class="editor-shape-control-group" id="editorArrowTypeGroup" hidden>
+                      <h3>Arrow type</h3>
+                      <div class="editor-shape-option-row" role="group" aria-label="Arrow type">
+                        <button class="editor-shape-icon-option active" type="button" data-arrow-type="straight" aria-label="Straight arrow">
+                          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13L13 3M8.8 3H13v4.2"/></svg>
+                        </button>
+                        <button class="editor-shape-icon-option" type="button" data-arrow-type="curved" aria-label="Curved arrow">
+                          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13c4.8 0 7-2.2 7-7V3m0 0L7.5 5.5M10 3l2.5 2.5"/></svg>
+                        </button>
+                        <button class="editor-shape-icon-option" type="button" data-arrow-type="elbow" aria-label="Elbow arrow">
+                          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3v7h8m0 0L8.5 7.5M11 10l-2.5 2.5"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="editor-shape-control-group" id="editorArrowheadGroup" hidden>
+                      <h3>Arrowhead</h3>
+                      <div class="editor-arrowhead-row">
+                        <label class="editor-arrowhead-select" aria-label="Start arrowhead">
+                          <span class="editor-arrowhead-preview" data-arrowhead-preview="start" aria-hidden="true"></span>
+                          <select id="editorArrowStarthead" aria-label="Start arrowhead">
+                            <option value="none" selected>None</option>
+                            <option value="arrow">Arrow</option>
+                            <option value="circle">Circle</option>
+                          </select>
+                          <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                        </label>
+                        <label class="editor-arrowhead-select" aria-label="End arrowhead">
+                          <span class="editor-arrowhead-preview is-arrow" data-arrowhead-preview="end" aria-hidden="true"></span>
+                          <select id="editorArrowEndhead" aria-label="End arrowhead">
+                            <option value="none">None</option>
+                            <option value="arrow" selected>Arrow</option>
+                            <option value="circle">Circle</option>
+                          </select>
+                          <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                        </label>
+                      </div>
+                    </div>
+                  </section>
+                  <section class="editor-shape-settings-section editor-shape-opacity-section" aria-labelledby="editorLineOpacityHeading">
+                    <h2 id="editorLineOpacityHeading">Opacity</h2>
+                    <input id="editorLineOpacity" type="range" min="0" max="100" value="100" aria-label="Line opacity" />
                     <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
                   </section>
                 </div>
@@ -1404,6 +1488,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=25"></script>
+    <script src="app.js?v=26"></script>
   </body>
 </html>
