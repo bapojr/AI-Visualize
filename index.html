@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=47" />
+    <link rel="stylesheet" href="styles.css?v=48" />
   </head>
   <body>
     <div id="app">
@@ -1123,6 +1123,17 @@
                       <img id="editorCanvasImage" alt="Selected generated visual" class="editor-canvas-image" />
                       <div class="editor-image-segmentation" id="editorImageSegmentation"></div>
                       <div class="canvas-drawing-layer" id="canvasDrawingLayer"></div>
+                      <div class="editor-image-selection-frame" id="editorImageSelectionFrame">
+                        <span class="editor-image-resize-handle is-top-left" aria-hidden="true"></span>
+                        <span class="editor-image-resize-handle is-top-right" aria-hidden="true"></span>
+                        <span class="editor-image-resize-handle is-bottom-left" aria-hidden="true"></span>
+                        <span class="editor-image-resize-handle is-bottom-right" aria-hidden="true"></span>
+                        <button class="editor-image-rotate-handle" id="editorImageRotateHandle" type="button" aria-label="Rotate image">
+                          <svg viewBox="0 0 15 16" aria-hidden="true">
+                            <path d="M7.99844 0C7.20781 0 6.52344 0.459375 6.19844 1.125C5.97969 1.04375 5.74531 1 5.49844 1C4.39531 1 3.49844 1.89688 3.49844 3V8.17188L3.41406 8.0875C2.63281 7.30625 1.36719 7.30625 0.585938 8.0875C-0.195312 8.86875 -0.195312 10.1344 0.585938 10.9156L3.32656 13.6562C4.82656 15.1562 6.86094 16 8.98281 16H9.49844C9.54531 16 9.59219 15.9969 9.63906 15.9875C12.5047 15.7938 14.7953 13.5062 14.9859 10.6406C14.9953 10.5938 14.9984 10.5469 14.9984 10.5V5C14.9984 3.89688 14.1016 3 12.9984 3C12.8266 3 12.6578 3.02188 12.4984 3.0625V3C12.4984 1.89688 11.6016 1 10.4984 1C10.2516 1 10.0172 1.04375 9.79844 1.125C9.47344 0.459375 8.78906 0 7.99844 0ZM7.49844 3.00312V3V2C7.49844 1.725 7.72344 1.5 7.99844 1.5C8.27344 1.5 8.49844 1.725 8.49844 2V7.25C8.49844 7.66563 8.83281 8 9.24844 8C9.66406 8 9.99844 7.66563 9.99844 7.25V3C9.99844 2.725 10.2234 2.5 10.4984 2.5C10.7734 2.5 10.9984 2.725 10.9984 3V7.25C10.9984 7.66563 11.3328 8 11.7484 8C12.1641 8 12.4984 7.66563 12.4984 7.25V5C12.4984 4.725 12.7234 4.5 12.9984 4.5C13.2734 4.5 13.4984 4.725 13.4984 5V10.4031C13.4953 10.4219 13.4953 10.4437 13.4922 10.4625C13.3859 12.6406 11.6391 14.3875 9.46094 14.4937C9.44219 14.4937 9.42031 14.4969 9.40156 14.5H8.98281C7.26094 14.5 5.60781 13.8156 4.38906 12.5969L1.64531 9.85312C1.45156 9.65937 1.45156 9.34063 1.64531 9.14688C1.83906 8.95313 2.15781 8.95313 2.35156 9.14688L3.71719 10.5125C3.93281 10.7281 4.25469 10.7906 4.53594 10.675C4.81719 10.5594 4.99844 10.2844 4.99844 9.98125V3C4.99844 2.725 5.22344 2.5 5.49844 2.5C5.77344 2.5 5.99844 2.72188 5.99844 2.99688V7.25C5.99844 7.66563 6.33281 8 6.74844 8C7.16406 8 7.49844 7.66563 7.49844 7.25V3.00312Z" fill="currentColor"/>
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1852,6 +1863,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=34"></script>
+    <script src="app.js?v=35"></script>
   </body>
 </html>

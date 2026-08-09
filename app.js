@@ -378,6 +378,7 @@ const state = {
   selectedEditorSegmentId: null,
   selectedEditorSegmentType: null,
   isEditorFrameSelected: false,
+  imageRotation: 0,
   imageOpacity: 100,
   imageLayer: 1,
   imagePromptExpanded: false,
@@ -778,6 +779,7 @@ function createHistoryNode(item, compact = false, isActive = false) {
       state.selectedVariant = 1;
       state.generatedResultTemplate = nextTemplate;
       state.currentEditorTemplate = nextTemplate;
+      state.imageRotation = 0;
       renderEditorCanvas();
       updatePreviewVisuals();
       }
@@ -1240,6 +1242,7 @@ function bindCanvasSelection() {
   const useReference = document.getElementById("editorUseReference");
   const extractText = document.getElementById("editorExtractText");
   const segmentation = document.getElementById("editorImageSegmentation");
+  const rotateHandle = document.getElementById("editorImageRotateHandle");
 
   const resetImageToolbarState = () => {
     imageActionToolbar?.querySelectorAll(".editor-image-tool").forEach((button) => {
@@ -1284,6 +1287,48 @@ function bindCanvasSelection() {
     selectWholeImage();
   });
 
+  let rotateSession = null;
+  rotateHandle?.addEventListener("click", (event) => event.stopPropagation());
+  rotateHandle?.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || !state.isEditorFrameSelected || !stageContent) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const bounds = stageContent.getBoundingClientRect();
+    const centerX = bounds.left + bounds.width / 2;
+    const centerY = bounds.top + bounds.height / 2;
+    rotateSession = {
+      pointerId: event.pointerId,
+      startAngle: Math.atan2(event.clientY - centerY, event.clientX - centerX),
+      startRotation: state.imageRotation,
+      centerX,
+      centerY,
+    };
+    rotateHandle.setPointerCapture?.(event.pointerId);
+    rotateHandle.classList.add("is-rotating");
+    document.getElementById("editorCanvasStage")?.classList.add("is-rotating");
+  });
+
+  document.addEventListener("pointermove", (event) => {
+    if (!rotateSession || event.pointerId !== rotateSession.pointerId) return;
+    const angle = Math.atan2(event.clientY - rotateSession.centerY, event.clientX - rotateSession.centerX);
+    let rotation = rotateSession.startRotation + ((angle - rotateSession.startAngle) * 180) / Math.PI;
+    if (event.shiftKey) rotation = Math.round(rotation / 15) * 15;
+    state.imageRotation = rotation;
+    updateCanvasTransform();
+  });
+
+  const endImageRotation = (event) => {
+    if (!rotateSession || event.pointerId !== rotateSession.pointerId) return;
+    rotateHandle.releasePointerCapture?.(event.pointerId);
+    state.imageRotation = ((state.imageRotation + 180) % 360 + 360) % 360 - 180;
+    rotateSession = null;
+    rotateHandle.classList.remove("is-rotating");
+    document.getElementById("editorCanvasStage")?.classList.remove("is-rotating");
+    updateCanvasTransform();
+  };
+  document.addEventListener("pointerup", endImageRotation);
+  document.addEventListener("pointercancel", endImageRotation);
+
   imageActionToolbar?.addEventListener("click", (event) => {
     const action = event.target.closest(".editor-image-tool");
     if (!action) return;
@@ -1307,6 +1352,8 @@ function bindCanvasSelection() {
       !event.target.closest("#editorImageSettings") &&
       !event.target.closest("#editorSegmentGraphicSettings") &&
       !event.target.closest("#editorSegmentTextSettings") &&
+      !event.target.closest(".canvas-main-toolbar") &&
+      !event.target.closest(".canvas-zoom-controls") &&
       !event.target.closest("#editorCanvasStageContent") &&
       !event.target.closest("#editorCanvasImage")
     ) {
@@ -1846,6 +1893,7 @@ function updateCanvasTransform() {
   stageContent.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
   stageContent.style.setProperty("--canvas-pan-x", `${state.canvasPanX}px`);
   stageContent.style.setProperty("--canvas-pan-y", `${state.canvasPanY}px`);
+  stageContent.style.setProperty("--editor-image-rotation", `${state.imageRotation}deg`);
 }
 
 function setEditorPanelView(panel, view) {
@@ -2202,6 +2250,7 @@ function initActions() {
         !go.closest('[data-screen="editor-desktop"], [data-screen="editor-select-area"], [data-screen="editor-collapsed-history"]')
       ) {
         state.isBlankEditor = false;
+        state.imageRotation = 0;
         renderHistory();
       }
       setScreen(destination);
@@ -2355,6 +2404,7 @@ function initActions() {
     state.selectedEditorSegmentId = null;
     state.selectedEditorSegmentType = null;
     state.isEditorFrameSelected = false;
+    state.imageRotation = 0;
     renderHistory();
     setScreen("editor-desktop");
   });
