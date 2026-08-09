@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=19" />
+    <link rel="stylesheet" href="styles.css?v=20" />
   </head>
   <body>
     <div id="app">
@@ -543,7 +543,50 @@
 
             </section>
 
-            <aside class="history-panel expanded" id="historyPanel" aria-label="Editor history"></aside>
+            <aside class="history-panel expanded editor-chat-panel" id="historyPanel" aria-label="Editor chat">
+              <div class="editor-chat-thread" id="editorChatThread" aria-live="polite"></div>
+              <div class="editor-chat-composer" id="editorChatComposer">
+                <textarea
+                  id="editorChatPrompt"
+                  aria-label="Describe what you want to visualize"
+                  placeholder="Describe what you want to visualize...."
+                ></textarea>
+                <div class="editor-chat-footer">
+                  <button class="landing-plus-button editor-chat-plus" type="button" aria-label="Attach file">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="12" viewBox="0 0 11 12" fill="none" aria-hidden="true">
+                      <path d="M5.625 1.5C5.625 1.29375 5.45625 1.125 5.25 1.125C5.04375 1.125 4.875 1.29375 4.875 1.5V5.625H0.75C0.54375 5.625 0.375 5.79375 0.375 6C0.375 6.20625 0.54375 6.375 0.75 6.375H4.875V10.5C4.875 10.7063 5.04375 10.875 5.25 10.875C5.45625 10.875 5.625 10.7063 5.625 10.5V6.375H9.75C9.95625 6.375 10.125 6.20625 10.125 6C10.125 5.79375 9.95625 5.625 9.75 5.625H5.625V1.5Z" fill="#13161B"/>
+                    </svg>
+                  </button>
+                  <div class="editor-chat-actions">
+                    <button class="landing-control-button gallery-trigger editor-gallery-trigger" type="button" aria-label="Gallery">
+                      <svg class="landing-gallery-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <path d="M2.625 2.1875C2.38437 2.1875 2.1875 2.38437 2.1875 2.625V11.375C2.1875 11.6156 2.38437 11.8125 2.625 11.8125H11.375C11.6156 11.8125 11.8125 11.6156 11.8125 11.375V2.625C11.8125 2.38437 11.6156 2.1875 11.375 2.1875H2.625ZM0.875 2.625C0.875 1.65977 1.65977 0.875 2.625 0.875H11.375C12.3402 0.875 13.125 1.65977 13.125 2.625V11.375C13.125 12.3402 12.3402 13.125 11.375 13.125H2.625C1.65977 13.125 0.875 12.3402 0.875 11.375V2.625ZM4.375 3.5C4.60706 3.5 4.82962 3.59219 4.99372 3.75628C5.15781 3.92038 5.25 4.14294 5.25 4.375C5.25 4.60706 5.15781 4.82962 4.99372 4.99372C4.82962 5.15781 4.60706 5.25 4.375 5.25C4.14294 5.25 3.92038 5.15781 3.75628 4.99372C3.59219 4.82962 3.5 4.60706 3.5 4.375C3.5 4.14294 3.59219 3.92038 3.75628 3.75628C3.92038 3.59219 4.14294 3.5 4.375 3.5ZM8.09375 5.46875C8.32617 5.46875 8.54219 5.5918 8.65977 5.79141L10.8473 9.51016C10.9676 9.7125 10.9676 9.96406 10.85 10.1691C10.7324 10.3742 10.5164 10.5 10.2812 10.5H3.71875C3.47539 10.5 3.24844 10.3633 3.13633 10.1473C3.02422 9.93125 3.04063 9.66875 3.18008 9.46914L4.71133 7.28164C4.83438 7.10664 5.03398 7.00273 5.25 7.00273C5.46602 7.00273 5.66562 7.10664 5.78867 7.28164L6.25898 7.9543L7.53047 5.79414C7.64805 5.59453 7.86406 5.47148 8.09648 5.47148L8.09375 5.46875Z" fill="#13161B"/>
+                      </svg>
+                      <span>Gallery</span>
+                      <span class="landing-info-icon" aria-hidden="true"></span>
+                    </button>
+                    <button class="editor-chat-compact-control editor-chat-ratio ratio-trigger" type="button" data-open-overlay="ratio-dropdown" aria-label="Ratio">
+                      <span class="ratio-trigger-text">4:3</span>
+                    </button>
+                    <button class="editor-chat-compact-control" type="button" data-open-overlay="style-dropdown" aria-label="Styles">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M3 1.125H5.625V3.1875C5.625 4.12031 6.37969 4.875 7.3125 4.875H9.375V10.5C9.375 10.7063 9.20625 10.875 9 10.875H3C2.79375 10.875 2.625 10.7063 2.625 10.5V1.5C2.625 1.29375 2.79375 1.125 3 1.125ZM6.75 1.59141L8.90859 3.75H7.3125C7.00078 3.75 6.75 3.49922 6.75 3.1875V1.59141ZM3 0C2.17266 0 1.5 0.672656 1.5 1.5V10.5C1.5 11.3273 2.17266 12 3 12H9C9.82734 12 10.5 11.3273 10.5 10.5V4.37109C10.5 3.97266 10.343 3.59062 10.0617 3.30937L7.18828 0.438281C6.90703 0.157031 6.52734 0 6.12891 0H3ZM4.3125 6C4.00078 6 3.75 6.25078 3.75 6.5625C3.75 6.87422 4.00078 7.125 4.3125 7.125H7.6875C7.99922 7.125 8.25 6.87422 8.25 6.5625C8.25 6.25078 7.99922 6 7.6875 6H4.3125ZM4.3125 8.25C4.00078 8.25 3.75 8.50078 3.75 8.8125C3.75 9.12422 4.00078 9.375 4.3125 9.375H7.6875C7.99922 9.375 8.25 9.12422 8.25 8.8125C8.25 8.50078 7.99922 8.25 7.6875 8.25H4.3125Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                    <button class="editor-chat-compact-control" type="button" data-open-overlay="model-dropdown" aria-label="AI model">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M5.82618 1.12472C5.93854 1.05955 6.07337 1.05955 6.18573 1.12472L9.77674 3.19888L6.00595 5.3764L2.23517 3.19888L5.82618 1.12472ZM1.69584 4.13371L5.46663 6.31124V10.6663L1.87561 8.59214C1.76325 8.52697 1.69584 8.41011 1.69584 8.27978V4.13146V4.13371ZM6.54528 10.6663V6.31124L10.3161 4.13371V8.28202C10.3161 8.41011 10.2486 8.52921 10.1363 8.59438L6.54528 10.6663ZM6.72505 0.192135C6.28011 -0.064045 5.73179 -0.064045 5.28685 0.192135L1.33629 2.47079C0.891345 2.72697 0.617188 3.20337 0.617188 3.71573V8.27753C0.617188 8.79214 0.891345 9.26629 1.33629 9.52247L5.28685 11.8079C5.73179 12.064 6.28011 12.064 6.72505 11.8079L10.6779 9.52697C11.1228 9.27079 11.397 8.79438 11.397 8.28202V3.72022C11.397 3.20562 11.1228 2.73146 10.6779 2.47528L6.72505 0.189888V0.192135Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                    <button class="editor-chat-submit" id="editorChatSubmit" type="button" disabled aria-label="Send message">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M14.4996 1.75C14.4996 1.33437 14.834 1 15.2496 1C15.6652 1 15.9996 1.33437 15.9996 1.75V7C15.9996 8.51875 14.7684 9.75 13.2496 9.75H2.55898L5.27773 12.4688C5.57148 12.7625 5.57148 13.2375 5.27773 13.5281C4.98398 13.8187 4.50898 13.8219 4.21836 13.5281L0.218359 9.53125C-0.0753906 9.2375 -0.0753906 8.7625 0.218359 8.47188L4.21836 4.46875C4.51211 4.175 4.98711 4.175 5.27773 4.46875C5.56836 4.7625 5.57148 5.2375 5.27773 5.52812L2.55898 8.24687L13.2496 8.25C13.9402 8.25 14.4996 7.69063 14.4996 7V1.75Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </aside>
           </main>
         </section>
 
@@ -1134,6 +1177,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=12"></script>
+    <script src="app.js?v=13"></script>
   </body>
 </html>

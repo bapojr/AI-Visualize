@@ -992,8 +992,10 @@ function toggleSubmitStates() {
   const desktopValue = document.getElementById("landingPromptDesktop")?.value.trim() || "";
   const mobileValue = document.getElementById("landingPromptMobile")?.value.trim() || "";
   const conversationValue = document.getElementById("conversationPromptBar")?.value.trim() || "";
+  const editorValue = document.getElementById("editorChatPrompt")?.value.trim() || "";
   const desktopButton = document.getElementById("landingSubmitDesktop");
   const mobileButton = document.getElementById("landingSubmitMobile");
+  const editorButton = document.getElementById("editorChatSubmit");
   const landingHelper = document.getElementById("landingPromptHelper");
   const conversationHelper = document.getElementById("conversationPromptHelper");
   document
@@ -1004,6 +1006,7 @@ function toggleSubmitStates() {
     ?.classList.toggle("has-value", Boolean(mobileValue));
   if (desktopButton) desktopButton.disabled = !desktopValue;
   if (mobileButton) mobileButton.disabled = !mobileValue;
+  if (editorButton) editorButton.disabled = !editorValue;
   if (landingHelper) {
     landingHelper.disabled = !desktopValue;
     landingHelper.classList.toggle("is-enabled", Boolean(desktopValue));
@@ -1374,6 +1377,26 @@ function initActions() {
   document.getElementById("landingPromptDesktop")?.addEventListener("input", toggleSubmitStates);
   document.getElementById("landingPromptMobile")?.addEventListener("input", toggleSubmitStates);
   document.getElementById("conversationPromptBar")?.addEventListener("input", toggleSubmitStates);
+  document.getElementById("editorChatPrompt")?.addEventListener("input", toggleSubmitStates);
+  document.getElementById("editorChatPrompt")?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      document.getElementById("editorChatSubmit")?.click();
+    }
+  });
+  document.getElementById("editorChatSubmit")?.addEventListener("click", () => {
+    const input = document.getElementById("editorChatPrompt");
+    const message = input?.value.trim();
+    if (!input || !message) return;
+
+    const messageNode = document.createElement("div");
+    messageNode.className = "editor-chat-message";
+    messageNode.textContent = message;
+    document.getElementById("editorChatThread")?.appendChild(messageNode);
+    input.value = "";
+    toggleSubmitStates();
+    input.focus();
+  });
   document.querySelector(".sidebar-auth-cta")?.addEventListener("click", () => {
     document.querySelector(".landing-sidebar")?.classList.add("is-signed-in");
   });

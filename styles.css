@@ -3859,6 +3859,157 @@ a {
   overflow: hidden;
 }
 
+.editor-chat-panel {
+  display: flex;
+  min-width: 0;
+  padding: 12px;
+  flex-direction: column;
+  gap: 12px;
+  background: #fafafa;
+}
+
+.editor-chat-thread {
+  display: flex;
+  min-height: 0;
+  padding: 4px;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.editor-chat-message {
+  max-width: 88%;
+  padding: 9px 11px;
+  align-self: flex-end;
+  border-radius: 10px 10px 2px 10px;
+  background: #eaf1ff;
+  color: var(--Gray-12, #13161b);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+}
+
+.editor-chat-composer {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 234px;
+  min-height: 190px;
+  padding: 16px;
+  flex: 0 0 auto;
+  flex-direction: column;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 12px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 4px 20px rgba(5, 30, 87, 0.08);
+}
+
+.editor-chat-composer textarea {
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  resize: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--Gray-12, #13161b);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.editor-chat-composer textarea::placeholder {
+  color: #7d8aa1;
+  opacity: 1;
+}
+
+.editor-chat-footer,
+.editor-chat-actions {
+  display: flex;
+  height: 32px;
+  align-items: center;
+}
+
+.editor-chat-footer {
+  width: 100%;
+  flex: 0 0 32px;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.editor-chat-actions {
+  min-width: 0;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.editor-chat-plus {
+  border-radius: 6px;
+}
+
+.editor-gallery-trigger {
+  min-width: 82px;
+  width: 82px;
+  padding-right: 5px;
+  padding-left: 5px;
+  gap: 4px;
+}
+
+.editor-gallery-trigger .landing-info-icon {
+  margin-left: 0;
+}
+
+.editor-chat-compact-control,
+.editor-chat-submit {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--Gray-12, #13161b);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.editor-chat-compact-control:hover {
+  background: var(--Gray-2, #f8f9fd);
+}
+
+.editor-chat-ratio {
+  width: 34px;
+  flex-basis: 34px;
+}
+
+.editor-chat-submit {
+  background: var(--Gray-2, #f8f9fd);
+  color: var(--Gray-6, #d8e0ee);
+}
+
+.editor-chat-submit:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.editor-chat-submit:not(:disabled) {
+  background: var(--Blue-9, #0062ff);
+  color: #fff;
+}
+
+.editor-chat-submit:not(:disabled):hover {
+  background: var(--Blue-10, #0054f1);
+}
+
 .history-panel.collapsed {
   width: 44px;
   padding: 16px 6px;
