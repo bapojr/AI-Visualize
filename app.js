@@ -341,6 +341,9 @@ const state = {
   canvasLine: "line",
   canvasPanX: 0,
   canvasPanY: 0,
+  editorLeftPanelCollapsed: false,
+  editorLeftPanelView: "edit",
+  editorRightPanelView: "chat",
   currentEditorTemplate: templateCatalog[0],
   editorBackground: "#F5F7F9",
   editorTitle: "Untitled",
@@ -1282,6 +1285,36 @@ function updateCanvasTransform() {
   stageContent.style.setProperty("--canvas-pan-y", `${state.canvasPanY}px`);
 }
 
+function setEditorPanelView(panel, view) {
+  if (panel === "left") state.editorLeftPanelView = view;
+  if (panel === "right") state.editorRightPanelView = view;
+
+  document.querySelectorAll(`[data-editor-panel-tab="${panel}"]`).forEach((tab) => {
+    const selected = tab.dataset.panelView === view;
+    tab.classList.toggle("selected", selected);
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+  });
+
+  document.querySelectorAll(`[data-editor-panel-view="${panel}"]`).forEach((panelView) => {
+    const selected = panelView.dataset.panelView === view;
+    panelView.classList.toggle("active", selected);
+    panelView.hidden = !selected;
+  });
+
+  if (panel === "right") {
+    document.getElementById("historyPanel")?.setAttribute("aria-label", view === "chat" ? "Editor chat" : "Editor edit");
+  }
+}
+
+function setEditorLeftPanelCollapsed(collapsed) {
+  state.editorLeftPanelCollapsed = collapsed;
+  document.getElementById("editorDesktopScreen")?.classList.toggle("editor-left-panel-collapsed", collapsed);
+  ["editorLeftPanelCollapse", "editorLeftPanelOpen"].forEach((id) => {
+    document.getElementById(id)?.setAttribute("aria-expanded", String(!collapsed));
+  });
+}
+
 function bindCanvasToolbar() {
   const stage = document.getElementById("editorCanvasStage");
   const stageContent = document.getElementById("editorCanvasStageContent");
@@ -1686,6 +1719,17 @@ function initActions() {
     toggleSubmitStates();
     input.focus();
   });
+  document.querySelectorAll("[data-editor-panel-tab]").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      setEditorPanelView(tab.dataset.editorPanelTab, tab.dataset.panelView);
+    });
+  });
+  document.getElementById("editorLeftPanelCollapse")?.addEventListener("click", () => {
+    setEditorLeftPanelCollapsed(true);
+  });
+  document.getElementById("editorLeftPanelOpen")?.addEventListener("click", () => {
+    setEditorLeftPanelCollapsed(false);
+  });
   document.querySelector(".sidebar-auth-cta")?.addEventListener("click", () => {
     document.querySelector(".landing-sidebar")?.classList.add("is-signed-in");
   });
@@ -1883,6 +1927,9 @@ function init() {
   updateEditorToolbar("text");
   bindCanvasSelection();
   bindCanvasToolbar();
+  setEditorPanelView("left", state.editorLeftPanelView);
+  setEditorPanelView("right", state.editorRightPanelView);
+  setEditorLeftPanelCollapsed(state.editorLeftPanelCollapsed);
   bindSelectGroups();
   bindEditorBackgroundSwatches();
   initActions();
