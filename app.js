@@ -2479,6 +2479,12 @@ function bindEditorExportMenu() {
   if (!wrap || !trigger || !menu) return;
 
   const setOpen = (open) => {
+    if (open) {
+      const shareMenu = document.getElementById("editorShareMenu");
+      const shareTrigger = document.getElementById("editorShareTrigger");
+      if (shareMenu) shareMenu.hidden = true;
+      shareTrigger?.setAttribute("aria-expanded", "false");
+    }
     menu.hidden = !open;
     trigger.setAttribute("aria-expanded", String(open));
   };
@@ -2533,6 +2539,105 @@ function bindEditorExportMenu() {
   });
 }
 
+function bindEditorShareMenu() {
+  const wrap = document.getElementById("editorShareWrap");
+  const trigger = document.getElementById("editorShareTrigger");
+  const menu = document.getElementById("editorShareMenu");
+  if (!wrap || !trigger || !menu) return;
+
+  const shareUrl = "https://paperpal.app/share/crispr-visual";
+  const setOpen = (open) => {
+    if (open) {
+      const exportMenu = document.getElementById("editorExportMenu");
+      const exportTrigger = document.getElementById("editorExportTrigger");
+      if (exportMenu) exportMenu.hidden = true;
+      exportTrigger?.setAttribute("aria-expanded", "false");
+    }
+    menu.hidden = !open;
+    trigger.setAttribute("aria-expanded", String(open));
+  };
+
+  const flashAction = (button, message) => {
+    const label = button.querySelector(":scope > span:last-child");
+    if (!label) return;
+    const original = label.innerHTML;
+    label.textContent = message;
+    window.setTimeout(() => {
+      label.innerHTML = original;
+    }, 1200);
+  };
+
+  trigger.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setOpen(menu.hidden);
+  });
+
+  menu.addEventListener("click", (event) => event.stopPropagation());
+
+  menu.querySelector('[data-editor-share-action="clipboard"]')?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const image = document.getElementById("editorCanvasImage");
+    try {
+      if (image?.src && navigator.clipboard?.write && window.ClipboardItem) {
+        const source = new Image();
+        source.crossOrigin = "anonymous";
+        await new Promise((resolve, reject) => {
+          source.onload = resolve;
+          source.onerror = reject;
+          source.src = image.src;
+        });
+        const canvas = document.createElement("canvas");
+        canvas.width = source.naturalWidth;
+        canvas.height = source.naturalHeight;
+        canvas.getContext("2d")?.drawImage(source, 0, 0);
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (blob) await navigator.clipboard.write([new ClipboardItem({"image/png": blob})]);
+      } else {
+        await navigator.clipboard?.writeText(shareUrl);
+      }
+      flashAction(button, "Copied");
+    } catch (error) {
+      await navigator.clipboard?.writeText(shareUrl);
+      flashAction(button, "Link copied");
+    }
+  });
+
+  menu.querySelector('[data-editor-share-action="public-link"]')?.addEventListener("click", async (event) => {
+    await navigator.clipboard?.writeText(shareUrl);
+    flashAction(event.currentTarget, "Link copied");
+  });
+
+  const encodedUrl = encodeURIComponent(shareUrl);
+  const encodedMessage = encodeURIComponent("View my Paperpal illustration");
+  const shareTargets = {
+    instagram: shareUrl,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    x: `https://x.com/intent/post?url=${encodedUrl}&text=${encodedMessage}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    email: `mailto:?subject=${encodedMessage}&body=${encodedUrl}`,
+    whatsapp: `https://wa.me/?text=${encodedMessage}%20${encodedUrl}`,
+    imessage: `sms:&body=${encodedMessage}%20${encodedUrl}`,
+    messenger: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+  };
+
+  menu.querySelectorAll("[data-editor-share-channel]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = shareTargets[button.dataset.editorShareChannel];
+      if (target) window.open(target, "_blank", "noopener,noreferrer");
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!wrap.contains(event.target)) setOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || menu.hidden) return;
+    setOpen(false);
+    trigger.focus();
+  });
+}
+
 function init() {
   renderCategoryPills("desktopCategoryPills", "desktop");
   renderCategoryPills("mobileCategoryPills", "mobile");
@@ -2561,6 +2666,7 @@ function init() {
   bindEditorTextSettings();
   bindEditorFrameSettings();
   bindEditorImageSettings();
+  bindEditorShareMenu();
   bindEditorExportMenu();
   initActions();
   syncConversationPrompt();
