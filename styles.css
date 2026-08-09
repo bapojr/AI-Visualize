@@ -4101,7 +4101,9 @@ a {
 .editor-pen-settings,
 .editor-text-settings,
 .editor-frame-settings,
-.editor-image-settings {
+.editor-image-settings,
+.editor-segment-graphic-settings,
+.editor-segment-text-settings {
   color: var(--Gray-12, #13161b);
   font-family: "IBM Plex Sans", sans-serif;
 }
@@ -4113,6 +4115,8 @@ a {
 .editor-text-settings[hidden],
 .editor-frame-settings[hidden],
 .editor-image-settings[hidden],
+.editor-segment-graphic-settings[hidden],
+.editor-segment-text-settings[hidden],
 .editor-shape-control-group[hidden] {
   display: none;
 }
@@ -4804,6 +4808,259 @@ a {
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.editor-segment-settings-section {
+  padding: 20px 16px 24px;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+}
+
+.editor-segment-color-row {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 10px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-12, #13161b);
+  font: 500 14px/20px "IBM Plex Sans", sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editor-segment-color-row + .editor-segment-color-row {
+  margin-top: 12px;
+}
+
+.editor-segment-color-row:hover,
+.editor-segment-color-row:focus-within,
+.editor-segment-color-row:focus-visible {
+  border-color: var(--Blue-9, #0062ff);
+  outline: none;
+}
+
+.editor-segment-color-row input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.editor-segment-color-dot {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  overflow: hidden;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 50%;
+  background: var(--segment-color, #91a6bc);
+  box-shadow: 0 2px 6px rgba(19, 22, 27, 0.12);
+  pointer-events: none;
+}
+
+.editor-segment-color-dot.is-none {
+  border-style: dashed;
+  background: var(--Gray-1, #fff);
+  box-shadow: none;
+}
+
+.editor-segment-color-dot.is-none::after {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 24px;
+  height: 1px;
+  background: var(--Gray-10, #7d8aa1);
+  content: "";
+  transform: rotate(45deg);
+}
+
+.editor-segment-color-row output {
+  margin-left: auto;
+  color: var(--Gray-10, #7d8aa1);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.editor-segment-range-control {
+  margin-top: 24px;
+}
+
+.editor-segment-range-control > div {
+  display: flex;
+  margin-bottom: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-segment-range-control label,
+.editor-segment-range-control output {
+  color: var(--Gray-10, #7d8aa1);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.editor-segment-range-control output {
+  color: var(--Gray-12, #13161b);
+  font-size: 13px;
+  text-transform: none;
+}
+
+.editor-segment-range-control input[type="range"] {
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--Blue-9, #0062ff);
+  cursor: pointer;
+}
+
+.editor-segment-field-label,
+.editor-segment-field > span:first-child {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--Gray-10, #7d8aa1);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#editorSegmentTextValue {
+  width: 100%;
+  min-height: 88px;
+  padding: 12px;
+  resize: vertical;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 10px;
+  background: var(--Gray-2, #f8f9fd);
+  color: var(--Gray-12, #13161b);
+  font: 500 14px/21px "IBM Plex Sans", sans-serif;
+  outline: none;
+}
+
+#editorSegmentTextValue:hover,
+#editorSegmentTextValue:focus {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Gray-1, #fff);
+}
+
+.editor-segment-text-grid {
+  display: grid;
+  margin-top: 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px 10px;
+}
+
+.editor-segment-select-wrap {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 10px;
+  background: var(--Gray-2, #f8f9fd);
+}
+
+.editor-segment-select-wrap:hover,
+.editor-segment-select-wrap:focus-within {
+  border-color: var(--Blue-9, #0062ff);
+}
+
+.editor-segment-select-wrap select {
+  width: 100%;
+  height: 100%;
+  padding: 0 28px 0 10px;
+  border: 0;
+  appearance: none;
+  background: transparent;
+  color: var(--Gray-12, #13161b);
+  font: 500 13px/18px "IBM Plex Sans", sans-serif;
+  outline: none;
+}
+
+.editor-segment-select-wrap svg {
+  position: absolute;
+  right: 10px;
+  width: 10px;
+  height: 6px;
+  fill: none;
+  stroke: var(--Gray-11, #5d6a81);
+  stroke-width: 1.6;
+  pointer-events: none;
+}
+
+.editor-segment-style-buttons {
+  display: grid;
+  height: 40px;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 10px;
+  background: var(--Gray-2, #f8f9fd);
+}
+
+.editor-segment-style-buttons button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  font: 500 15px/20px "IBM Plex Sans", sans-serif;
+}
+
+.editor-segment-style-buttons button:first-child {
+  border-right: 1px solid var(--Gray-5, #e4eaf7);
+  font-style: italic;
+}
+
+.editor-segment-style-buttons button:last-child {
+  text-decoration: underline;
+}
+
+.editor-segment-style-buttons button:hover,
+.editor-segment-style-buttons button:focus-visible,
+.editor-segment-style-buttons button.active {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-segment-field input[type="number"] {
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 10px;
+  background: var(--Gray-2, #f8f9fd);
+  color: var(--Gray-12, #13161b);
+  font: 500 14px/20px "IBM Plex Sans", sans-serif;
+  outline: none;
+}
+
+.editor-segment-field input[type="number"]:hover,
+.editor-segment-field input[type="number"]:focus {
+  border-color: var(--Blue-9, #0062ff);
+}
+
+.editor-segment-text-color-row {
+  margin-top: 24px;
 }
 
 .editor-copy-section {

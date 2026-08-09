@@ -386,6 +386,7 @@ const state = {
   editorExportCertificate: true,
   editorInspectorPromptExpanded: false,
   editorInspectorTemplateId: null,
+  editorSegmentStyles: {},
   hasHistory: false,
   mixedOrder: shuffle([...templateCatalog]),
   generatedResultTemplate: templateCatalog[0],
@@ -1247,6 +1248,7 @@ function bindCanvasSelection() {
     segmentation?.querySelectorAll(".editor-segment").forEach((segment) => {
       segment.classList.remove("active");
     });
+    document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
     document.activeElement?.closest?.(".editor-segment")?.blur();
     imageToolbar?.classList.remove("hidden");
     textToolbar?.classList.add("hidden");
@@ -1262,6 +1264,7 @@ function bindCanvasSelection() {
     segmentation?.querySelectorAll(".editor-segment").forEach((segment) => {
       segment.classList.remove("active");
     });
+    document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
     imageToolbar?.classList.add("hidden");
     textToolbar?.classList.add("hidden");
     moreMenu?.classList.add("hidden");
@@ -1284,6 +1287,8 @@ function bindCanvasSelection() {
       !event.target.closest("#editorImageActionStack") &&
       !event.target.closest("#editorTextActionStack") &&
       !event.target.closest("#editorImageSettings") &&
+      !event.target.closest("#editorSegmentGraphicSettings") &&
+      !event.target.closest("#editorSegmentTextSettings") &&
       !event.target.closest("#editorCanvasStageContent") &&
       !event.target.closest("#editorCanvasImage")
     ) {
@@ -1295,17 +1300,17 @@ function bindCanvasSelection() {
     const segment = event.target.closest(".editor-segment");
     if (!segment) return;
     event.stopPropagation();
-    if (!state.isEditorFrameSelected && !state.selectedEditorSegmentId) {
-      selectWholeImage();
-      return;
-    }
     state.selectedEditorSegmentId = segment.dataset.segmentId;
     state.selectedEditorSegmentType = segment.dataset.segmentType;
     state.isEditorFrameSelected = false;
     stageContent?.classList.remove("is-frame-selected");
+    setEditorPanelView("left", "edit");
     setCanvasTool(state.canvasTool);
     segmentation.querySelectorAll(".editor-segment").forEach((item) => {
       item.classList.toggle("active", item === segment);
+    });
+    document.querySelectorAll(".editor-object-item").forEach((item) => {
+      item.classList.toggle("selected", item.dataset.editorObjectId === segment.dataset.segmentId);
     });
     moreMenu?.classList.add("hidden");
     if (segment.dataset.segmentType === "text") {
@@ -1533,7 +1538,7 @@ function renderEditorInspector() {
     (segmentationRegions[template.id] || []).forEach((region) => {
       const copy = editorObjectCopy(template, region);
       const item = document.createElement("button");
-      item.className = "editor-object-item";
+      item.className = `editor-object-item ${state.selectedEditorSegmentId === region.id ? "selected" : ""}`;
       item.type = "button";
       item.dataset.editorObjectId = region.id;
       item.setAttribute("aria-label", `${copy.title}: ${copy.description}`);
@@ -1562,8 +1567,12 @@ function renderEditorInspector() {
       ["pointerenter", "pointerleave", "focus", "blur"].forEach((eventName) => {
         item.addEventListener(eventName, () => window.requestAnimationFrame(syncCanvasHover));
       });
-      item.addEventListener("click", () => {
+      item.addEventListener("click", (event) => {
+        event.stopPropagation();
         list.querySelectorAll(".editor-object-item").forEach((object) => object.classList.toggle("selected", object === item));
+        const segment = Array.from(document.querySelectorAll("#editorImageSegmentation .editor-segment"))
+          .find((candidate) => candidate.dataset.segmentId === region.id);
+        segment?.click();
       });
       list.appendChild(item);
     });
@@ -1602,31 +1611,208 @@ function syncImageSettingsPanel() {
   applyImageAppearance();
 }
 
+function selectedEditorRegion() {
+  if (!state.selectedEditorSegmentId) return null;
+  const template = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
+  const region = (segmentationRegions[template.id] || []).find((item) => item.id === state.selectedEditorSegmentId);
+  return region ? {template, region} : null;
+}
+
+function editorColorToHex(red, green, blue) {
+  return `#${[red, green, blue].map((channel) => Math.round(channel).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+}
+
+function detectEditorRegionColor(region, mode) {
+  const image = document.getElementById("editorCanvasImage");
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) {
+    return mode === "text" ? "#000000" : "#91A6BC";
+  }
+
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 48;
+    canvas.height = 48;
+    const context = canvas.getContext("2d", {willReadFrequently: true});
+    if (!context) return mode === "text" ? "#000000" : "#91A6BC";
+    context.drawImage(
+      image,
+      image.naturalWidth * region.x / 100,
+      image.naturalHeight * region.y / 100,
+      image.naturalWidth * region.w / 100,
+      image.naturalHeight * region.h / 100,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    const buckets = new Map();
+    for (let index = 0; index < pixels.length; index += 4) {
+      const red = pixels[index];
+      const green = pixels[index + 1];
+      const blue = pixels[index + 2];
+      const alpha = pixels[index + 3];
+      if (alpha < 128) continue;
+      const maximum = Math.max(red, green, blue);
+      const minimum = Math.min(red, green, blue);
+      const saturation = maximum - minimum;
+      const luminance = red * 0.2126 + green * 0.7152 + blue * 0.0722;
+      if (mode === "text" ? luminance > 155 : luminance > 230 || luminance < 32 || saturation < 24) continue;
+      const key = `${red >> 4}-${green >> 4}-${blue >> 4}`;
+      const bucket = buckets.get(key) || {count: 0, red: 0, green: 0, blue: 0, luminance: 0, saturation: 0};
+      bucket.count += 1;
+      bucket.red += red;
+      bucket.green += green;
+      bucket.blue += blue;
+      bucket.luminance += luminance;
+      bucket.saturation += saturation;
+      buckets.set(key, bucket);
+    }
+
+    let bestBucket = null;
+    let bestScore = -1;
+    buckets.forEach((bucket) => {
+      const luminance = bucket.luminance / bucket.count;
+      const saturation = bucket.saturation / bucket.count;
+      const score = mode === "text"
+        ? bucket.count * (280 - luminance)
+        : bucket.count * (24 + saturation) * (1 - Math.abs(luminance - 150) / 300);
+      if (score > bestScore) {
+        bestScore = score;
+        bestBucket = bucket;
+      }
+    });
+    if (!bestBucket) return mode === "text" ? "#000000" : "#91A6BC";
+    return editorColorToHex(
+      bestBucket.red / bestBucket.count,
+      bestBucket.green / bestBucket.count,
+      bestBucket.blue / bestBucket.count,
+    );
+  } catch (error) {
+    return mode === "text" ? "#000000" : "#91A6BC";
+  }
+}
+
+function editorRegionText(template, region) {
+  return region.id === "title" ? template.title : region.label;
+}
+
+function currentEditorSegmentStyle() {
+  const selection = selectedEditorRegion();
+  if (!selection) return null;
+  const {template, region} = selection;
+  const key = `${template.id}:${region.id}`;
+  if (!state.editorSegmentStyles[key]) {
+    const image = document.getElementById("editorCanvasImage");
+    const renderedHeight = image?.getBoundingClientRect().height || 700;
+    state.editorSegmentStyles[key] = {
+      fill: detectEditorRegionColor(region, "fill"),
+      stroke: "transparent",
+      strokeWidth: 1,
+      strokeOpacity: 100,
+      borderDash: 0,
+      opacity: 100,
+      text: editorRegionText(template, region),
+      fontFamily: "IBM Plex Sans",
+      italic: false,
+      underline: false,
+      fontWeight: region.id === "title" ? 600 : 500,
+      fontSize: Math.max(12, Math.min(48, Math.round(renderedHeight * region.h / 100 * 4.2) / 10)),
+      textColor: detectEditorRegionColor(region, "text"),
+    };
+  }
+  return {template, region, style: state.editorSegmentStyles[key]};
+}
+
+function syncEditorSegmentSettingsPanel() {
+  const selection = currentEditorSegmentStyle();
+  if (!selection) return;
+  const {template, region, style} = selection;
+  const objectCopy = editorObjectCopy(template, region);
+
+  if (region.type !== "text") {
+    const heading = document.getElementById("editorSegmentGraphicHeading");
+    if (heading) heading.textContent = objectCopy.title;
+    const fill = document.getElementById("editorSegmentFillColor");
+    if (fill) fill.value = style.fill;
+    const fillSwatch = document.getElementById("editorSegmentFillSwatch");
+    if (fillSwatch) fillSwatch.style.setProperty("--segment-color", style.fill);
+    const fillValue = document.getElementById("editorSegmentFillValue");
+    if (fillValue) fillValue.textContent = style.fill;
+    const strokeSwatch = document.getElementById("editorSegmentStrokeSwatch");
+    strokeSwatch?.classList.toggle("is-none", style.stroke === "transparent");
+    if (strokeSwatch && style.stroke !== "transparent") strokeSwatch.style.setProperty("--segment-color", style.stroke);
+    const strokeValue = document.getElementById("editorSegmentStrokeValue");
+    if (strokeValue) strokeValue.textContent = style.stroke === "transparent" ? "None" : style.stroke;
+    [
+      ["editorSegmentStrokeWidth", style.strokeWidth, "editorSegmentStrokeWidthValue", `${style.strokeWidth} px`],
+      ["editorSegmentStrokeOpacity", style.strokeOpacity, "editorSegmentStrokeOpacityValue", `${style.strokeOpacity}%`],
+      ["editorSegmentBorderDash", style.borderDash, "editorSegmentBorderDashValue", `${style.borderDash}`],
+      ["editorSegmentOpacity", style.opacity, "editorSegmentOpacityValue", `${style.opacity}%`],
+    ].forEach(([inputId, value, outputId, label]) => {
+      const input = document.getElementById(inputId);
+      const output = document.getElementById(outputId);
+      if (input) input.value = `${value}`;
+      if (output) output.textContent = label;
+    });
+    return;
+  }
+
+  const textValue = document.getElementById("editorSegmentTextValue");
+  if (textValue) textValue.value = style.text;
+  const fontFamily = document.getElementById("editorSegmentFontFamily");
+  if (fontFamily) fontFamily.value = style.fontFamily;
+  const fontWeight = document.getElementById("editorSegmentFontWeight");
+  if (fontWeight) fontWeight.value = `${style.fontWeight}`;
+  const fontSize = document.getElementById("editorSegmentFontSize");
+  if (fontSize) fontSize.value = `${style.fontSize}`;
+  const italic = document.getElementById("editorSegmentItalic");
+  italic?.classList.toggle("active", style.italic);
+  italic?.setAttribute("aria-pressed", String(style.italic));
+  const underline = document.getElementById("editorSegmentUnderline");
+  underline?.classList.toggle("active", style.underline);
+  underline?.setAttribute("aria-pressed", String(style.underline));
+  const textColor = document.getElementById("editorSegmentTextColor");
+  if (textColor) textColor.value = style.textColor;
+  const textColorSwatch = document.getElementById("editorSegmentTextColorSwatch");
+  if (textColorSwatch) textColorSwatch.style.setProperty("--segment-color", style.textColor);
+  const textColorValue = document.getElementById("editorSegmentTextColorValue");
+  if (textColorValue) textColorValue.textContent = style.textColor;
+}
+
 function setCanvasTool(tool) {
   state.canvasTool = tool;
   const imageSelected = state.isEditorFrameSelected;
+  const segmentSelected = Boolean(state.selectedEditorSegmentId) && !imageSelected;
+  const textSegmentSelected = segmentSelected && state.selectedEditorSegmentType === "text";
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
   const canvasSettings = document.getElementById("editorCanvasSettings");
-  if (canvasSettings) canvasSettings.hidden = imageSelected || !["select", "hand"].includes(tool);
+  if (canvasSettings) canvasSettings.hidden = imageSelected || segmentSelected || !["select", "hand"].includes(tool);
   const shapeSettings = document.getElementById("editorShapeSettings");
-  if (shapeSettings) shapeSettings.hidden = imageSelected || tool !== "shape";
-  if (!imageSelected && tool === "shape") syncShapeSettingsPanel();
+  if (shapeSettings) shapeSettings.hidden = imageSelected || segmentSelected || tool !== "shape";
+  if (!imageSelected && !segmentSelected && tool === "shape") syncShapeSettingsPanel();
   const lineSettings = document.getElementById("editorLineSettings");
-  if (lineSettings) lineSettings.hidden = imageSelected || tool !== "line";
-  if (!imageSelected && tool === "line") syncLineSettingsPanel();
+  if (lineSettings) lineSettings.hidden = imageSelected || segmentSelected || tool !== "line";
+  if (!imageSelected && !segmentSelected && tool === "line") syncLineSettingsPanel();
   const penSettings = document.getElementById("editorPenSettings");
-  if (penSettings) penSettings.hidden = imageSelected || tool !== "pen";
-  if (!imageSelected && tool === "pen") syncPenSettingsPanel();
+  if (penSettings) penSettings.hidden = imageSelected || segmentSelected || tool !== "pen";
+  if (!imageSelected && !segmentSelected && tool === "pen") syncPenSettingsPanel();
   const textSettings = document.getElementById("editorTextSettings");
-  if (textSettings) textSettings.hidden = imageSelected || tool !== "text";
-  if (!imageSelected && tool === "text") syncTextSettingsPanel();
+  if (textSettings) textSettings.hidden = imageSelected || segmentSelected || tool !== "text";
+  if (!imageSelected && !segmentSelected && tool === "text") syncTextSettingsPanel();
   const frameSettings = document.getElementById("editorFrameSettings");
-  if (frameSettings) frameSettings.hidden = imageSelected || tool !== "frame";
-  if (!imageSelected && tool === "frame") syncFrameSettingsPanel();
+  if (frameSettings) frameSettings.hidden = imageSelected || segmentSelected || tool !== "frame";
+  if (!imageSelected && !segmentSelected && tool === "frame") syncFrameSettingsPanel();
   const imageSettings = document.getElementById("editorImageSettings");
   if (imageSettings) imageSettings.hidden = !imageSelected;
   if (imageSelected) syncImageSettingsPanel();
+  const segmentGraphicSettings = document.getElementById("editorSegmentGraphicSettings");
+  if (segmentGraphicSettings) segmentGraphicSettings.hidden = !segmentSelected || textSegmentSelected;
+  const segmentTextSettings = document.getElementById("editorSegmentTextSettings");
+  if (segmentTextSettings) segmentTextSettings.hidden = !textSegmentSelected;
+  if (segmentSelected) syncEditorSegmentSettingsPanel();
 
   document.querySelectorAll(".canvas-tool-button[data-canvas-tool]").forEach((button) => {
     button.classList.toggle("active", button.dataset.canvasTool === tool);
@@ -2569,6 +2755,78 @@ function bindEditorImageSettings() {
   syncImageSettingsPanel();
 }
 
+function bindEditorSegmentSettings() {
+  const updateStyle = (change) => {
+    const selection = currentEditorSegmentStyle();
+    if (!selection) return;
+    change(selection.style, selection);
+    syncEditorSegmentSettingsPanel();
+  };
+
+  document.getElementById("editorSegmentFillColor")?.addEventListener("input", (event) => {
+    updateStyle((style) => {
+      style.fill = event.target.value.toUpperCase();
+    });
+  });
+  document.getElementById("editorSegmentStrokeToggle")?.addEventListener("click", () => {
+    updateStyle((style) => {
+      style.stroke = style.stroke === "transparent" ? "#13161B" : "transparent";
+    });
+  });
+  [
+    ["editorSegmentStrokeWidth", "strokeWidth"],
+    ["editorSegmentStrokeOpacity", "strokeOpacity"],
+    ["editorSegmentBorderDash", "borderDash"],
+    ["editorSegmentOpacity", "opacity"],
+  ].forEach(([id, property]) => {
+    document.getElementById(id)?.addEventListener("input", (event) => {
+      updateStyle((style) => {
+        style[property] = Number(event.target.value);
+      });
+    });
+  });
+
+  document.getElementById("editorSegmentTextValue")?.addEventListener("input", (event) => {
+    updateStyle((style, selection) => {
+      style.text = event.target.value;
+      const inspectorItem = Array.from(document.querySelectorAll(".editor-object-item"))
+        .find((item) => item.dataset.editorObjectId === selection.region.id);
+      const description = inspectorItem?.querySelector(".editor-object-description");
+      if (description) description.textContent = style.text;
+    });
+  });
+  document.getElementById("editorSegmentFontFamily")?.addEventListener("change", (event) => {
+    updateStyle((style) => {
+      style.fontFamily = event.target.value;
+    });
+  });
+  document.getElementById("editorSegmentFontWeight")?.addEventListener("change", (event) => {
+    updateStyle((style) => {
+      style.fontWeight = Number(event.target.value);
+    });
+  });
+  document.getElementById("editorSegmentFontSize")?.addEventListener("input", (event) => {
+    updateStyle((style) => {
+      style.fontSize = Math.max(8, Math.min(96, Number(event.target.value) || 8));
+    });
+  });
+  document.getElementById("editorSegmentTextColor")?.addEventListener("input", (event) => {
+    updateStyle((style) => {
+      style.textColor = event.target.value.toUpperCase();
+    });
+  });
+  document.getElementById("editorSegmentItalic")?.addEventListener("click", () => {
+    updateStyle((style) => {
+      style.italic = !style.italic;
+    });
+  });
+  document.getElementById("editorSegmentUnderline")?.addEventListener("click", () => {
+    updateStyle((style) => {
+      style.underline = !style.underline;
+    });
+  });
+}
+
 function bindEditorInspector() {
   document.getElementById("editorInspectorPromptToggle")?.addEventListener("click", () => {
     state.editorInspectorPromptExpanded = !state.editorInspectorPromptExpanded;
@@ -2784,6 +3042,7 @@ function init() {
   bindEditorTextSettings();
   bindEditorFrameSettings();
   bindEditorImageSettings();
+  bindEditorSegmentSettings();
   bindEditorInspector();
   bindEditorShareMenu();
   bindEditorExportMenu();
