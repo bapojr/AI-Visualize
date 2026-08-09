@@ -1522,16 +1522,6 @@ function initActions() {
     }
   });
 
-  document.getElementById("zoomInBtn")?.addEventListener("click", () => {
-    state.zoom += 10;
-    updateZoom();
-  });
-
-  document.getElementById("zoomOutBtn")?.addEventListener("click", () => {
-    state.zoom = Math.max(50, state.zoom - 10);
-    updateZoom();
-  });
-
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       if (state.activeOverlay) {
@@ -1545,8 +1535,8 @@ function initActions() {
 
 function updateZoom() {
   const zoomLabel = `${state.zoom}%`;
-  document.getElementById("zoomValue").textContent = zoomLabel;
-  document.getElementById("canvasZoomPill").textContent = zoomLabel;
+  const canvasZoomPill = document.getElementById("canvasZoomPill");
+  if (canvasZoomPill) canvasZoomPill.textContent = zoomLabel;
   document.getElementById("editorCanvasStageContent")?.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
 }
 
