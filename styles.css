@@ -5401,6 +5401,12 @@ a {
   box-shadow: 0 0 0 1px rgba(28, 77, 192, 0.08);
 }
 
+.editor-segment.inspector-hover {
+  border-color: var(--Blue-9, #0062ff);
+  background: rgba(237, 243, 255, 0.3);
+  box-shadow: 0 0 0 2px rgba(0, 98, 255, 0.14), inset 0 0 0 999px rgba(0, 98, 255, 0.06);
+}
+
 .editor-segment-label {
   position: absolute;
   top: -26px;

@@ -1553,6 +1553,15 @@ function renderEditorInspector() {
       text.className = "editor-object-copy";
       text.innerHTML = `<span class="editor-object-title">${copy.title}</span><span class="editor-object-description">${copy.description}</span>`;
       item.append(thumbnail, text);
+      const syncCanvasHover = () => {
+        const segment = Array.from(document.querySelectorAll("#editorImageSegmentation .editor-segment"))
+          .find((candidate) => candidate.dataset.segmentId === region.id);
+        if (!segment) return;
+        segment.classList.toggle("inspector-hover", item.matches(":hover") || item.matches(":focus-visible"));
+      };
+      ["pointerenter", "pointerleave", "focus", "blur"].forEach((eventName) => {
+        item.addEventListener(eventName, () => window.requestAnimationFrame(syncCanvasHover));
+      });
       item.addEventListener("click", () => {
         list.querySelectorAll(".editor-object-item").forEach((object) => object.classList.toggle("selected", object === item));
       });
