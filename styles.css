@@ -5749,11 +5749,8 @@ a {
   width: 16px;
   height: 16px;
   flex: 0 0 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
+  stroke: none;
 }
 
 .editor-image-tool:hover,
