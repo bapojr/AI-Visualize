@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=35" />
+    <link rel="stylesheet" href="styles.css?v=36" />
   </head>
   <body>
     <div id="app">
@@ -527,6 +527,69 @@
                       <button type="button" data-editor-copy-format="png">Copy as PNG</button>
                       <button type="button" data-editor-copy-format="svg">Copy as SVG</button>
                     </div>
+                  </section>
+                </div>
+                <div class="editor-shape-settings" id="editorShapeSettings" hidden>
+                  <div class="editor-canvas-settings-heading" id="editorShapeSettingsHeading">Rectangle</div>
+                  <section class="editor-shape-settings-section" aria-labelledby="editorShapeFillHeading">
+                    <h2 id="editorShapeFillHeading">Fill</h2>
+                    <div class="editor-shape-swatches" role="group" aria-label="Shape fill colors">
+                      <button class="editor-shape-swatch is-none active" type="button" data-shape-fill="transparent" aria-label="No fill"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-fill="#F8F9FD" aria-label="White fill" style="--swatch-color: #F8F9FD"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-fill="#F9B0B8" aria-label="Pink fill" style="--swatch-color: #F9B0B8"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-fill="#FFD0B5" aria-label="Peach fill" style="--swatch-color: #FFD0B5"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-fill="#FFE7AF" aria-label="Cream fill" style="--swatch-color: #FFE7AF"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-fill="#CAF0B0" aria-label="Green fill" style="--swatch-color: #CAF0B0"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-fill="#BED3F5" aria-label="Blue fill" style="--swatch-color: #BED3F5"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-fill="#E5DCFA" aria-label="Lavender fill" style="--swatch-color: #E5DCFA"></button>
+                      <label class="editor-shape-custom-swatch" data-shape-custom="fill" aria-label="Choose a custom fill color">
+                        <input id="editorShapeFillPicker" type="color" value="#F9B0B8" aria-label="Custom shape fill color" />
+                      </label>
+                    </div>
+                  </section>
+                  <section class="editor-shape-settings-section editor-shape-stroke-section" aria-labelledby="editorShapeStrokeHeading">
+                    <h2 id="editorShapeStrokeHeading">Stroke</h2>
+                    <div class="editor-shape-swatches" role="group" aria-label="Shape stroke colors">
+                      <button class="editor-shape-swatch is-none" type="button" data-shape-stroke="transparent" aria-label="No stroke"></button>
+                      <button class="editor-shape-swatch active" type="button" data-shape-stroke="#13161B" aria-label="Black stroke" style="--swatch-color: #13161B"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-stroke="#F72D45" aria-label="Red stroke" style="--swatch-color: #F72D45"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-stroke="#FF6B11" aria-label="Orange stroke" style="--swatch-color: #FF6B11"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-stroke="#FFB700" aria-label="Yellow stroke" style="--swatch-color: #FFB700"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-stroke="#46C800" aria-label="Green stroke" style="--swatch-color: #46C800"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-stroke="#477FE5" aria-label="Blue stroke" style="--swatch-color: #477FE5"></button>
+                      <button class="editor-shape-swatch" type="button" data-shape-stroke="#7D5CE0" aria-label="Purple stroke" style="--swatch-color: #7D5CE0"></button>
+                      <label class="editor-shape-custom-swatch" data-shape-custom="stroke" aria-label="Choose a custom stroke color">
+                        <input id="editorShapeStrokePicker" type="color" value="#13161B" aria-label="Custom shape stroke color" />
+                      </label>
+                    </div>
+                    <div class="editor-shape-control-group">
+                      <h3>Width</h3>
+                      <div class="editor-shape-option-row" role="group" aria-label="Stroke width">
+                        <button class="editor-shape-icon-option" type="button" data-shape-width="1" aria-label="Thin stroke"><span class="shape-width-icon thin"></span></button>
+                        <button class="editor-shape-icon-option active" type="button" data-shape-width="2" aria-label="Medium stroke"><span class="shape-width-icon medium"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-shape-width="4" aria-label="Thick stroke"><span class="shape-width-icon thick"></span></button>
+                      </div>
+                    </div>
+                    <div class="editor-shape-control-group">
+                      <h3>Style</h3>
+                      <div class="editor-shape-option-row" role="group" aria-label="Stroke style">
+                        <button class="editor-shape-icon-option active" type="button" data-shape-style="solid" aria-label="Solid stroke"><span class="shape-style-icon solid"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-shape-style="dashed" aria-label="Dashed stroke"><span class="shape-style-icon dashed"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-shape-style="dotted" aria-label="Dotted stroke"><span class="shape-style-icon dotted"></span></button>
+                      </div>
+                    </div>
+                    <div class="editor-shape-control-group" id="editorShapeEdgesGroup">
+                      <h3>Edges</h3>
+                      <div class="editor-shape-option-row" role="group" aria-label="Shape edges">
+                        <button class="editor-shape-icon-option active" type="button" data-shape-edges="sharp" aria-label="Sharp edges"><span class="shape-edge-icon sharp"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-shape-edges="rounded" aria-label="Rounded edges"><span class="shape-edge-icon rounded"></span></button>
+                      </div>
+                    </div>
+                  </section>
+                  <section class="editor-shape-settings-section editor-shape-opacity-section" aria-labelledby="editorShapeOpacityHeading">
+                    <h2 id="editorShapeOpacityHeading">Opacity</h2>
+                    <input id="editorShapeOpacity" type="range" min="0" max="100" value="100" aria-label="Shape opacity" />
+                    <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
                   </section>
                 </div>
               </div>
@@ -1341,6 +1404,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=24"></script>
+    <script src="app.js?v=25"></script>
   </body>
 </html>

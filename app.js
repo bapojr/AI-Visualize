@@ -338,6 +338,14 @@ const state = {
   zoom: 100,
   canvasTool: "select",
   canvasShape: "rectangle",
+  shapeFill: "transparent",
+  shapeFillCustom: false,
+  shapeStroke: "#13161B",
+  shapeStrokeCustom: false,
+  shapeStrokeWidth: 2,
+  shapeStrokeStyle: "solid",
+  shapeEdges: "sharp",
+  shapeOpacity: 100,
   canvasLine: "line",
   canvasPanX: 0,
   canvasPanY: 0,
@@ -1266,12 +1274,55 @@ function bindCanvasSelection() {
   });
 }
 
+function applyShapeAppearance(object) {
+  if (!object) return;
+  const hasStroke = state.shapeStroke !== "transparent";
+  const renderedStroke = hasStroke ? state.shapeStroke : state.shapeFill;
+  object.style.setProperty("--shape-fill", state.shapeFill);
+  object.style.setProperty("--shape-stroke", renderedStroke);
+  object.style.setProperty("--shape-stroke-width", `${hasStroke ? state.shapeStrokeWidth : 0}px`);
+  object.style.setProperty("--shape-stroke-style", state.shapeStrokeStyle);
+  object.style.setProperty("--shape-radius", state.shapeEdges === "rounded" ? "12px" : "0px");
+  object.style.opacity = `${state.shapeOpacity / 100}`;
+}
+
+function syncShapeSettingsPanel() {
+  const heading = document.getElementById("editorShapeSettingsHeading");
+  const shapeLabel = state.canvasShape.charAt(0).toUpperCase() + state.canvasShape.slice(1);
+  if (heading) heading.textContent = shapeLabel;
+  const edgesGroup = document.getElementById("editorShapeEdgesGroup");
+  if (edgesGroup) edgesGroup.hidden = state.canvasShape === "ellipse";
+
+  document.querySelectorAll("[data-shape-fill]").forEach((button) => {
+    button.classList.toggle("active", !state.shapeFillCustom && button.dataset.shapeFill === state.shapeFill);
+  });
+  document.querySelector('[data-shape-custom="fill"]')?.classList.toggle("active", state.shapeFillCustom);
+  document.querySelectorAll("[data-shape-stroke]").forEach((button) => {
+    button.classList.toggle("active", !state.shapeStrokeCustom && button.dataset.shapeStroke === state.shapeStroke);
+  });
+  document.querySelector('[data-shape-custom="stroke"]')?.classList.toggle("active", state.shapeStrokeCustom);
+  document.querySelectorAll("[data-shape-width]").forEach((button) => {
+    button.classList.toggle("active", Number(button.dataset.shapeWidth) === state.shapeStrokeWidth);
+  });
+  document.querySelectorAll("[data-shape-style]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.shapeStyle === state.shapeStrokeStyle);
+  });
+  document.querySelectorAll("[data-shape-edges]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.shapeEdges === state.shapeEdges);
+  });
+  const opacity = document.getElementById("editorShapeOpacity");
+  if (opacity) opacity.value = `${state.shapeOpacity}`;
+}
+
 function setCanvasTool(tool) {
   state.canvasTool = tool;
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
   const canvasSettings = document.getElementById("editorCanvasSettings");
   if (canvasSettings) canvasSettings.hidden = !["select", "hand"].includes(tool);
+  const shapeSettings = document.getElementById("editorShapeSettings");
+  if (shapeSettings) shapeSettings.hidden = tool !== "shape";
+  if (tool === "shape") syncShapeSettingsPanel();
 
   document.querySelectorAll(".canvas-tool-button[data-canvas-tool]").forEach((button) => {
     button.classList.toggle("active", button.dataset.canvasTool === tool);
@@ -1514,6 +1565,7 @@ function bindCanvasToolbar() {
       object = document.createElement("div");
       if (state.canvasTool === "shape") {
         object.className = `canvas-object canvas-shape-object canvas-${state.canvasShape}-object`;
+        applyShapeAppearance(object);
       } else if (state.canvasTool === "line") {
         object.className = `canvas-object canvas-line-object${state.canvasLine === "arrow" ? " canvas-arrow-object" : ""}`;
       } else {
@@ -1931,6 +1983,65 @@ function bindEditorBackgroundSwatches() {
   });
 }
 
+function bindEditorShapeSettings() {
+  const updateSelectedShape = () => {
+    document.querySelectorAll(".canvas-shape-object.is-selected").forEach(applyShapeAppearance);
+    syncShapeSettingsPanel();
+  };
+
+  document.querySelectorAll("[data-shape-fill]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.shapeFill = button.dataset.shapeFill;
+      state.shapeFillCustom = false;
+      updateSelectedShape();
+    });
+  });
+  document.querySelectorAll("[data-shape-stroke]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.shapeStroke = button.dataset.shapeStroke;
+      state.shapeStrokeCustom = false;
+      updateSelectedShape();
+    });
+  });
+  document.querySelectorAll("[data-shape-width]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.shapeStrokeWidth = Number(button.dataset.shapeWidth);
+      updateSelectedShape();
+    });
+  });
+  document.querySelectorAll("[data-shape-style]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.shapeStrokeStyle = button.dataset.shapeStyle;
+      updateSelectedShape();
+    });
+  });
+  document.querySelectorAll("[data-shape-edges]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.shapeEdges = button.dataset.shapeEdges;
+      updateSelectedShape();
+    });
+  });
+
+  const fillPicker = document.getElementById("editorShapeFillPicker");
+  fillPicker?.addEventListener("input", () => {
+    state.shapeFill = fillPicker.value;
+    state.shapeFillCustom = true;
+    updateSelectedShape();
+  });
+  const strokePicker = document.getElementById("editorShapeStrokePicker");
+  strokePicker?.addEventListener("input", () => {
+    state.shapeStroke = strokePicker.value;
+    state.shapeStrokeCustom = true;
+    updateSelectedShape();
+  });
+  document.getElementById("editorShapeOpacity")?.addEventListener("input", (event) => {
+    state.shapeOpacity = Number(event.target.value);
+    updateSelectedShape();
+  });
+
+  syncShapeSettingsPanel();
+}
+
 function init() {
   renderCategoryPills("desktopCategoryPills", "desktop");
   renderCategoryPills("mobileCategoryPills", "mobile");
@@ -1953,6 +2064,7 @@ function init() {
   setEditorLeftPanelCollapsed(state.editorLeftPanelCollapsed);
   bindSelectGroups();
   bindEditorBackgroundSwatches();
+  bindEditorShapeSettings();
   initActions();
   syncConversationPrompt();
   syncMobileConversationPrompt();
