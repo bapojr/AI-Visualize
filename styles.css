@@ -5879,6 +5879,360 @@ a {
   color: var(--Blue-10, #0054f1);
 }
 
+.editor-region-drawing-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 14;
+  overflow: visible;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.editor-canvas-stage-content.is-region-editing .editor-region-drawing-layer {
+  pointer-events: auto;
+}
+
+.editor-canvas-stage-content.is-region-editing .editor-image-selection-frame {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.editor-canvas-stage-content.is-region-editing .editor-image-segmentation {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.editor-region-drawing-layer[data-region-tool="rectangle"] {
+  cursor: crosshair;
+}
+
+.editor-region-drawing-layer[data-region-tool="pen"] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M4 19l1.2-4.6L16.3 3.3a1.8 1.8 0 012.5 0l1.9 1.9a1.8 1.8 0 010 2.5L9.6 18.8z' fill='%230062FF' stroke='white' stroke-width='1.2'/%3E%3C/svg%3E") 4 20, crosshair;
+}
+
+.editor-region-mark {
+  position: absolute;
+  pointer-events: none;
+}
+
+.editor-region-rectangle {
+  border: 2px dashed var(--Blue-9, #0062ff);
+  background: rgba(0, 98, 255, 0.08);
+  box-sizing: border-box;
+}
+
+.editor-region-pen-mark {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.editor-region-pen-mark path {
+  fill: none;
+  stroke: var(--region-color, #0062ff);
+  stroke-width: var(--region-width, 12);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.editor-region-toolbar {
+  display: flex;
+  width: 100%;
+  height: 40px;
+  padding: 4px 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow-x: auto;
+  border-radius: 25px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+  scrollbar-width: none;
+}
+
+.editor-image-toolbar[hidden],
+.editor-region-toolbar[hidden] {
+  display: none !important;
+}
+
+.editor-region-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.editor-region-toolbar button {
+  font-family: "IBM Plex Sans", sans-serif;
+  white-space: nowrap;
+}
+
+.editor-region-toolbar-title {
+  display: inline-flex;
+  height: 32px;
+  padding: 0 8px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  border-radius: 16px;
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  font: 500 13px/20px "IBM Plex Sans", sans-serif;
+}
+
+.editor-region-toolbar-title svg,
+.editor-region-tool svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.editor-region-tool-toggle {
+  display: flex;
+  height: 32px;
+  padding: 2px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 16px;
+  background: var(--Gray-1, #fff);
+}
+
+.editor-region-tool {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+}
+
+.editor-region-tool:hover,
+.editor-region-tool:focus-visible {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-region-tool.selected,
+.editor-region-tool[aria-pressed="true"] {
+  background: var(--Blue-9, #0062ff);
+  color: var(--Gray-1, #fff);
+}
+
+.editor-region-menu-button,
+.editor-region-action {
+  display: inline-flex;
+  height: 32px;
+  padding: 0 8px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 16px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-12, #13161b);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.editor-region-menu-button:hover,
+.editor-region-menu-button:focus-visible,
+.editor-region-action:hover,
+.editor-region-action:focus-visible {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-region-menu-button svg {
+  width: 8px;
+  height: 5px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.editor-region-width-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.editor-region-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--Blue-9, #0062ff);
+}
+
+.editor-region-action svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.editor-region-action.is-primary {
+  border-color: var(--Blue-12, #051e57);
+  background: var(--Blue-12, #051e57);
+  color: var(--Gray-1, #fff);
+}
+
+.editor-region-action.is-close {
+  border-color: transparent;
+}
+
+.editor-region-action:disabled {
+  border-color: var(--Gray-5, #e4eaf7);
+  background: var(--Gray-2, #f8f9fd);
+  color: var(--Gray-8, #bcc7dc);
+  cursor: not-allowed;
+}
+
+.editor-region-toolbar-divider {
+  width: 1px;
+  height: 24px;
+  flex: 0 0 1px;
+  background: var(--Gray-5, #e4eaf7);
+}
+
+.editor-region-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 142px;
+  z-index: 24;
+  display: flex;
+  width: 350px;
+  padding: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  transform: translateX(-50%);
+}
+
+.editor-region-prompt-header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-region-prompt-icon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--Blue-9, #0062ff);
+  color: var(--Gray-1, #fff);
+}
+
+.editor-region-prompt-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.editor-region-prompt h2 {
+  margin: 0;
+  flex: 1;
+  color: var(--Gray-11, #5d6a81);
+  font: 600 12px/16px "IBM Plex Sans", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.editor-region-prompt-close {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-9, #98a6bd);
+  font: 300 28px/28px "IBM Plex Sans", sans-serif;
+}
+
+.editor-region-prompt-close:hover,
+.editor-region-prompt-close:focus-visible {
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+#editorRegionPromptInput {
+  width: 100%;
+  height: 140px;
+  margin-top: 12px;
+  padding: 14px;
+  resize: none;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 12px;
+  background: var(--Gray-2, #f8f9fd);
+  color: var(--Gray-12, #13161b);
+  font: 500 14px/20px "IBM Plex Sans", sans-serif;
+  outline: none;
+  box-sizing: border-box;
+}
+
+#editorRegionPromptInput::placeholder {
+  color: var(--Gray-8, #bcc7dc);
+}
+
+#editorRegionPromptInput:hover,
+#editorRegionPromptInput:focus {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Gray-1, #fff);
+}
+
+.editor-region-prompt-actions {
+  display: grid;
+  width: 100%;
+  margin-top: 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.editor-region-prompt-actions button {
+  height: 48px;
+  border-radius: 8px;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.editor-region-apply {
+  border: 1px solid var(--Blue-9, #0062ff);
+  background: var(--Blue-9, #0062ff);
+  color: var(--Gray-1, #fff);
+}
+
+.editor-region-cancel {
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+}
+
+.editor-region-apply:hover,
+.editor-region-apply:focus-visible,
+.editor-region-cancel:hover,
+.editor-region-cancel:focus-visible {
+  border-color: var(--Blue-9, #0062ff);
+  outline: none;
+}
+
 .editor-text-action-stack {
   position: absolute;
   left: 50%;

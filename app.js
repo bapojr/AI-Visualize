@@ -379,6 +379,10 @@ const state = {
   selectedEditorSegmentType: null,
   isEditorFrameSelected: false,
   imageRotation: 0,
+  isEditorRegionEditing: false,
+  editorRegionTool: "rectangle",
+  editorRegionStrokeWidth: 12,
+  editorRegionColor: "#0062FF",
   imageOpacity: 100,
   imageLayer: 1,
   imagePromptExpanded: false,
@@ -1149,6 +1153,8 @@ function renderEditorCanvas() {
   const textActionStack = document.getElementById("editorTextActionStack");
   if (!canvas || !image) return;
 
+  setEditorRegionMode(false, {clear: true});
+
   canvas.classList.add("image-mode");
   [canvasShell, canvasStage, mediaShell].forEach((layer) => {
     if (layer) layer.style.background = state.editorBackground;
@@ -1241,6 +1247,7 @@ function bindCanvasSelection() {
   const textToolbar = document.getElementById("editorTextActionStack");
   const useReference = document.getElementById("editorUseReference");
   const extractText = document.getElementById("editorExtractText");
+  const editRegion = document.getElementById("editorEditRegion");
   const segmentation = document.getElementById("editorImageSegmentation");
   const rotateHandle = document.getElementById("editorImageRotateHandle");
 
@@ -1268,6 +1275,7 @@ function bindCanvasSelection() {
   };
 
   const clearEditorSelection = () => {
+    setEditorRegionMode(false, {clear: true});
     state.selectedEditorSegmentId = null;
     state.selectedEditorSegmentType = null;
     state.isEditorFrameSelected = false;
@@ -1285,6 +1293,11 @@ function bindCanvasSelection() {
   editorImage?.addEventListener("click", (event) => {
     event.stopPropagation();
     selectWholeImage();
+  });
+
+  editRegion?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setEditorRegionMode(true, {clear: true});
   });
 
   let rotateSession = null;
@@ -1352,6 +1365,7 @@ function bindCanvasSelection() {
       !event.target.closest("#editorImageSettings") &&
       !event.target.closest("#editorSegmentGraphicSettings") &&
       !event.target.closest("#editorSegmentTextSettings") &&
+      !event.target.closest("#editorRegionPrompt") &&
       !event.target.closest(".canvas-main-toolbar") &&
       !event.target.closest(".canvas-zoom-controls") &&
       !event.target.closest("#editorCanvasStageContent") &&
@@ -1386,6 +1400,195 @@ function bindCanvasSelection() {
       textToolbar?.classList.add("hidden");
     }
   });
+}
+
+function setEditorRegionTool(tool) {
+  state.editorRegionTool = tool === "pen" ? "pen" : "rectangle";
+  const layer = document.getElementById("editorRegionDrawingLayer");
+  if (layer) layer.dataset.regionTool = state.editorRegionTool;
+  document.querySelectorAll("[data-region-tool]").forEach((button) => {
+    const selected = button.dataset.regionTool === state.editorRegionTool;
+    button.classList.toggle("selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+}
+
+function syncEditorRegionActions() {
+  const hasMarks = Boolean(document.querySelector("#editorRegionDrawingLayer .editor-region-mark"));
+  const undo = document.getElementById("editorRegionUndo");
+  const clear = document.getElementById("editorRegionClear");
+  if (undo) undo.disabled = !hasMarks;
+  if (clear) clear.disabled = !hasMarks;
+}
+
+function clearEditorRegionMarks() {
+  document.getElementById("editorRegionDrawingLayer")?.replaceChildren();
+  document.getElementById("editorRegionPrompt")?.classList.add("hidden");
+  const input = document.getElementById("editorRegionPromptInput");
+  if (input) input.value = "";
+  syncEditorRegionActions();
+}
+
+function setEditorRegionMode(active, options = {}) {
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  const actionStack = document.getElementById("editorImageActionStack");
+  const imageToolbar = document.getElementById("editorImageToolbar");
+  const regionToolbar = document.getElementById("editorRegionToolbar");
+  state.isEditorRegionEditing = Boolean(active);
+  stageContent?.classList.toggle("is-region-editing", state.isEditorRegionEditing);
+  if (imageToolbar) imageToolbar.hidden = state.isEditorRegionEditing;
+  if (regionToolbar) regionToolbar.hidden = !state.isEditorRegionEditing;
+  if (state.isEditorRegionEditing) {
+    actionStack?.classList.remove("hidden");
+    setEditorRegionTool("rectangle");
+  } else {
+    document.getElementById("editorRegionPrompt")?.classList.add("hidden");
+  }
+  if (options.clear) clearEditorRegionMarks();
+}
+
+function bindEditorRegionEditing() {
+  const layer = document.getElementById("editorRegionDrawingLayer");
+  const prompt = document.getElementById("editorRegionPrompt");
+  const input = document.getElementById("editorRegionPromptInput");
+  const widthLabel = document.getElementById("editorRegionWidthLabel");
+  if (!layer || !prompt || !input) return;
+
+  let drawSession = null;
+  const localPoint = (event) => {
+    const bounds = layer.getBoundingClientRect();
+    const scaleX = bounds.width ? layer.offsetWidth / bounds.width : 1;
+    const scaleY = bounds.height ? layer.offsetHeight / bounds.height : 1;
+    return {
+      x: Math.max(0, Math.min(layer.offsetWidth, (event.clientX - bounds.left) * scaleX)),
+      y: Math.max(0, Math.min(layer.offsetHeight, (event.clientY - bounds.top) * scaleY)),
+    };
+  };
+
+  const removeLatestMark = () => {
+    layer.querySelector(".editor-region-mark:last-child")?.remove();
+    prompt.classList.add("hidden");
+    input.value = "";
+    syncEditorRegionActions();
+  };
+
+  const showRegionPrompt = () => {
+    prompt.classList.remove("hidden");
+    input.value = "";
+    syncEditorRegionActions();
+    window.setTimeout(() => input.focus(), 0);
+  };
+
+  document.querySelectorAll("[data-region-tool]").forEach((button) => {
+    button.addEventListener("click", () => setEditorRegionTool(button.dataset.regionTool));
+  });
+
+  document.getElementById("editorRegionWidth")?.addEventListener("click", () => {
+    const widths = [4, 8, 12, 16];
+    const currentIndex = widths.indexOf(state.editorRegionStrokeWidth);
+    state.editorRegionStrokeWidth = widths[(currentIndex + 1) % widths.length];
+    if (widthLabel) widthLabel.textContent = `${state.editorRegionStrokeWidth}px`;
+  });
+
+  layer.addEventListener("pointerdown", (event) => {
+    if (!state.isEditorRegionEditing || event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    prompt.classList.add("hidden");
+    const start = localPoint(event);
+
+    if (state.editorRegionTool === "pen") {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.classList.add("editor-region-mark", "editor-region-pen-mark");
+      svg.setAttribute("viewBox", `0 0 ${layer.offsetWidth} ${layer.offsetHeight}`);
+      svg.style.setProperty("--region-color", state.editorRegionColor);
+      svg.style.setProperty("--region-width", `${state.editorRegionStrokeWidth}`);
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", `M ${start.x} ${start.y}`);
+      svg.appendChild(path);
+      layer.appendChild(svg);
+      drawSession = {pointerId: event.pointerId, tool: "pen", mark: svg, path, points: [start]};
+    } else {
+      const rectangle = document.createElement("div");
+      rectangle.className = "editor-region-mark editor-region-rectangle";
+      rectangle.style.left = `${start.x}px`;
+      rectangle.style.top = `${start.y}px`;
+      rectangle.style.width = "0px";
+      rectangle.style.height = "0px";
+      layer.appendChild(rectangle);
+      drawSession = {pointerId: event.pointerId, tool: "rectangle", mark: rectangle, start};
+    }
+    layer.setPointerCapture?.(event.pointerId);
+  });
+
+  layer.addEventListener("pointermove", (event) => {
+    if (!drawSession || event.pointerId !== drawSession.pointerId) return;
+    const point = localPoint(event);
+    if (drawSession.tool === "pen") {
+      drawSession.points.push(point);
+      drawSession.path.setAttribute("d", drawSession.points.map((item, index) => `${index ? "L" : "M"} ${item.x} ${item.y}`).join(" "));
+      return;
+    }
+    const left = Math.min(drawSession.start.x, point.x);
+    const top = Math.min(drawSession.start.y, point.y);
+    drawSession.mark.style.left = `${left}px`;
+    drawSession.mark.style.top = `${top}px`;
+    drawSession.mark.style.width = `${Math.abs(point.x - drawSession.start.x)}px`;
+    drawSession.mark.style.height = `${Math.abs(point.y - drawSession.start.y)}px`;
+  });
+
+  const endRegionDrawing = (event, cancelled = false) => {
+    if (!drawSession || event.pointerId !== drawSession.pointerId) return;
+    if (layer.hasPointerCapture?.(event.pointerId)) layer.releasePointerCapture(event.pointerId);
+    const session = drawSession;
+    drawSession = null;
+    const width = parseFloat(session.mark.style.width || "0");
+    const height = parseFloat(session.mark.style.height || "0");
+    const invalid = cancelled || (session.tool === "pen" ? session.points.length < 3 : width < 8 || height < 8);
+    if (invalid) {
+      session.mark.remove();
+      syncEditorRegionActions();
+      return;
+    }
+    showRegionPrompt();
+  };
+  layer.addEventListener("pointerup", (event) => endRegionDrawing(event));
+  layer.addEventListener("pointercancel", (event) => endRegionDrawing(event, true));
+  document.addEventListener("pointerup", (event) => endRegionDrawing(event));
+  document.addEventListener("pointercancel", (event) => endRegionDrawing(event, true));
+  document.addEventListener("mouseup", () => {
+    if (drawSession) endRegionDrawing({pointerId: drawSession.pointerId});
+  });
+
+  document.getElementById("editorRegionUndo")?.addEventListener("click", removeLatestMark);
+  document.getElementById("editorRegionClear")?.addEventListener("click", clearEditorRegionMarks);
+  document.getElementById("editorRegionPromptClose")?.addEventListener("click", removeLatestMark);
+  document.getElementById("editorRegionCancel")?.addEventListener("click", removeLatestMark);
+  document.getElementById("editorRegionClose")?.addEventListener("click", () => setEditorRegionMode(false, {clear: true}));
+
+  document.getElementById("editorRegionApply")?.addEventListener("click", (event) => {
+    const value = input.value.trim();
+    if (!value) {
+      input.focus();
+      return;
+    }
+    const applyButton = event.currentTarget;
+    const message = document.createElement("div");
+    message.className = "editor-chat-message";
+    message.textContent = `Edit selected region: ${value}`;
+    document.getElementById("editorChatThread")?.appendChild(message);
+    setEditorPanelView("right", "chat");
+    applyButton.textContent = "Applied";
+    applyButton.disabled = true;
+    window.setTimeout(() => {
+      applyButton.textContent = "Apply changes";
+      applyButton.disabled = false;
+      setEditorRegionMode(false, {clear: true});
+    }, 650);
+  });
+
+  setEditorRegionTool("rectangle");
+  syncEditorRegionActions();
 }
 
 function applyShapeAppearance(object) {
@@ -3098,6 +3301,7 @@ function init() {
   initLandingPromptTyping();
   updateEditorToolbar("text");
   bindCanvasSelection();
+  bindEditorRegionEditing();
   bindCanvasToolbar();
   setEditorPanelView("left", state.editorLeftPanelView);
   setEditorPanelView("right", state.editorRightPanelView);

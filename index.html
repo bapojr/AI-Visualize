@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=48" />
+    <link rel="stylesheet" href="styles.css?v=49" />
   </head>
   <body>
     <div id="app">
@@ -1134,12 +1134,13 @@
                           </svg>
                         </button>
                       </div>
+                      <div class="editor-region-drawing-layer" id="editorRegionDrawingLayer" aria-label="Image region drawing area"></div>
                     </div>
                   </div>
                 </div>
                 <div class="editor-image-action-stack hidden" id="editorImageActionStack">
                   <div class="editor-image-toolbar" id="editorImageToolbar">
-                    <button class="editor-image-tool" type="button" data-open-overlay="segment-overlay" aria-pressed="false">
+                    <button class="editor-image-tool" id="editorEditRegion" type="button" aria-pressed="false">
                       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.8877 1.73124 14.2688 2.11229c.296.29602.296.77469 0 1.06756l-.9164.91954-1.4518-1.45175.9164-.9164c.296-.29602.7747-.29602 1.0674 0h.0032ZM6.6069 7.9445l4.2261-4.2293 1.4518 1.45175-4.2293 4.22615a.7558.7558 0 0 1-.3275.1921l-1.8423.5259.5259-1.84224a.7558.7558 0 0 1 .1922-.32751l.0031.00315ZM11.7494.66368 5.5362 6.87379a2.267 2.267 0 0 0-.5763.97938l-.9007 3.14913a.7558.7558 0 0 0 .9353.9353l3.1492-.9006a2.267 2.267 0 0 0 .9794-.5763l6.2132-6.21015a2.2674 2.2674 0 0 0 0-3.20582l-.381-.38105a2.2674 2.2674 0 0 0-3.2059 0ZM2.7712 1.89185A2.7712 2.7712 0 0 0 0 4.66309v8.56571A2.7712 2.7712 0 0 0 2.7712 16h8.5657a2.7712 2.7712 0 0 0 2.7713-2.7712V9.70172a.7558.7558 0 0 0-1.5116 0v3.52708c0 .6959-.5637 1.2596-1.2597 1.2596H2.7712c-.696 0-1.2596-.5637-1.2596-1.2596V4.66309c0-.69596.5636-1.25966 1.2596-1.25966h3.5271a.7558.7558 0 0 0 0-1.51158H2.7712Z" fill="currentColor"/></svg>
                       <span>Edit Region</span>
                     </button>
@@ -1160,7 +1161,50 @@
                       <span>Crop</span>
                     </button>
                   </div>
+                  <div class="editor-region-toolbar" id="editorRegionToolbar" role="toolbar" aria-label="Edit image region" hidden>
+                    <span class="editor-region-toolbar-title">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.8877 1.73124 14.2688 2.11229c.296.29602.296.77469 0 1.06756l-.9164.91954-1.4518-1.45175.9164-.9164c.296-.29602.7747-.29602 1.0674 0h.0032ZM6.6069 7.9445l4.2261-4.2293 1.4518 1.45175-4.2293 4.22615a.7558.7558 0 0 1-.3275.1921l-1.8423.5259.5259-1.84224a.7558.7558 0 0 1 .1922-.32751l.0031.00315Z" fill="currentColor"/></svg>
+                      <span>Region Redraw</span>
+                    </span>
+                    <div class="editor-region-tool-toggle" role="group" aria-label="Region selection tool">
+                      <button class="editor-region-tool" id="editorRegionPen" type="button" data-region-tool="pen" aria-label="Pen" aria-pressed="false">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.13941 11.0568C1.26755 10.6005 1.50818 10.1849 1.8457 9.84738L11.0337 0.659409C11.4524 0.237512 12.0275 0 12.6275 0C13.2275 0 13.8026 0.237512 14.2245 0.662534L15.3401 1.77822C15.7652 2.20011 16.0027 2.77514 16.0027 3.37517C16.0027 3.9752 15.7652 4.55023 15.3401 4.97213L6.15217 14.1601C5.81778 14.4945 5.39901 14.7383 4.94273 14.8664L0.951905 15.9727C0.692517 16.0446 0.411252 15.9727 0.220618 15.7789C0.0299828 15.5852 -0.045021 15.307 0.0268577 15.0476L1.13941 11.0568ZM12.09 1.72196L10.4368 3.37517L12.6275 5.56591L14.2807 3.9127C14.4245 3.76894 14.5026 3.57831 14.5026 3.37517C14.5026 3.17204 14.4213 2.9814 14.2807 2.83765L13.165 1.72196C13.0213 1.58133 12.8275 1.50008 12.6275 1.50008C12.4275 1.50008 12.2337 1.58133 12.09 1.72196ZM9.37734 4.4346L2.90513 10.9099C2.752 11.0631 2.64262 11.2506 2.58324 11.46L1.83008 14.1757L4.54584 13.4226C4.7521 13.3663 4.94273 13.2538 5.09587 13.1007L11.5681 6.62534L9.37734 4.4346Z" fill="currentColor"/></svg>
+                      </button>
+                      <button class="editor-region-tool selected" id="editorRegionRectangle" type="button" data-region-tool="rectangle" aria-label="Rectangle" aria-pressed="true">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.7143 1.71429C14.0286 1.71429 14.2857 1.97143 14.2857 2.28571V13.7143C14.2857 14.0286 14.0286 14.2857 13.7143 14.2857H2.28571C1.97143 14.2857 1.71429 14.0286 1.71429 13.7143V2.28571C1.71429 1.97143 1.97143 1.71429 2.28571 1.71429H13.7143ZM2.28571 0C1.025 0 0 1.025 0 2.28571V13.7143C0 14.975 1.025 16 2.28571 16H13.7143C14.975 16 16 14.975 16 13.7143V2.28571C16 1.025 14.975 0 13.7143 0H2.28571Z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                    <button class="editor-region-menu-button" id="editorRegionWidth" type="button" aria-label="Region pen width">
+                      <span class="editor-region-width-dot" aria-hidden="true"></span><span id="editorRegionWidthLabel">12px</span>
+                      <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                    </button>
+                    <button class="editor-region-menu-button" id="editorRegionColor" type="button" aria-label="Region color">
+                      <span class="editor-region-color-dot" aria-hidden="true"></span><span>Blue</span>
+                      <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                    </button>
+                    <button class="editor-region-action is-primary" id="editorRegionUndo" type="button" disabled>
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3H2v3.5M2.4 5.8A6 6 0 1 1 2 9"/></svg>
+                      <span>Undo</span>
+                    </button>
+                    <button class="editor-region-action" id="editorRegionClear" type="button" disabled>Clear all</button>
+                    <span class="editor-region-toolbar-divider" aria-hidden="true"></span>
+                    <button class="editor-region-action is-close" id="editorRegionClose" type="button">Close</button>
+                  </div>
                 </div>
+                <section class="editor-region-prompt hidden" id="editorRegionPrompt" aria-labelledby="editorRegionPromptTitle">
+                  <header class="editor-region-prompt-header">
+                    <span class="editor-region-prompt-icon" aria-hidden="true">
+                      <svg viewBox="0 0 16 16"><path d="M13.8877 1.73124 14.2688 2.11229c.296.29602.296.77469 0 1.06756l-.9164.91954-1.4518-1.45175.9164-.9164c.296-.29602.7747-.29602 1.0674 0h.0032ZM6.6069 7.9445l4.2261-4.2293 1.4518 1.45175-4.2293 4.22615a.7558.7558 0 0 1-.3275.1921l-1.8423.5259.5259-1.84224a.7558.7558 0 0 1 .1922-.32751l.0031.00315Z" fill="currentColor"/></svg>
+                    </span>
+                    <h2 id="editorRegionPromptTitle">Selected region</h2>
+                    <button class="editor-region-prompt-close" id="editorRegionPromptClose" type="button" aria-label="Close selected region prompt">&times;</button>
+                  </header>
+                  <textarea id="editorRegionPromptInput" rows="5" placeholder="Describe what should change in this area" aria-label="Describe changes for selected region"></textarea>
+                  <div class="editor-region-prompt-actions">
+                    <button class="editor-region-apply" id="editorRegionApply" type="button">Apply changes</button>
+                    <button class="editor-region-cancel" id="editorRegionCancel" type="button">Cancel</button>
+                  </div>
+                </section>
                 <div class="editor-text-action-stack hidden" id="editorTextActionStack">
                   <div class="editor-text-toolbar" id="editorTextToolbar">
                     <div class="editor-text-group">
@@ -1863,6 +1907,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=35"></script>
+    <script src="app.js?v=36"></script>
   </body>
 </html>
