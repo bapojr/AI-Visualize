@@ -378,6 +378,9 @@ const state = {
   selectedEditorSegmentId: null,
   selectedEditorSegmentType: null,
   isEditorFrameSelected: false,
+  imageOpacity: 100,
+  imageLayer: 1,
+  imagePromptExpanded: false,
   hasHistory: false,
   mixedOrder: shuffle([...templateCatalog]),
   generatedResultTemplate: templateCatalog[0],
@@ -1161,6 +1164,7 @@ function renderEditorCanvas() {
   image.src = activeTemplate.image;
   image.alt = activeTemplate.title;
   image.className = `editor-canvas-image orientation-${activeTemplate.orientation}`;
+  applyImageAppearance();
   stageContent?.classList.toggle("is-frame-selected", state.isEditorFrameSelected);
   if (segmentation) {
     segmentation.innerHTML = "";
@@ -1228,6 +1232,21 @@ function bindCanvasSelection() {
   const moreTrigger = document.getElementById("editorImageMoreTrigger");
   const segmentation = document.getElementById("editorImageSegmentation");
 
+  const selectWholeImage = () => {
+    state.selectedEditorSegmentId = null;
+    state.selectedEditorSegmentType = "frame";
+    state.isEditorFrameSelected = true;
+    stageContent?.classList.add("is-frame-selected");
+    segmentation?.querySelectorAll(".editor-segment").forEach((segment) => {
+      segment.classList.remove("active");
+    });
+    document.activeElement?.closest?.(".editor-segment")?.blur();
+    imageToolbar?.classList.remove("hidden");
+    textToolbar?.classList.add("hidden");
+    moreMenu?.classList.add("hidden");
+    setCanvasTool(state.canvasTool);
+  };
+
   const clearEditorSelection = () => {
     state.selectedEditorSegmentId = null;
     state.selectedEditorSegmentType = null;
@@ -1239,20 +1258,12 @@ function bindCanvasSelection() {
     imageToolbar?.classList.add("hidden");
     textToolbar?.classList.add("hidden");
     moreMenu?.classList.add("hidden");
+    setCanvasTool(state.canvasTool);
   };
 
   editorImage?.addEventListener("click", (event) => {
     event.stopPropagation();
-    state.selectedEditorSegmentId = null;
-    state.selectedEditorSegmentType = "frame";
-    state.isEditorFrameSelected = true;
-    stageContent?.classList.add("is-frame-selected");
-    segmentation?.querySelectorAll(".editor-segment").forEach((segment) => {
-      segment.classList.remove("active");
-    });
-    imageToolbar?.classList.remove("hidden");
-    textToolbar?.classList.add("hidden");
-    moreMenu?.classList.add("hidden");
+    selectWholeImage();
   });
 
   moreTrigger?.addEventListener("click", (event) => {
@@ -1265,6 +1276,7 @@ function bindCanvasSelection() {
     if (
       !event.target.closest("#editorImageActionStack") &&
       !event.target.closest("#editorTextActionStack") &&
+      !event.target.closest("#editorImageSettings") &&
       !event.target.closest("#editorCanvasStageContent") &&
       !event.target.closest("#editorCanvasImage")
     ) {
@@ -1276,10 +1288,15 @@ function bindCanvasSelection() {
     const segment = event.target.closest(".editor-segment");
     if (!segment) return;
     event.stopPropagation();
+    if (!state.isEditorFrameSelected && !state.selectedEditorSegmentId) {
+      selectWholeImage();
+      return;
+    }
     state.selectedEditorSegmentId = segment.dataset.segmentId;
     state.selectedEditorSegmentType = segment.dataset.segmentType;
     state.isEditorFrameSelected = false;
     stageContent?.classList.remove("is-frame-selected");
+    setCanvasTool(state.canvasTool);
     segmentation.querySelectorAll(".editor-segment").forEach((item) => {
       item.classList.toggle("active", item === segment);
     });
@@ -1453,27 +1470,62 @@ function syncFrameSettingsPanel() {
   if (opacity) opacity.value = `${state.frameOpacity}`;
 }
 
+function currentImagePrompt() {
+  if (state.prompt.trim()) return state.prompt.trim();
+  const template = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
+  const visualType = template.category === "Graphical Abstract" ? "graphical abstract" : template.category.replace(/s$/, "").toLowerCase();
+  return `Create a clean scientific educational ${visualType} titled “${template.title}.” ${template.summary}`;
+}
+
+function applyImageAppearance() {
+  const image = document.getElementById("editorCanvasImage");
+  if (!image) return;
+  image.style.opacity = `${state.imageOpacity / 100}`;
+  image.style.setProperty("--image-layer", `${state.imageLayer}`);
+}
+
+function syncImageSettingsPanel() {
+  const prompt = document.getElementById("editorImagePromptText");
+  const toggle = document.getElementById("editorImagePromptToggle");
+  if (prompt) {
+    prompt.textContent = currentImagePrompt();
+    prompt.classList.toggle("expanded", state.imagePromptExpanded);
+  }
+  if (toggle) {
+    toggle.setAttribute("aria-expanded", String(state.imagePromptExpanded));
+    const label = toggle.querySelector("span");
+    if (label) label.textContent = state.imagePromptExpanded ? "Show less" : "Show all";
+  }
+  const opacity = document.getElementById("editorImageOpacity");
+  if (opacity) opacity.value = `${state.imageOpacity}`;
+  applyImageAppearance();
+}
+
 function setCanvasTool(tool) {
   state.canvasTool = tool;
+  const imageSelected = state.isEditorFrameSelected;
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
   const canvasSettings = document.getElementById("editorCanvasSettings");
-  if (canvasSettings) canvasSettings.hidden = !["select", "hand"].includes(tool);
+  if (canvasSettings) canvasSettings.hidden = imageSelected || !["select", "hand"].includes(tool);
   const shapeSettings = document.getElementById("editorShapeSettings");
-  if (shapeSettings) shapeSettings.hidden = tool !== "shape";
-  if (tool === "shape") syncShapeSettingsPanel();
+  if (shapeSettings) shapeSettings.hidden = imageSelected || tool !== "shape";
+  if (!imageSelected && tool === "shape") syncShapeSettingsPanel();
   const lineSettings = document.getElementById("editorLineSettings");
-  if (lineSettings) lineSettings.hidden = tool !== "line";
-  if (tool === "line") syncLineSettingsPanel();
+  if (lineSettings) lineSettings.hidden = imageSelected || tool !== "line";
+  if (!imageSelected && tool === "line") syncLineSettingsPanel();
   const penSettings = document.getElementById("editorPenSettings");
-  if (penSettings) penSettings.hidden = tool !== "pen";
-  if (tool === "pen") syncPenSettingsPanel();
+  if (penSettings) penSettings.hidden = imageSelected || tool !== "pen";
+  if (!imageSelected && tool === "pen") syncPenSettingsPanel();
   const textSettings = document.getElementById("editorTextSettings");
-  if (textSettings) textSettings.hidden = tool !== "text";
-  if (tool === "text") syncTextSettingsPanel();
+  if (textSettings) textSettings.hidden = imageSelected || tool !== "text";
+  if (!imageSelected && tool === "text") syncTextSettingsPanel();
   const frameSettings = document.getElementById("editorFrameSettings");
-  if (frameSettings) frameSettings.hidden = tool !== "frame";
-  if (tool === "frame") syncFrameSettingsPanel();
+  if (frameSettings) frameSettings.hidden = imageSelected || tool !== "frame";
+  if (!imageSelected && tool === "frame") syncFrameSettingsPanel();
+  const imageSettings = document.getElementById("editorImageSettings");
+  if (imageSettings) imageSettings.hidden = !imageSelected;
+  if (imageSelected) syncImageSettingsPanel();
 
   document.querySelectorAll(".canvas-tool-button[data-canvas-tool]").forEach((button) => {
     button.classList.toggle("active", button.dataset.canvasTool === tool);
@@ -2360,6 +2412,61 @@ function bindEditorFrameSettings() {
   syncFrameSettingsPanel();
 }
 
+function bindEditorImageSettings() {
+  document.getElementById("editorImagePromptToggle")?.addEventListener("click", () => {
+    state.imagePromptExpanded = !state.imagePromptExpanded;
+    syncImageSettingsPanel();
+  });
+  document.getElementById("editorImagePromptCopy")?.addEventListener("click", async (event) => {
+    await navigator.clipboard?.writeText(currentImagePrompt());
+    event.currentTarget.setAttribute("aria-label", "Prompt copied");
+    window.setTimeout(() => event.currentTarget.setAttribute("aria-label", "Copy image prompt"), 1200);
+  });
+  document.getElementById("editorImageOpacity")?.addEventListener("input", (event) => {
+    state.imageOpacity = Number(event.target.value);
+    applyImageAppearance();
+  });
+  document.querySelectorAll("[data-image-layer-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.imageLayerAction;
+      if (action === "back") state.imageLayer = 0;
+      if (action === "backward") state.imageLayer = Math.max(0, state.imageLayer - 1);
+      if (action === "forward") state.imageLayer = Math.min(4, state.imageLayer + 1);
+      if (action === "front") state.imageLayer = 4;
+      applyImageAppearance();
+    });
+  });
+
+  const flashCopiedState = (button) => {
+    const original = button.textContent;
+    button.textContent = "Copied";
+    window.setTimeout(() => {
+      button.textContent = original;
+    }, 1200);
+  };
+  document.querySelectorAll("[data-image-copy-format]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const image = document.getElementById("editorCanvasImage");
+      if (!image?.src) return;
+      try {
+        if (button.dataset.imageCopyFormat === "png" && navigator.clipboard?.write && window.ClipboardItem) {
+          const blob = await fetch(image.src).then((response) => response.blob());
+          await navigator.clipboard.write([new ClipboardItem({[blob.type || "image/png"]: blob})]);
+        } else {
+          const width = image.naturalWidth || 1200;
+          const height = image.naturalHeight || 900;
+          const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><image href="${image.src}" width="${width}" height="${height}"/></svg>`;
+          await navigator.clipboard?.writeText(svg);
+        }
+        flashCopiedState(button);
+      } catch (error) {
+        navigator.clipboard?.writeText(image.src);
+      }
+    });
+  });
+  syncImageSettingsPanel();
+}
+
 function init() {
   renderCategoryPills("desktopCategoryPills", "desktop");
   renderCategoryPills("mobileCategoryPills", "mobile");
@@ -2387,6 +2494,7 @@ function init() {
   bindEditorPenSettings();
   bindEditorTextSettings();
   bindEditorFrameSettings();
+  bindEditorImageSettings();
   initActions();
   syncConversationPrompt();
   syncMobileConversationPrompt();

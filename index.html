@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=38" />
+    <link rel="stylesheet" href="styles.css?v=39" />
   </head>
   <body>
     <div id="app">
@@ -768,6 +768,54 @@
                     <h2 id="editorFrameOpacityHeading">Opacity</h2>
                     <input id="editorFrameOpacity" type="range" min="0" max="100" value="100" aria-label="Frame opacity" />
                     <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
+                  </section>
+                </div>
+                <div class="editor-image-settings" id="editorImageSettings" hidden>
+                  <div class="editor-canvas-settings-heading">Image</div>
+                  <section class="editor-image-settings-section editor-image-prompt-section" aria-labelledby="editorImagePromptHeading">
+                    <div class="editor-image-section-heading">
+                      <h2 id="editorImagePromptHeading">Prompt</h2>
+                      <button id="editorImagePromptCopy" type="button" aria-label="Copy image prompt">
+                        <svg viewBox="0 0 16 16" aria-hidden="true">
+                          <rect x="2" y="2" width="9" height="9" rx="2"/>
+                          <path d="M6 13h6a2 2 0 0 0 2-2V6"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <p class="editor-image-prompt" id="editorImagePromptText"></p>
+                    <button class="editor-image-prompt-toggle" id="editorImagePromptToggle" type="button" aria-expanded="false">
+                      <span>Show all</span>
+                      <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                    </button>
+                  </section>
+                  <section class="editor-image-settings-section editor-shape-opacity-section" aria-labelledby="editorImageOpacityHeading">
+                    <h2 id="editorImageOpacityHeading">Opacity</h2>
+                    <input id="editorImageOpacity" type="range" min="0" max="100" value="100" aria-label="Image opacity" />
+                    <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
+                  </section>
+                  <section class="editor-image-settings-section editor-image-layer-section" aria-labelledby="editorImageLayerHeading">
+                    <h2 id="editorImageLayerHeading">Layer</h2>
+                    <div class="editor-image-layer-actions" role="group" aria-label="Image layer controls">
+                      <button type="button" data-image-layer-action="back" aria-label="Send image to back">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13h10M8 2v8m-3-3 3 3 3-3"/></svg>
+                      </button>
+                      <button type="button" data-image-layer-action="backward" aria-label="Send image backward">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v10m-4-4 4 4 4-4"/></svg>
+                      </button>
+                      <button type="button" data-image-layer-action="forward" aria-label="Bring image forward">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14V4m-4 4 4-4 4 4"/></svg>
+                      </button>
+                      <button type="button" data-image-layer-action="front" aria-label="Bring image to front">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3h10M8 14V6m-3 3 3-3 3 3"/></svg>
+                      </button>
+                    </div>
+                  </section>
+                  <section class="editor-image-settings-section editor-image-copy-section" aria-labelledby="editorImageCopyHeading">
+                    <h2 id="editorImageCopyHeading">Copy as</h2>
+                    <div class="editor-copy-actions">
+                      <button type="button" data-image-copy-format="png">Copy as PNG</button>
+                      <button type="button" data-image-copy-format="svg">Copy as SVG</button>
+                    </div>
                   </section>
                 </div>
               </div>
@@ -1582,6 +1630,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=27"></script>
+    <script src="app.js?v=28"></script>
   </body>
 </html>

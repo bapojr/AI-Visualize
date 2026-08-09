@@ -3543,7 +3543,8 @@ a {
 .editor-line-settings,
 .editor-pen-settings,
 .editor-text-settings,
-.editor-frame-settings {
+.editor-frame-settings,
+.editor-image-settings {
   color: var(--Gray-12, #13161b);
   font-family: "IBM Plex Sans", sans-serif;
 }
@@ -3554,6 +3555,7 @@ a {
 .editor-pen-settings[hidden],
 .editor-text-settings[hidden],
 .editor-frame-settings[hidden],
+.editor-image-settings[hidden],
 .editor-shape-control-group[hidden] {
   display: none;
 }
@@ -4106,6 +4108,147 @@ a {
   white-space: nowrap;
 }
 
+.editor-image-settings-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+}
+
+.editor-image-settings-section h2 {
+  margin: 0;
+  color: var(--Gray-12, #13161b);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.editor-image-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editor-image-section-heading > button {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  cursor: pointer;
+}
+
+.editor-image-section-heading > button:hover,
+.editor-image-section-heading > button:focus-visible {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-image-section-heading svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.editor-image-prompt {
+  display: -webkit-box;
+  margin: 16px 0 0;
+  overflow: hidden;
+  color: var(--Gray-10, #7d8aa1);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 21px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.editor-image-prompt.expanded {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+.editor-image-prompt-toggle {
+  display: flex;
+  margin: 16px auto 0;
+  padding: 0;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-12, #13161b);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.editor-image-prompt-toggle svg {
+  width: 10px;
+  height: 6px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 160ms ease;
+}
+
+.editor-image-prompt-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.editor-image-layer-section h2,
+.editor-image-copy-section h2 {
+  margin-bottom: 16px;
+}
+
+.editor-image-layer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-image-layer-actions button {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 50%;
+  background: var(--Gray-3, #f1f4fa);
+  color: var(--Gray-12, #13161b);
+  cursor: pointer;
+}
+
+.editor-image-layer-actions button:hover,
+.editor-image-layer-actions button:focus-visible {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-image-layer-actions svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .editor-copy-section {
   padding-top: 24px;
 }
@@ -4415,6 +4558,8 @@ a {
 }
 
 .editor-canvas-image {
+  position: relative;
+  z-index: var(--image-layer, 1);
   display: block;
   max-width: none;
   max-height: none;
@@ -4671,6 +4816,7 @@ a {
 .editor-image-segmentation {
   position: absolute;
   inset: 0;
+  z-index: 10;
   pointer-events: none;
 }
 
