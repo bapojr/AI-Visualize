@@ -3277,9 +3277,9 @@ a {
   align-items: center;
   gap: 8px;
   border-radius: 8px;
-  background: #1f2022;
-  box-shadow: 0 12px 30px rgba(19, 22, 27, 0.18);
-  color: #fff;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+  color: var(--Gray-12, #13161b);
 }
 
 .editor-collapsed-back,
@@ -3294,17 +3294,18 @@ a {
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: #fff;
+  color: var(--Gray-12, #13161b);
 }
 
 .editor-collapsed-back:hover,
 .editor-collapsed-panel-open:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
 }
 
 .editor-collapsed-back:focus-visible,
 .editor-collapsed-panel-open:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--Blue-9, #0062ff);
   outline-offset: 1px;
 }
 
@@ -3312,7 +3313,7 @@ a {
   min-width: 0;
   flex: 1 1 auto;
   overflow: hidden;
-  color: #fff;
+  color: var(--Gray-12, #13161b);
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -3321,11 +3322,10 @@ a {
   white-space: nowrap;
 }
 
-.editor-collapsed-panel-open img {
+.editor-collapsed-panel-open svg {
   display: block;
   width: 14px;
-  height: 14px;
-  filter: brightness(0) invert(1);
+  height: 11px;
 }
 
 #editorDesktopScreen.editor-left-panel-collapsed .editor-main {
