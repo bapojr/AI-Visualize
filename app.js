@@ -384,6 +384,8 @@ const state = {
   editorExportFormat: "png",
   editorExportDpi: "96",
   editorExportCertificate: true,
+  editorInspectorPromptExpanded: false,
+  editorInspectorTemplateId: null,
   hasHistory: false,
   mixedOrder: shuffle([...templateCatalog]),
   generatedResultTemplate: templateCatalog[0],
@@ -1159,6 +1161,7 @@ function renderEditorCanvas() {
     actionStack?.classList.add("hidden");
     textActionStack?.classList.add("hidden");
     updateZoom();
+    renderEditorInspector();
     return;
   }
 
@@ -1188,6 +1191,7 @@ function renderEditorCanvas() {
   actionStack?.classList.add("hidden");
   textActionStack?.classList.add("hidden");
   updateZoom();
+  renderEditorInspector();
 }
 
 function updateSuggestionsRailState() {
@@ -1480,6 +1484,91 @@ function currentImagePrompt() {
   return `Create a clean scientific educational ${visualType} titled “${template.title}.” ${template.summary}`;
 }
 
+function currentInspectorPrompt() {
+  if (state.prompt.trim()) return state.prompt.trim();
+  const template = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
+  const visualType = template.category === "Graphical Abstract" ? "graphical abstract" : template.category.replace(/s$/, "").toLowerCase();
+  return `Create a publication-ready ${visualType} titled “${template.title}” for ${template.subject}. ${template.summary} Use a clear scientific hierarchy with an immediately readable heading, accurately labeled illustrations, concise supporting text, balanced spacing, and an editable composition suitable for publication and presentation.`;
+}
+
+function editorObjectCopy(template, region) {
+  if (region.type === "text") {
+    return {
+      title: "Text",
+      description: region.id === "title" ? template.title : region.label,
+    };
+  }
+  if (region.type === "callout") {
+    return {
+      title: "Label",
+      description: `${region.label} with its supporting scientific annotation.`,
+    };
+  }
+  return {
+    title: `${region.label} illustration`,
+    description: `Editable visual object from ${template.title}.`,
+  };
+}
+
+function renderEditorInspector() {
+  const prompt = document.getElementById("editorInspectorPromptText");
+  const toggle = document.getElementById("editorInspectorPromptToggle");
+  const list = document.getElementById("editorObjectList");
+  if (!prompt || !toggle || !list) return;
+
+  const template = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
+  if (state.editorInspectorTemplateId !== template.id) {
+    state.editorInspectorTemplateId = template.id;
+    state.editorInspectorPromptExpanded = false;
+  }
+
+  prompt.textContent = currentInspectorPrompt();
+  prompt.classList.toggle("expanded", state.editorInspectorPromptExpanded);
+  toggle.setAttribute("aria-expanded", String(state.editorInspectorPromptExpanded));
+  const toggleLabel = toggle.querySelector("span");
+  if (toggleLabel) toggleLabel.textContent = state.editorInspectorPromptExpanded ? "Show less" : "Show more";
+
+  list.innerHTML = "";
+  if (!state.isBlankEditor) {
+    (segmentationRegions[template.id] || []).forEach((region) => {
+      const copy = editorObjectCopy(template, region);
+      const item = document.createElement("button");
+      item.className = "editor-object-item";
+      item.type = "button";
+      item.dataset.editorObjectId = region.id;
+      item.setAttribute("aria-label", `${copy.title}: ${copy.description}`);
+
+      const thumbnail = document.createElement("span");
+      thumbnail.className = "editor-object-thumbnail";
+      const image = document.createElement("img");
+      image.src = template.image;
+      image.alt = "";
+      image.style.width = `${10000 / region.w}%`;
+      image.style.height = `${10000 / region.h}%`;
+      image.style.left = `${(-region.x / region.w) * 100}%`;
+      image.style.top = `${(-region.y / region.h) * 100}%`;
+      thumbnail.appendChild(image);
+
+      const text = document.createElement("span");
+      text.className = "editor-object-copy";
+      text.innerHTML = `<span class="editor-object-title">${copy.title}</span><span class="editor-object-description">${copy.description}</span>`;
+      item.append(thumbnail, text);
+      item.addEventListener("click", () => {
+        list.querySelectorAll(".editor-object-item").forEach((object) => object.classList.toggle("selected", object === item));
+      });
+      list.appendChild(item);
+    });
+  }
+
+  window.requestAnimationFrame(() => {
+    const expanded = state.editorInspectorPromptExpanded;
+    prompt.classList.remove("expanded");
+    const isTruncated = prompt.scrollHeight > prompt.clientHeight + 1;
+    prompt.classList.toggle("expanded", expanded);
+    toggle.hidden = !isTruncated;
+  });
+}
+
 function applyImageAppearance() {
   const image = document.getElementById("editorCanvasImage");
   if (!image) return;
@@ -1565,6 +1654,7 @@ function setEditorPanelView(panel, view) {
 
   if (panel === "right") {
     document.getElementById("historyPanel")?.setAttribute("aria-label", view === "chat" ? "Editor chat" : "Editor edit");
+    if (view === "edit") renderEditorInspector();
   }
 }
 
@@ -2470,6 +2560,25 @@ function bindEditorImageSettings() {
   syncImageSettingsPanel();
 }
 
+function bindEditorInspector() {
+  document.getElementById("editorInspectorPromptToggle")?.addEventListener("click", () => {
+    state.editorInspectorPromptExpanded = !state.editorInspectorPromptExpanded;
+    renderEditorInspector();
+  });
+
+  document.getElementById("editorInspectorPromptEdit")?.addEventListener("click", () => {
+    const input = document.getElementById("editorChatPrompt");
+    setEditorPanelView("right", "chat");
+    if (!input) return;
+    input.value = currentInspectorPrompt();
+    toggleSubmitStates();
+    window.setTimeout(() => {
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }, 0);
+  });
+}
+
 function bindEditorExportMenu() {
   const wrap = document.getElementById("editorExportWrap");
   const trigger = document.getElementById("editorExportTrigger");
@@ -2666,6 +2775,7 @@ function init() {
   bindEditorTextSettings();
   bindEditorFrameSettings();
   bindEditorImageSettings();
+  bindEditorInspector();
   bindEditorShareMenu();
   bindEditorExportMenu();
   initActions();
