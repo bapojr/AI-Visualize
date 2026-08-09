@@ -3381,7 +3381,7 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: #ffffff;
+  background: #f5f7f9;
   min-height: 0;
   overflow: hidden;
 }
@@ -3393,7 +3393,7 @@ a {
   place-items: center;
   padding: 38px;
   overflow: auto;
-  background: #ffffff;
+  background: #f5f7f9;
 }
 
 .canvas-card {
