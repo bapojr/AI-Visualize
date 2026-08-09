@@ -337,7 +337,7 @@ const state = {
   editorState: "text",
   zoom: 100,
   currentEditorTemplate: templateCatalog[0],
-  editorBackground: "#FFFFFF",
+  editorBackground: "#F5F7F9",
   editorTitle: "Untitled",
   selectedEditorSegmentId: null,
   selectedEditorSegmentType: null,
@@ -1553,7 +1553,7 @@ function updateZoom() {
 function bindEditorBackgroundSwatches() {
   document.querySelectorAll(".editor-bg-swatch").forEach((button) => {
     button.addEventListener("click", () => {
-      state.editorBackground = button.dataset.color || "#FFFFFF";
+      state.editorBackground = button.dataset.color || "#F5F7F9";
       document.querySelectorAll(".editor-bg-swatch").forEach((swatch) => {
         swatch.classList.toggle("active", swatch === button);
       });
