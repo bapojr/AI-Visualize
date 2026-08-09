@@ -335,7 +335,7 @@ const state = {
   selectedVariant: 1,
   activeOverlay: null,
   editorState: "text",
-  zoom: 50,
+  zoom: 100,
   currentEditorTemplate: templateCatalog[0],
   editorBackground: "#F5F7F9",
   editorTitle: "Untitled",
@@ -1531,7 +1531,7 @@ function initActions() {
   });
 
   document.getElementById("canvasZoomReset")?.addEventListener("click", () => {
-    setCanvasZoom(50);
+    setCanvasZoom(100);
   });
 
   document.getElementById("editorCanvasStage")?.addEventListener("wheel", (event) => {
