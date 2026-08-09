@@ -1310,6 +1310,12 @@ function setEditorPanelView(panel, view) {
 function setEditorLeftPanelCollapsed(collapsed) {
   state.editorLeftPanelCollapsed = collapsed;
   document.getElementById("editorDesktopScreen")?.classList.toggle("editor-left-panel-collapsed", collapsed);
+  const leftPanel = document.getElementById("editorLeftPanel");
+  if (leftPanel) {
+    if (collapsed) leftPanel.setAttribute("inert", "");
+    else leftPanel.removeAttribute("inert");
+    leftPanel.setAttribute("aria-hidden", String(collapsed));
+  }
   ["editorLeftPanelCollapse", "editorLeftPanelOpen"].forEach((id) => {
     document.getElementById(id)?.setAttribute("aria-expanded", String(!collapsed));
   });

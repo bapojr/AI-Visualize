@@ -3165,6 +3165,10 @@ a {
   transition: grid-template-columns 180ms ease;
 }
 
+#editorDesktopScreen {
+  position: relative;
+}
+
 .editor-sidepanel {
   min-width: 0;
   background: #ffffff;
@@ -3261,12 +3265,73 @@ a {
   display: block;
 }
 
-.editor-left-panel-open {
+.editor-collapsed-header {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 50;
   display: none;
+  width: 240px;
+  height: 48px;
+  padding: 8px 12px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  background: #1f2022;
+  box-shadow: 0 12px 30px rgba(19, 22, 27, 0.18);
+  color: #fff;
+}
+
+.editor-collapsed-back,
+.editor-collapsed-panel-open {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+}
+
+.editor-collapsed-back:hover,
+.editor-collapsed-panel-open:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.editor-collapsed-back:focus-visible,
+.editor-collapsed-panel-open:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.editor-collapsed-title {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  color: #fff;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-collapsed-panel-open img {
+  display: block;
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1);
 }
 
 #editorDesktopScreen.editor-left-panel-collapsed .editor-main {
   grid-template-columns: 0 minmax(0, 1fr) 400px;
+  height: 100vh;
+  min-height: 100vh;
 }
 
 #editorDesktopScreen.editor-left-panel-collapsed .editor-sidepanel {
@@ -3275,8 +3340,18 @@ a {
   pointer-events: none;
 }
 
-#editorDesktopScreen.editor-left-panel-collapsed .editor-left-panel-open {
+#editorDesktopScreen.editor-left-panel-collapsed > .editor-topbar {
+  display: none;
+}
+
+#editorDesktopScreen.editor-left-panel-collapsed .editor-collapsed-header {
   display: flex;
+}
+
+@media (max-width: 1320px) {
+  #editorDesktopScreen.editor-left-panel-collapsed .canvas-main-toolbar {
+    top: 76px;
+  }
 }
 
 .editor-sidepanel-tabs {
