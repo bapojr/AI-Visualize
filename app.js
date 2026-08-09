@@ -381,6 +381,9 @@ const state = {
   imageOpacity: 100,
   imageLayer: 1,
   imagePromptExpanded: false,
+  editorExportFormat: "png",
+  editorExportDpi: "96",
+  editorExportCertificate: true,
   hasHistory: false,
   mixedOrder: shuffle([...templateCatalog]),
   generatedResultTemplate: templateCatalog[0],
@@ -2467,6 +2470,69 @@ function bindEditorImageSettings() {
   syncImageSettingsPanel();
 }
 
+function bindEditorExportMenu() {
+  const wrap = document.getElementById("editorExportWrap");
+  const trigger = document.getElementById("editorExportTrigger");
+  const menu = document.getElementById("editorExportMenu");
+  const certificate = document.getElementById("editorExportCertificate");
+  const download = document.getElementById("editorExportDownload");
+  if (!wrap || !trigger || !menu) return;
+
+  const setOpen = (open) => {
+    menu.hidden = !open;
+    trigger.setAttribute("aria-expanded", String(open));
+  };
+
+  const selectRadio = (selector, selected) => {
+    menu.querySelectorAll(selector).forEach((option) => {
+      const isSelected = option === selected;
+      option.classList.toggle("selected", isSelected);
+      option.setAttribute("aria-checked", String(isSelected));
+    });
+  };
+
+  trigger.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setOpen(menu.hidden);
+  });
+
+  menu.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const format = event.target.closest("[data-editor-export-format]");
+    if (format) {
+      state.editorExportFormat = format.dataset.editorExportFormat;
+      selectRadio("[data-editor-export-format]", format);
+      return;
+    }
+    const dpi = event.target.closest("[data-editor-export-dpi]");
+    if (dpi) {
+      state.editorExportDpi = dpi.dataset.editorExportDpi;
+      selectRadio("[data-editor-export-dpi]", dpi);
+    }
+  });
+
+  certificate?.addEventListener("click", () => {
+    state.editorExportCertificate = !state.editorExportCertificate;
+    certificate.classList.toggle("selected", state.editorExportCertificate);
+    certificate.setAttribute("aria-checked", String(state.editorExportCertificate));
+  });
+
+  download?.addEventListener("click", () => {
+    setOpen(false);
+    showToast();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!wrap.contains(event.target)) setOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || menu.hidden) return;
+    setOpen(false);
+    trigger.focus();
+  });
+}
+
 function init() {
   renderCategoryPills("desktopCategoryPills", "desktop");
   renderCategoryPills("mobileCategoryPills", "mobile");
@@ -2495,6 +2561,7 @@ function init() {
   bindEditorTextSettings();
   bindEditorFrameSettings();
   bindEditorImageSettings();
+  bindEditorExportMenu();
   initActions();
   syncConversationPrompt();
   syncMobileConversationPrompt();

@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=40" />
+    <link rel="stylesheet" href="styles.css?v=41" />
   </head>
   <body>
     <div id="app">
@@ -471,9 +471,56 @@
             <div class="editor-actions">
               <button class="btn btn-ghost">Add credits</button>
               <button class="btn btn-ghost" data-open-overlay="share-modal">Share</button>
-              <button class="btn btn-primary" data-open-overlay="export-modal">
-                Export / Download
-              </button>
+              <div class="editor-export-wrap" id="editorExportWrap">
+                <button class="btn editor-export-trigger" id="editorExportTrigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="editorExportMenu">
+                  <span>Export / Download</span>
+                  <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                </button>
+                <div class="editor-export-menu" id="editorExportMenu" role="dialog" aria-label="Export options" hidden>
+                  <div class="editor-export-options editor-export-format-options" role="radiogroup" aria-label="Export format">
+                    <button class="editor-export-option selected" type="button" role="radio" aria-checked="true" data-editor-export-format="png">
+                      <span class="editor-export-radio" aria-hidden="true"></span><span>PNG</span>
+                    </button>
+                    <button class="editor-export-option" type="button" role="radio" aria-checked="false" data-editor-export-format="editable-svg">
+                      <span class="editor-export-radio" aria-hidden="true"></span><span>Editable SVG</span>
+                      <img class="editor-prime-icon" src="assets/sidebar/prime.svg" alt="Prime" />
+                    </button>
+                    <button class="editor-export-option" type="button" role="radio" aria-checked="false" data-editor-export-format="svg-pptx">
+                      <span class="editor-export-radio" aria-hidden="true"></span><span>SVG in PPTX</span>
+                      <img class="editor-prime-icon" src="assets/sidebar/prime.svg" alt="Prime" />
+                    </button>
+                  </div>
+                  <div class="editor-export-divider"></div>
+                  <section class="editor-export-upscale" aria-labelledby="editorExportUpscaleHeading">
+                    <h2 id="editorExportUpscaleHeading">Upscale</h2>
+                    <div class="editor-export-options editor-export-dpi-options" role="radiogroup" aria-label="Export resolution">
+                      <button class="editor-export-option selected" type="button" role="radio" aria-checked="true" data-editor-export-dpi="96">
+                        <span class="editor-export-radio" aria-hidden="true"></span><span>96 DPI</span>
+                      </button>
+                      <button class="editor-export-option" type="button" role="radio" aria-checked="false" data-editor-export-dpi="300">
+                        <span class="editor-export-radio" aria-hidden="true"></span><span>300 DPI</span>
+                      </button>
+                      <button class="editor-export-option" type="button" role="radio" aria-checked="false" data-editor-export-dpi="600">
+                        <span class="editor-export-radio" aria-hidden="true"></span><span>600 DPI</span>
+                        <img class="editor-prime-icon" src="assets/sidebar/prime.svg" alt="Prime" />
+                      </button>
+                      <button class="editor-export-option" type="button" role="radio" aria-checked="false" data-editor-export-dpi="1200">
+                        <span class="editor-export-radio" aria-hidden="true"></span><span>1200 DPI</span>
+                        <img class="editor-prime-icon" src="assets/sidebar/prime.svg" alt="Prime" />
+                      </button>
+                    </div>
+                  </section>
+                  <div class="editor-export-divider editor-export-lower-divider"></div>
+                  <button class="editor-export-certificate selected" id="editorExportCertificate" type="button" role="checkbox" aria-checked="true">
+                    <span class="editor-export-checkbox" aria-hidden="true">
+                      <svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-8"/></svg>
+                    </span>
+                    <span>Include authorization certificate</span>
+                    <span class="editor-export-info" aria-label="Authorization certificate information">?</span>
+                  </button>
+                  <button class="editor-export-download" id="editorExportDownload" type="button">Download</button>
+                </div>
+              </div>
             </div>
           </header>
 
@@ -1650,6 +1697,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=28"></script>
+    <script src="app.js?v=29"></script>
   </body>
 </html>
