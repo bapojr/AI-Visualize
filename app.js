@@ -379,6 +379,9 @@ const state = {
   selectedEditorSegmentType: null,
   isEditorFrameSelected: false,
   imageRotation: 0,
+  isEditorCropping: false,
+  editorCropRect: null,
+  editorCroppedImages: {},
   isEditorRegionEditing: false,
   editorRegionTool: "rectangle",
   editorRegionStrokeWidth: 12,
@@ -1153,6 +1156,7 @@ function renderEditorCanvas() {
   const textActionStack = document.getElementById("editorTextActionStack");
   if (!canvas || !image) return;
 
+  setEditorCropMode(false);
   setEditorRegionMode(false, {clear: true});
 
   canvas.classList.add("image-mode");
@@ -1176,14 +1180,15 @@ function renderEditorCanvas() {
 
   state.currentEditorTemplate = activeTemplate;
   stageContent?.classList.remove("is-blank-canvas");
-  image.src = activeTemplate.image;
+  const croppedImage = state.editorCroppedImages[activeTemplate.id];
+  image.src = croppedImage?.src || activeTemplate.image;
   image.alt = activeTemplate.title;
-  image.className = `editor-canvas-image orientation-${activeTemplate.orientation}`;
+  image.className = `editor-canvas-image orientation-${croppedImage?.orientation || activeTemplate.orientation}`;
   applyImageAppearance();
   stageContent?.classList.toggle("is-frame-selected", state.isEditorFrameSelected);
   if (segmentation) {
     segmentation.innerHTML = "";
-    (segmentationRegions[activeTemplate.id] || []).forEach((region) => {
+    (croppedImage ? [] : segmentationRegions[activeTemplate.id] || []).forEach((region) => {
       const button = document.createElement("button");
       button.className = `editor-segment ${state.selectedEditorSegmentId === region.id ? "active" : ""}`;
       button.style.left = `${region.x}%`;
@@ -1248,6 +1253,7 @@ function bindCanvasSelection() {
   const useReference = document.getElementById("editorUseReference");
   const extractText = document.getElementById("editorExtractText");
   const editRegion = document.getElementById("editorEditRegion");
+  const cropImage = document.getElementById("editorCropImage");
   const segmentation = document.getElementById("editorImageSegmentation");
   const rotateHandle = document.getElementById("editorImageRotateHandle");
 
@@ -1275,6 +1281,7 @@ function bindCanvasSelection() {
   };
 
   const clearEditorSelection = () => {
+    setEditorCropMode(false);
     setEditorRegionMode(false, {clear: true});
     state.selectedEditorSegmentId = null;
     state.selectedEditorSegmentType = null;
@@ -1298,6 +1305,11 @@ function bindCanvasSelection() {
   editRegion?.addEventListener("click", (event) => {
     event.stopPropagation();
     setEditorRegionMode(true, {clear: true});
+  });
+
+  cropImage?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setEditorCropMode(true);
   });
 
   let rotateSession = null;
@@ -1402,6 +1414,181 @@ function bindCanvasSelection() {
   });
 }
 
+function updateEditorCropSelection() {
+  const selection = document.getElementById("editorCropSelection");
+  const rect = state.editorCropRect;
+  if (!selection || !rect) return;
+  selection.style.setProperty("--crop-x", `${rect.x}px`);
+  selection.style.setProperty("--crop-y", `${rect.y}px`);
+  selection.style.setProperty("--crop-width", `${rect.width}px`);
+  selection.style.setProperty("--crop-height", `${rect.height}px`);
+}
+
+function setEditorCropMode(active, options = {}) {
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  const layer = document.getElementById("editorCropLayer");
+  const actionStack = document.getElementById("editorImageActionStack");
+  state.isEditorCropping = Boolean(active);
+  stageContent?.classList.toggle("is-cropping", state.isEditorCropping);
+  if (layer) layer.hidden = !state.isEditorCropping;
+
+  if (state.isEditorCropping) {
+    setEditorRegionMode(false, {clear: true});
+    state.editorCropRect = {
+      x: 0,
+      y: 0,
+      width: layer?.offsetWidth || stageContent?.offsetWidth || 0,
+      height: layer?.offsetHeight || stageContent?.offsetHeight || 0,
+    };
+    actionStack?.classList.add("hidden");
+    updateEditorCropSelection();
+  } else {
+    state.editorCropRect = null;
+    document.getElementById("editorCropSelection")?.classList.remove("is-dragging");
+    if (options.restoreToolbar && state.isEditorFrameSelected) actionStack?.classList.remove("hidden");
+  }
+}
+
+function bindEditorCrop() {
+  const layer = document.getElementById("editorCropLayer");
+  const selection = document.getElementById("editorCropSelection");
+  const image = document.getElementById("editorCanvasImage");
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  if (!layer || !selection || !image || !stageContent) return;
+
+  let cropSession = null;
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const getLocalPoint = (event) => {
+    const bounds = stageContent.getBoundingClientRect();
+    const computed = window.getComputedStyle(stageContent);
+    const transform = computed.transform === "none" ? new DOMMatrix() : new DOMMatrix(computed.transform);
+    const originParts = computed.transformOrigin.split(" ");
+    const originX = parseFloat(originParts[0]) || 0;
+    const originY = parseFloat(originParts[1]) || 0;
+    const width = stageContent.offsetWidth;
+    const height = stageContent.offsetHeight;
+    const corners = [
+      [0, 0],
+      [width, 0],
+      [width, height],
+      [0, height],
+    ].map(([x, y]) => {
+      const point = new DOMPoint(x - originX, y - originY).matrixTransform(transform);
+      return {x: point.x + originX, y: point.y + originY};
+    });
+    const layoutLeft = bounds.left - Math.min(...corners.map((point) => point.x));
+    const layoutTop = bounds.top - Math.min(...corners.map((point) => point.y));
+    const relative = new DOMPoint(event.clientX - layoutLeft - originX, event.clientY - layoutTop - originY).matrixTransform(transform.inverse());
+    return {
+      x: clamp(relative.x + originX, 0, width),
+      y: clamp(relative.y + originY, 0, height),
+    };
+  };
+
+  selection.addEventListener("pointerdown", (event) => {
+    if (!state.isEditorCropping || event.button !== 0 || event.target.closest(".editor-crop-controls")) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const handle = event.target.closest("[data-crop-handle]");
+    cropSession = {
+      pointerId: event.pointerId,
+      mode: handle ? "resize" : "move",
+      direction: handle?.dataset.cropHandle || "",
+      startPoint: getLocalPoint(event),
+      startRect: {...state.editorCropRect},
+    };
+    selection.setPointerCapture?.(event.pointerId);
+    selection.classList.add("is-dragging");
+  });
+
+  document.addEventListener("pointermove", (event) => {
+    if (!cropSession || event.pointerId !== cropSession.pointerId || !state.editorCropRect) return;
+    const point = getLocalPoint(event);
+    const dx = point.x - cropSession.startPoint.x;
+    const dy = point.y - cropSession.startPoint.y;
+    const start = cropSession.startRect;
+    const maxWidth = layer.offsetWidth;
+    const maxHeight = layer.offsetHeight;
+    const minSize = Math.min(50, maxWidth, maxHeight);
+    const next = {...start};
+
+    if (cropSession.mode === "move") {
+      next.x = clamp(start.x + dx, 0, maxWidth - start.width);
+      next.y = clamp(start.y + dy, 0, maxHeight - start.height);
+    } else {
+      if (cropSession.direction.includes("e")) next.width = clamp(start.width + dx, minSize, maxWidth - start.x);
+      if (cropSession.direction.includes("s")) next.height = clamp(start.height + dy, minSize, maxHeight - start.y);
+      if (cropSession.direction.includes("w")) {
+        next.x = clamp(start.x + dx, 0, start.x + start.width - minSize);
+        next.width = start.width + start.x - next.x;
+      }
+      if (cropSession.direction.includes("n")) {
+        next.y = clamp(start.y + dy, 0, start.y + start.height - minSize);
+        next.height = start.height + start.y - next.y;
+      }
+    }
+    state.editorCropRect = next;
+    updateEditorCropSelection();
+  });
+
+  const endCropDrag = (event) => {
+    if (!cropSession || event.pointerId !== cropSession.pointerId) return;
+    if (selection.hasPointerCapture?.(event.pointerId)) selection.releasePointerCapture(event.pointerId);
+    cropSession = null;
+    selection.classList.remove("is-dragging");
+  };
+  document.addEventListener("pointerup", endCropDrag);
+  document.addEventListener("pointercancel", endCropDrag);
+
+  const cancelCrop = () => setEditorCropMode(false, {restoreToolbar: true});
+  document.getElementById("editorCropCancel")?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    cancelCrop();
+  });
+
+  document.getElementById("editorCropConfirm")?.addEventListener("click", async (event) => {
+    event.stopPropagation();
+    const rect = state.editorCropRect;
+    if (!rect || !image.naturalWidth || !image.naturalHeight || !layer.offsetWidth || !layer.offsetHeight) return;
+    const scaleX = image.naturalWidth / layer.offsetWidth;
+    const scaleY = image.naturalHeight / layer.offsetHeight;
+    const sourceX = Math.round(rect.x * scaleX);
+    const sourceY = Math.round(rect.y * scaleY);
+    const sourceWidth = Math.max(1, Math.round(rect.width * scaleX));
+    const sourceHeight = Math.max(1, Math.round(rect.height * scaleY));
+    const canvas = document.createElement("canvas");
+    canvas.width = sourceWidth;
+    canvas.height = sourceHeight;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
+    const croppedSource = canvas.toDataURL("image/png");
+    const orientation = sourceWidth >= sourceHeight ? "landscape" : "portrait";
+    const activeTemplate = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
+    state.editorCroppedImages[activeTemplate.id] = {src: croppedSource, orientation};
+    image.src = croppedSource;
+    image.className = `editor-canvas-image orientation-${orientation}`;
+    document.getElementById("editorImageSegmentation")?.replaceChildren();
+    try {
+      await image.decode();
+    } catch (_) {
+      // The image remains usable even when decode() is not available.
+    }
+    applyImageAppearance();
+    setEditorCropMode(false, {restoreToolbar: true});
+    updateCanvasTransform();
+    renderEditorInspector();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !state.isEditorCropping) return;
+    event.preventDefault();
+    cancelCrop();
+  });
+}
+
 function setEditorRegionTool(tool) {
   state.editorRegionTool = tool === "pen" ? "pen" : "rectangle";
   const layer = document.getElementById("editorRegionDrawingLayer");
@@ -1435,6 +1622,7 @@ function setEditorRegionMode(active, options = {}) {
   const imageToolbar = document.getElementById("editorImageToolbar");
   const regionToolbar = document.getElementById("editorRegionToolbar");
   state.isEditorRegionEditing = Boolean(active);
+  if (state.isEditorRegionEditing) setEditorCropMode(false);
   stageContent?.classList.toggle("is-region-editing", state.isEditorRegionEditing);
   if (imageToolbar) imageToolbar.hidden = state.isEditorRegionEditing;
   if (regionToolbar) regionToolbar.hidden = !state.isEditorRegionEditing;
@@ -3301,6 +3489,7 @@ function init() {
   initLandingPromptTyping();
   updateEditorToolbar("text");
   bindCanvasSelection();
+  bindEditorCrop();
   bindEditorRegionEditing();
   bindCanvasToolbar();
   setEditorPanelView("left", state.editorLeftPanelView);
