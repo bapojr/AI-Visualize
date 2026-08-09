@@ -496,8 +496,8 @@
 }
 
 .landing-stage .landing-intro h1 {
-  width: min(1060px, 100%);
-  max-width: 1060px;
+  width: max-content;
+  max-width: 100%;
   min-height: 46px;
   margin: 0;
   color: var(--Blue-12, #051e57);
@@ -515,6 +515,23 @@
 .landing-stage .landing-intro h1 strong {
   color: var(--Blue-10, #0054f1);
   font: inherit;
+}
+
+.landing-heading-typing {
+  display: inline-block;
+  min-width: 1px;
+  white-space: nowrap;
+}
+
+.landing-heading-typing::after {
+  display: inline-block;
+  width: 2px;
+  height: 0.82em;
+  margin-left: 3px;
+  background: currentColor;
+  content: "";
+  vertical-align: -0.05em;
+  animation: landing-caret-blink 850ms steps(1, end) infinite;
 }
 
 .landing-stage .landing-intro p {
@@ -833,8 +850,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .gallery-trigger,
-  .landing-typing-placeholder::after {
+  .landing-typing-placeholder::after,
+  .landing-heading-typing::after {
     animation: none;
+  }
+
+  .landing-heading-typing::after {
+    display: none;
   }
 }
 

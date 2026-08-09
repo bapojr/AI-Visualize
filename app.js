@@ -205,6 +205,8 @@ const landingPromptExamples = [
   "Create a poster on...",
 ];
 
+const landingHeadingPhrases = ["Graphical Abstract", "Poster", "Infographic"];
+
 const suggestionPills = [
   "More designs",
   "Make the colors more natural",
@@ -1102,6 +1104,47 @@ function initLandingPromptTyping() {
   };
 
   typeNextCharacter();
+}
+
+function initLandingHeadingTyping() {
+  const heading = document.getElementById("landingHeadingTyping");
+  if (!heading) return;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    heading.textContent = landingHeadingPhrases[0];
+    return;
+  }
+
+  let phraseIndex = 0;
+  let characterIndex = landingHeadingPhrases[0].length;
+  let deleting = true;
+
+  const updateHeading = () => {
+    const phrase = landingHeadingPhrases[phraseIndex];
+    if (deleting) {
+      characterIndex = Math.max(0, characterIndex - 1);
+      heading.textContent = phrase.slice(0, characterIndex);
+      if (characterIndex === 0) {
+        phraseIndex = (phraseIndex + 1) % landingHeadingPhrases.length;
+        deleting = false;
+        window.setTimeout(updateHeading, 280);
+        return;
+      }
+      window.setTimeout(updateHeading, 48);
+      return;
+    }
+
+    characterIndex = Math.min(landingHeadingPhrases[phraseIndex].length, characterIndex + 1);
+    heading.textContent = landingHeadingPhrases[phraseIndex].slice(0, characterIndex);
+    if (characterIndex === landingHeadingPhrases[phraseIndex].length) {
+      deleting = true;
+      window.setTimeout(updateHeading, 1400);
+      return;
+    }
+    window.setTimeout(updateHeading, 82);
+  };
+
+  window.setTimeout(updateHeading, 1400);
 }
 
 function updateEditorToolbar(kind) {
@@ -3487,6 +3530,7 @@ function init() {
   updateSuggestionsRailState();
   toggleSubmitStates();
   initLandingPromptTyping();
+  initLandingHeadingTyping();
   updateEditorToolbar("text");
   bindCanvasSelection();
   bindEditorCrop();
