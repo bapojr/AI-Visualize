@@ -3379,6 +3379,7 @@ a {
 }
 
 .canvas-shell {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -3395,6 +3396,144 @@ a {
   padding: 38px;
   overflow: auto;
   background: #f5f7f9;
+}
+
+.canvas-main-toolbar {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  width: 377px;
+  height: 40px;
+  padding: 4px 12px;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+  border-radius: 25px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+.canvas-tool-button,
+.canvas-tool-chevron {
+  position: relative;
+  display: flex;
+  padding: 0;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+}
+
+.canvas-tool-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.canvas-tool-button svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.canvas-tool-button:hover {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.canvas-tool-button.active,
+.canvas-tool-group.active .canvas-tool-button,
+.canvas-tool-group.active .canvas-tool-chevron {
+  color: var(--Blue-10, #0054f1);
+}
+
+.canvas-tool-button:focus-visible,
+.canvas-tool-chevron:focus-visible {
+  outline: 2px solid var(--Blue-9, #0062ff);
+  outline-offset: 1px;
+}
+
+.canvas-tool-button[data-tooltip]::after {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 30;
+  padding: 5px 8px;
+  transform: translate(-50%, -2px);
+  border-radius: 5px;
+  background: #13161b;
+  color: #fff;
+  content: attr(data-tooltip);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.canvas-tool-button[data-tooltip]:hover::after,
+.canvas-tool-button[data-tooltip]:focus-visible::after {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+.canvas-tool-group {
+  display: flex;
+  width: 44px;
+  height: 32px;
+  flex: 0 0 44px;
+  align-items: center;
+}
+
+.canvas-tool-group[data-canvas-tool-group="line"] {
+  width: 43px;
+  flex-basis: 43px;
+}
+
+.canvas-tool-chevron {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  border-radius: 3px;
+}
+
+.canvas-tool-chevron:hover {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.canvas-tool-chevron svg {
+  display: block;
+  width: 8px;
+  height: 4.52px;
+}
+
+.canvas-tool-group[data-canvas-tool-group="line"] .canvas-tool-chevron {
+  margin-left: -1px;
+}
+
+.canvas-toolbar-divider {
+  width: 1px;
+  height: 32px;
+  flex: 0 0 1px;
+  background: var(--Gray-6, #d8e0ee);
+}
+
+.canvas-import-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .canvas-card {
@@ -3435,8 +3574,13 @@ a {
   position: relative;
   display: inline-block;
   transform-origin: center center;
-  transform: scale(var(--editor-zoom-scale, 1));
+  transform: translate(var(--canvas-pan-x, 0), var(--canvas-pan-y, 0)) scale(var(--editor-zoom-scale, 1));
   transition: transform 180ms ease;
+}
+
+.editor-canvas-stage-content.is-blank-canvas {
+  width: 520px;
+  height: 560px;
 }
 
 .editor-canvas-image {
@@ -3448,6 +3592,131 @@ a {
   box-shadow: 0 18px 40px rgba(15, 24, 46, 0.08);
   background: #ffffff;
   border-radius: 0;
+}
+
+.canvas-drawing-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.canvas-object {
+  position: absolute;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#editorCanvasStage[data-canvas-tool="select"] .canvas-object {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+#editorCanvasStage:not([data-canvas-tool="select"]) .editor-canvas-image,
+#editorCanvasStage:not([data-canvas-tool="select"]) .editor-segment,
+#editorCanvasStage:not([data-canvas-tool="select"]) .canvas-object {
+  pointer-events: none;
+}
+
+.canvas-shape-object {
+  min-width: 1px;
+  min-height: 1px;
+  border: 2px solid #5d6a81;
+  background: rgba(237, 243, 255, 0.3);
+}
+
+.canvas-frame-object {
+  min-width: 1px;
+  min-height: 1px;
+  border: 2px dashed #5d6a81;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.canvas-line-object {
+  height: 2px;
+  transform-origin: 0 50%;
+  border-radius: 999px;
+  background: #5d6a81;
+}
+
+.canvas-pen-object {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none !important;
+}
+
+.canvas-pen-object path {
+  fill: none;
+  stroke: #5d6a81;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#editorCanvasStage[data-canvas-tool="select"] .canvas-pen-object path {
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.canvas-text-object {
+  min-width: 120px;
+  min-height: 28px;
+  padding: 4px 6px;
+  border: 1px dashed #0054f1;
+  background: rgba(255, 255, 255, 0.92);
+  color: #13161b;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+  outline: none;
+  white-space: pre-wrap;
+}
+
+.canvas-text-object:empty::before {
+  color: #7d8aa1;
+  content: "Type here";
+}
+
+.canvas-imported-image {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.12);
+}
+
+.canvas-object.is-selected:not(.canvas-pen-object) {
+  outline: 2px solid var(--Blue-10, #0054f1);
+  outline-offset: 2px;
+}
+
+.canvas-pen-object.is-selected path {
+  stroke: var(--Blue-10, #0054f1);
+}
+
+#editorCanvasStage[data-canvas-tool="hand"] {
+  cursor: grab;
+}
+
+#editorCanvasStage[data-canvas-tool="hand"].is-panning {
+  cursor: grabbing;
+}
+
+#editorCanvasStage.is-panning .editor-canvas-stage-content {
+  transition: none;
+}
+
+#editorCanvasStage[data-canvas-tool="shape"] .editor-canvas-stage-content,
+#editorCanvasStage[data-canvas-tool="line"] .editor-canvas-stage-content,
+#editorCanvasStage[data-canvas-tool="pen"] .editor-canvas-stage-content,
+#editorCanvasStage[data-canvas-tool="frame"] .editor-canvas-stage-content {
+  cursor: crosshair;
+}
+
+#editorCanvasStage[data-canvas-tool="text"] .editor-canvas-stage-content {
+  cursor: text;
 }
 
 .editor-canvas-image.orientation-portrait {
@@ -3575,7 +3844,7 @@ a {
 .editor-text-action-stack {
   position: absolute;
   left: 50%;
-  top: 18px;
+  top: 64px;
   transform: translateX(-50%);
   z-index: 7;
 }

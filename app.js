@@ -336,6 +336,9 @@ const state = {
   activeOverlay: null,
   editorState: "text",
   zoom: 100,
+  canvasTool: "select",
+  canvasPanX: 0,
+  canvasPanY: 0,
   currentEditorTemplate: templateCatalog[0],
   editorBackground: "#F5F7F9",
   editorTitle: "Untitled",
@@ -1110,6 +1113,7 @@ function renderEditorCanvas() {
     image.alt = "";
     image.className = "editor-canvas-image hidden";
     stageContent?.classList.remove("is-frame-selected");
+    stageContent?.classList.add("is-blank-canvas");
     if (segmentation) segmentation.innerHTML = "";
     actionStack?.classList.add("hidden");
     textActionStack?.classList.add("hidden");
@@ -1118,6 +1122,7 @@ function renderEditorCanvas() {
   }
 
   state.currentEditorTemplate = activeTemplate;
+  stageContent?.classList.remove("is-blank-canvas");
   image.src = activeTemplate.image;
   image.alt = activeTemplate.title;
   image.className = `editor-canvas-image orientation-${activeTemplate.orientation}`;
@@ -1252,6 +1257,220 @@ function bindCanvasSelection() {
       textToolbar?.classList.add("hidden");
     }
   });
+}
+
+function setCanvasTool(tool) {
+  state.canvasTool = tool;
+  const stage = document.getElementById("editorCanvasStage");
+  if (stage) stage.dataset.canvasTool = tool;
+
+  document.querySelectorAll(".canvas-tool-button[data-canvas-tool]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.canvasTool === tool);
+  });
+  document.querySelectorAll("[data-canvas-tool-group]").forEach((group) => {
+    group.classList.toggle("active", group.dataset.canvasToolGroup === tool);
+  });
+}
+
+function updateCanvasTransform() {
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  if (!stageContent) return;
+  stageContent.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
+  stageContent.style.setProperty("--canvas-pan-x", `${state.canvasPanX}px`);
+  stageContent.style.setProperty("--canvas-pan-y", `${state.canvasPanY}px`);
+}
+
+function bindCanvasToolbar() {
+  const stage = document.getElementById("editorCanvasStage");
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  const drawingLayer = document.getElementById("canvasDrawingLayer");
+  const importInput = document.getElementById("canvasImportInput");
+  if (!stage || !stageContent || !drawingLayer) return;
+
+  const selectObject = (object) => {
+    drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((item) => {
+      item.classList.remove("is-selected");
+    });
+    object?.classList.add("is-selected");
+  };
+
+  const pointInCanvas = (event) => {
+    const rect = stageContent.getBoundingClientRect();
+    const scale = state.zoom / 100;
+    return {
+      x: Math.min(stageContent.offsetWidth, Math.max(0, (event.clientX - rect.left) / scale)),
+      y: Math.min(stageContent.offsetHeight, Math.max(0, (event.clientY - rect.top) / scale)),
+    };
+  };
+
+  const positionBox = (object, start, point, constrainSquare = false) => {
+    let deltaX = point.x - start.x;
+    let deltaY = point.y - start.y;
+    if (constrainSquare) {
+      const size = Math.max(Math.abs(deltaX), Math.abs(deltaY));
+      deltaX = (deltaX < 0 ? -1 : 1) * size;
+      deltaY = (deltaY < 0 ? -1 : 1) * size;
+    }
+    object.style.left = `${Math.min(start.x, start.x + deltaX)}px`;
+    object.style.top = `${Math.min(start.y, start.y + deltaY)}px`;
+    object.style.width = `${Math.abs(deltaX)}px`;
+    object.style.height = `${Math.abs(deltaY)}px`;
+  };
+
+  const positionLine = (object, start, point, snapAngle = false) => {
+    let deltaX = point.x - start.x;
+    let deltaY = point.y - start.y;
+    let angle = Math.atan2(deltaY, deltaX);
+    const length = Math.hypot(deltaX, deltaY);
+    if (snapAngle) angle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+    object.style.left = `${start.x}px`;
+    object.style.top = `${start.y}px`;
+    object.style.width = `${length}px`;
+    object.style.transform = `rotate(${angle}rad)`;
+  };
+
+  document.querySelectorAll("[data-canvas-tool]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const tool = button.dataset.canvasTool;
+      setCanvasTool(tool);
+      if (tool === "import") {
+        importInput?.click();
+        setCanvasTool("select");
+      }
+    });
+  });
+
+  let panSession = null;
+  stage.addEventListener("pointerdown", (event) => {
+    if (state.canvasTool !== "hand" || event.button !== 0 || event.target.closest(".canvas-zoom-controls")) return;
+    event.preventDefault();
+    panSession = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      panX: state.canvasPanX,
+      panY: state.canvasPanY,
+    };
+    stage.setPointerCapture?.(event.pointerId);
+    stage.classList.add("is-panning");
+  });
+
+  stage.addEventListener("pointermove", (event) => {
+    if (!panSession || event.pointerId !== panSession.pointerId) return;
+    state.canvasPanX = panSession.panX + event.clientX - panSession.startX;
+    state.canvasPanY = panSession.panY + event.clientY - panSession.startY;
+    updateCanvasTransform();
+  });
+
+  const endPan = (event) => {
+    if (!panSession || event.pointerId !== panSession.pointerId) return;
+    stage.releasePointerCapture?.(event.pointerId);
+    panSession = null;
+    stage.classList.remove("is-panning");
+  };
+  stage.addEventListener("pointerup", endPan);
+  stage.addEventListener("pointercancel", endPan);
+
+  let drawSession = null;
+  stageContent.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || !["shape", "line", "pen", "text", "frame"].includes(state.canvasTool)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const start = pointInCanvas(event);
+
+    if (state.canvasTool === "text") {
+      const text = document.createElement("div");
+      text.className = "canvas-object canvas-text-object is-selected";
+      text.contentEditable = "true";
+      text.spellcheck = true;
+      text.style.left = `${start.x}px`;
+      text.style.top = `${start.y}px`;
+      drawingLayer.appendChild(text);
+      selectObject(text);
+      setCanvasTool("select");
+      window.setTimeout(() => text.focus(), 0);
+      return;
+    }
+
+    let object;
+    if (state.canvasTool === "pen") {
+      object = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      object.classList.add("canvas-object", "canvas-pen-object");
+      object.setAttribute("viewBox", `0 0 ${stageContent.offsetWidth} ${stageContent.offsetHeight}`);
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", `M ${start.x} ${start.y}`);
+      object.appendChild(path);
+      drawingLayer.appendChild(object);
+      drawSession = {tool: "pen", object, path, points: [start], pointerId: event.pointerId};
+    } else {
+      object = document.createElement("div");
+      object.className = `canvas-object canvas-${state.canvasTool === "shape" ? "shape" : state.canvasTool}-object`;
+      drawingLayer.appendChild(object);
+      drawSession = {tool: state.canvasTool, object, start, pointerId: event.pointerId};
+      if (state.canvasTool === "line") positionLine(object, start, start);
+      else positionBox(object, start, start);
+    }
+    stageContent.setPointerCapture?.(event.pointerId);
+  });
+
+  stageContent.addEventListener("pointermove", (event) => {
+    if (!drawSession || event.pointerId !== drawSession.pointerId) return;
+    const point = pointInCanvas(event);
+    if (drawSession.tool === "pen") {
+      drawSession.points.push(point);
+      const pathData = drawSession.points.map((item, index) => `${index ? "L" : "M"} ${item.x} ${item.y}`).join(" ");
+      drawSession.path.setAttribute("d", pathData);
+    } else if (drawSession.tool === "line") {
+      positionLine(drawSession.object, drawSession.start, point, event.shiftKey);
+    } else {
+      positionBox(drawSession.object, drawSession.start, point, event.shiftKey);
+    }
+  });
+
+  const endDrawing = (event) => {
+    if (!drawSession || event.pointerId !== drawSession.pointerId) return;
+    stageContent.releasePointerCapture?.(event.pointerId);
+    const {object, tool, points = []} = drawSession;
+    const width = parseFloat(object.style.width || "0");
+    const height = parseFloat(object.style.height || "0");
+    const tooSmall = tool === "pen" ? points.length < 2 : tool === "line" ? width < 4 : width < 4 || height < 4;
+    if (tooSmall) object.remove();
+    else selectObject(object);
+    drawSession = null;
+  };
+  stageContent.addEventListener("pointerup", endDrawing);
+  stageContent.addEventListener("pointercancel", endDrawing);
+
+  drawingLayer.addEventListener("click", (event) => {
+    if (state.canvasTool !== "select") return;
+    const object = event.target.closest(".canvas-object");
+    if (!object) return;
+    event.stopPropagation();
+    selectObject(object);
+  });
+
+  importInput?.addEventListener("change", () => {
+    const file = importInput.files?.[0];
+    if (!file) {
+      setCanvasTool("select");
+      return;
+    }
+    const image = document.createElement("img");
+    const objectUrl = URL.createObjectURL(file);
+    image.className = "canvas-object canvas-imported-image is-selected";
+    image.alt = file.name;
+    image.draggable = false;
+    image.src = objectUrl;
+    image.style.left = `${Math.max(0, (stageContent.offsetWidth - 180) / 2)}px`;
+    image.style.top = "40px";
+    image.addEventListener("load", () => URL.revokeObjectURL(objectUrl), {once: true});
+    drawingLayer.appendChild(image);
+    selectObject(image);
+    importInput.value = "";
+    setCanvasTool("select");
+  });
+
+  setCanvasTool(state.canvasTool);
 }
 
 function bindSelectGroups() {
@@ -1531,6 +1750,8 @@ function initActions() {
   });
 
   document.getElementById("canvasZoomReset")?.addEventListener("click", () => {
+    state.canvasPanX = 0;
+    state.canvasPanY = 0;
     setCanvasZoom(100);
   });
 
@@ -1560,7 +1781,7 @@ function updateZoom() {
   const zoomLabel = `${state.zoom}%`;
   const canvasZoomPill = document.getElementById("canvasZoomPill");
   if (canvasZoomPill) canvasZoomPill.textContent = zoomLabel;
-  document.getElementById("editorCanvasStageContent")?.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
+  updateCanvasTransform();
 }
 
 function bindEditorBackgroundSwatches() {
@@ -1591,6 +1812,7 @@ function init() {
   initLandingPromptTyping();
   updateEditorToolbar("text");
   bindCanvasSelection();
+  bindCanvasToolbar();
   bindSelectGroups();
   bindEditorBackgroundSwatches();
   initActions();
