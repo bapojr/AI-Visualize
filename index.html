@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=37" />
+    <link rel="stylesheet" href="styles.css?v=38" />
   </head>
   <body>
     <div id="app">
@@ -673,6 +673,100 @@
                   <section class="editor-shape-settings-section editor-shape-opacity-section" aria-labelledby="editorLineOpacityHeading">
                     <h2 id="editorLineOpacityHeading">Opacity</h2>
                     <input id="editorLineOpacity" type="range" min="0" max="100" value="100" aria-label="Line opacity" />
+                    <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
+                  </section>
+                </div>
+                <div class="editor-pen-settings" id="editorPenSettings" hidden>
+                  <div class="editor-canvas-settings-heading">Pen</div>
+                  <section class="editor-shape-settings-section editor-pen-stroke-section" aria-labelledby="editorPenStrokeHeading">
+                    <h2 id="editorPenStrokeHeading">Stroke</h2>
+                    <div class="editor-shape-swatches" role="group" aria-label="Pen stroke colors">
+                      <button class="editor-shape-swatch is-none" type="button" data-pen-stroke="transparent" aria-label="No pen stroke"></button>
+                      <button class="editor-shape-swatch active" type="button" data-pen-stroke="#13161B" aria-label="Black pen stroke" style="--swatch-color: #13161B"></button>
+                      <button class="editor-shape-swatch" type="button" data-pen-stroke="#F72D45" aria-label="Red pen stroke" style="--swatch-color: #F72D45"></button>
+                      <button class="editor-shape-swatch" type="button" data-pen-stroke="#FF6B11" aria-label="Orange pen stroke" style="--swatch-color: #FF6B11"></button>
+                      <button class="editor-shape-swatch" type="button" data-pen-stroke="#FFB700" aria-label="Yellow pen stroke" style="--swatch-color: #FFB700"></button>
+                      <button class="editor-shape-swatch" type="button" data-pen-stroke="#46C800" aria-label="Green pen stroke" style="--swatch-color: #46C800"></button>
+                      <button class="editor-shape-swatch" type="button" data-pen-stroke="#477FE5" aria-label="Blue pen stroke" style="--swatch-color: #477FE5"></button>
+                      <button class="editor-shape-swatch" type="button" data-pen-stroke="#7D5CE0" aria-label="Purple pen stroke" style="--swatch-color: #7D5CE0"></button>
+                      <label class="editor-shape-custom-swatch" data-pen-custom="stroke" aria-label="Choose a custom pen stroke color">
+                        <input id="editorPenStrokePicker" type="color" value="#13161B" aria-label="Custom pen stroke color" />
+                      </label>
+                    </div>
+                    <div class="editor-shape-control-group">
+                      <h3>Width</h3>
+                      <div class="editor-shape-option-row" role="group" aria-label="Pen width">
+                        <button class="editor-shape-icon-option active" type="button" data-pen-width="1" aria-label="Thin pen"><span class="shape-width-icon thin"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-pen-width="2" aria-label="Medium pen"><span class="shape-width-icon medium"></span></button>
+                        <button class="editor-shape-icon-option" type="button" data-pen-width="4" aria-label="Thick pen"><span class="shape-width-icon thick"></span></button>
+                      </div>
+                    </div>
+                  </section>
+                  <section class="editor-shape-settings-section editor-shape-opacity-section" aria-labelledby="editorPenOpacityHeading">
+                    <h2 id="editorPenOpacityHeading">Opacity</h2>
+                    <input id="editorPenOpacity" type="range" min="0" max="100" value="100" aria-label="Pen opacity" />
+                    <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
+                  </section>
+                </div>
+                <div class="editor-text-settings" id="editorTextSettings" hidden>
+                  <div class="editor-canvas-settings-heading">Text</div>
+                  <section class="editor-shape-settings-section editor-text-typography-section" aria-labelledby="editorTextTypographyHeading">
+                    <h2 id="editorTextTypographyHeading">Typography</h2>
+                    <label class="editor-property-select">
+                      <select id="editorTextTypography" aria-label="Text typography">
+                        <option value="400">Regular</option>
+                        <option value="500" selected>Medium</option>
+                        <option value="600">Semibold</option>
+                        <option value="700">Bold</option>
+                      </select>
+                      <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                    </label>
+                    <div class="editor-text-alignment-row" role="group" aria-label="Text alignment">
+                      <button class="editor-shape-icon-option active" type="button" data-text-align="left" aria-label="Align text left"><span class="text-align-icon left"></span></button>
+                      <button class="editor-shape-icon-option" type="button" data-text-align="center" aria-label="Align text center"><span class="text-align-icon center"></span></button>
+                      <button class="editor-shape-icon-option" type="button" data-text-align="right" aria-label="Align text right"><span class="text-align-icon right"></span></button>
+                    </div>
+                  </section>
+                  <section class="editor-shape-settings-section editor-text-stroke-section" aria-labelledby="editorTextStrokeHeading">
+                    <h2 id="editorTextStrokeHeading">Stroke</h2>
+                    <div class="editor-shape-swatches" role="group" aria-label="Text colors">
+                      <button class="editor-shape-swatch is-none" type="button" data-text-stroke="transparent" aria-label="No text color"></button>
+                      <button class="editor-shape-swatch active" type="button" data-text-stroke="#13161B" aria-label="Black text" style="--swatch-color: #13161B"></button>
+                      <button class="editor-shape-swatch" type="button" data-text-stroke="#F72D45" aria-label="Red text" style="--swatch-color: #F72D45"></button>
+                      <button class="editor-shape-swatch" type="button" data-text-stroke="#FF6B11" aria-label="Orange text" style="--swatch-color: #FF6B11"></button>
+                      <button class="editor-shape-swatch" type="button" data-text-stroke="#FFB700" aria-label="Yellow text" style="--swatch-color: #FFB700"></button>
+                      <button class="editor-shape-swatch" type="button" data-text-stroke="#46C800" aria-label="Green text" style="--swatch-color: #46C800"></button>
+                      <button class="editor-shape-swatch" type="button" data-text-stroke="#477FE5" aria-label="Blue text" style="--swatch-color: #477FE5"></button>
+                      <button class="editor-shape-swatch" type="button" data-text-stroke="#7D5CE0" aria-label="Purple text" style="--swatch-color: #7D5CE0"></button>
+                      <label class="editor-shape-custom-swatch" data-text-custom="stroke" aria-label="Choose a custom text color">
+                        <input id="editorTextStrokePicker" type="color" value="#13161B" aria-label="Custom text color" />
+                      </label>
+                    </div>
+                  </section>
+                  <section class="editor-shape-settings-section editor-shape-opacity-section" aria-labelledby="editorTextOpacityHeading">
+                    <h2 id="editorTextOpacityHeading">Opacity</h2>
+                    <input id="editorTextOpacity" type="range" min="0" max="100" value="100" aria-label="Text opacity" />
+                    <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
+                  </section>
+                </div>
+                <div class="editor-frame-settings" id="editorFrameSettings" hidden>
+                  <div class="editor-canvas-settings-heading">Frame</div>
+                  <section class="editor-shape-settings-section editor-frame-size-section" aria-labelledby="editorFrameSizeHeading">
+                    <h2 id="editorFrameSizeHeading">Size</h2>
+                    <div class="editor-frame-size-options" role="group" aria-label="Frame size">
+                      <button class="editor-frame-size-option active" type="button" data-frame-ratio="16:9" aria-label="16 by 9 frame, 1920 by 1080 pixels">
+                        <span class="editor-frame-ratio">16:9</span>
+                        <span class="editor-frame-dimensions">1920 × 1080</span>
+                      </button>
+                      <button class="editor-frame-size-option" type="button" data-frame-ratio="4:3" aria-label="4 by 3 frame, 1024 by 768 pixels">
+                        <span class="editor-frame-ratio">4:3</span>
+                        <span class="editor-frame-dimensions">1024 × 768</span>
+                      </button>
+                    </div>
+                  </section>
+                  <section class="editor-shape-settings-section editor-shape-opacity-section" aria-labelledby="editorFrameOpacityHeading">
+                    <h2 id="editorFrameOpacityHeading">Opacity</h2>
+                    <input id="editorFrameOpacity" type="range" min="0" max="100" value="100" aria-label="Frame opacity" />
                     <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
                   </section>
                 </div>
@@ -1488,6 +1582,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=26"></script>
+    <script src="app.js?v=27"></script>
   </body>
 </html>

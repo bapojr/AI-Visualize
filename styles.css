@@ -3540,7 +3540,10 @@ a {
 
 .editor-canvas-settings,
 .editor-shape-settings,
-.editor-line-settings {
+.editor-line-settings,
+.editor-pen-settings,
+.editor-text-settings,
+.editor-frame-settings {
   color: var(--Gray-12, #13161b);
   font-family: "IBM Plex Sans", sans-serif;
 }
@@ -3548,6 +3551,9 @@ a {
 .editor-canvas-settings[hidden],
 .editor-shape-settings[hidden],
 .editor-line-settings[hidden],
+.editor-pen-settings[hidden],
+.editor-text-settings[hidden],
+.editor-frame-settings[hidden],
 .editor-shape-control-group[hidden] {
   display: none;
 }
@@ -3944,6 +3950,162 @@ a {
   left: 0;
 }
 
+.editor-pen-stroke-section {
+  padding-bottom: 20px;
+}
+
+.editor-property-select {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 32px;
+  align-items: center;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+}
+
+.editor-property-select:focus-within,
+.editor-property-select:hover {
+  border-color: var(--Blue-9, #0062ff);
+}
+
+.editor-property-select select {
+  width: 100%;
+  height: 100%;
+  padding: 0 36px 0 12px;
+  border: 0;
+  appearance: none;
+  background: transparent;
+  color: var(--Gray-12, #13161b);
+  font: 500 14px/20px "IBM Plex Sans", sans-serif;
+  outline: none;
+  cursor: pointer;
+}
+
+.editor-property-select svg {
+  position: absolute;
+  right: 12px;
+  width: 10px;
+  height: 6px;
+  fill: none;
+  stroke: var(--Gray-12, #13161b);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.editor-text-alignment-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.text-align-icon {
+  display: block;
+  width: 14px;
+  height: 12px;
+  background-repeat: no-repeat;
+}
+
+.text-align-icon.left {
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor);
+  background-position: left 0, left 5px, left 10px;
+  background-size: 14px 2px, 9px 2px, 12px 2px;
+}
+
+.text-align-icon.center {
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor);
+  background-position: center 0, center 5px, center 10px;
+  background-size: 14px 2px, 9px 2px, 12px 2px;
+}
+
+.text-align-icon.right {
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor);
+  background-position: right 0, right 5px, right 10px;
+  background-size: 14px 2px, 9px 2px, 12px 2px;
+}
+
+.editor-text-stroke-section {
+  padding-top: 16px;
+  padding-bottom: 20px;
+}
+
+.editor-frame-size-options {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.editor-frame-size-option {
+  display: flex;
+  width: 86px;
+  padding: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  font-family: "IBM Plex Sans", sans-serif;
+  outline: none;
+  cursor: pointer;
+}
+
+.editor-frame-ratio {
+  display: flex;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 8px;
+  background: var(--Gray-2, #f8f9fd);
+  color: var(--Gray-12, #13161b);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.editor-frame-size-option:hover .editor-frame-ratio {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-frame-size-option.active .editor-frame-ratio {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-frame-size-option:focus-visible .editor-frame-ratio {
+  box-shadow: 0 0 0 2px var(--Blue-3, #edf3ff), 0 0 0 3px var(--Blue-9, #0062ff);
+}
+
+.editor-frame-size-option:focus,
+.editor-frame-size-option:focus-visible {
+  outline: none;
+}
+
+.editor-frame-dimensions {
+  color: var(--Gray-10, #7d8aa1);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
 .editor-copy-section {
   padding-top: 24px;
 }
@@ -4329,10 +4491,12 @@ a {
 }
 
 .canvas-frame-object {
+  --frame-opacity: 1;
   min-width: 1px;
   min-height: 1px;
   border: 2px dashed #5d6a81;
   background: rgba(255, 255, 255, 0.08);
+  opacity: var(--frame-opacity);
 }
 
 .canvas-line-object {
@@ -4422,8 +4586,8 @@ a {
 
 .canvas-pen-object path {
   fill: none;
-  stroke: #5d6a81;
-  stroke-width: 2.5;
+  stroke: var(--pen-color, #13161b);
+  stroke-width: var(--pen-width, 1);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -4434,16 +4598,21 @@ a {
 }
 
 .canvas-text-object {
+  --text-color: #13161b;
+  --text-weight: 500;
+  --text-align: left;
   min-width: 120px;
   min-height: 28px;
   padding: 4px 6px;
   border: 1px dashed #0054f1;
   background: rgba(255, 255, 255, 0.92);
-  color: #13161b;
+  color: var(--text-color);
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 16px;
+  font-weight: var(--text-weight);
   line-height: 20px;
   outline: none;
+  text-align: var(--text-align);
   white-space: pre-wrap;
 }
 

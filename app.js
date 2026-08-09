@@ -356,6 +356,17 @@ const state = {
   arrowType: "straight",
   arrowStarthead: "none",
   arrowEndhead: "arrow",
+  penStroke: "#13161B",
+  penStrokeCustom: false,
+  penStrokeWidth: 1,
+  penOpacity: 100,
+  textStroke: "#13161B",
+  textStrokeCustom: false,
+  textTypography: 500,
+  textAlign: "left",
+  textOpacity: 100,
+  frameRatio: "16:9",
+  frameOpacity: 100,
   canvasPanX: 0,
   canvasPanY: 0,
   editorLeftPanelCollapsed: false,
@@ -1380,6 +1391,68 @@ function syncLineSettingsPanel() {
   if (opacity) opacity.value = `${state.lineOpacity}`;
 }
 
+function applyPenAppearance(object) {
+  if (!object) return;
+  object.style.setProperty("--pen-color", state.penStroke);
+  object.style.setProperty("--pen-width", `${state.penStrokeWidth}`);
+  object.style.opacity = `${state.penOpacity / 100}`;
+}
+
+function syncPenSettingsPanel() {
+  document.querySelectorAll("[data-pen-stroke]").forEach((button) => {
+    button.classList.toggle("active", !state.penStrokeCustom && button.dataset.penStroke === state.penStroke);
+  });
+  document.querySelector('[data-pen-custom="stroke"]')?.classList.toggle("active", state.penStrokeCustom);
+  document.querySelectorAll("[data-pen-width]").forEach((button) => {
+    button.classList.toggle("active", Number(button.dataset.penWidth) === state.penStrokeWidth);
+  });
+  const opacity = document.getElementById("editorPenOpacity");
+  if (opacity) opacity.value = `${state.penOpacity}`;
+}
+
+function applyTextAppearance(object) {
+  if (!object) return;
+  object.style.setProperty("--text-color", state.textStroke);
+  object.style.setProperty("--text-weight", `${state.textTypography}`);
+  object.style.setProperty("--text-align", state.textAlign);
+  object.style.opacity = `${state.textOpacity / 100}`;
+}
+
+function syncTextSettingsPanel() {
+  document.querySelectorAll("[data-text-stroke]").forEach((button) => {
+    button.classList.toggle("active", !state.textStrokeCustom && button.dataset.textStroke === state.textStroke);
+  });
+  document.querySelector('[data-text-custom="stroke"]')?.classList.toggle("active", state.textStrokeCustom);
+  document.querySelectorAll("[data-text-align]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.textAlign === state.textAlign);
+  });
+  const typography = document.getElementById("editorTextTypography");
+  if (typography) typography.value = `${state.textTypography}`;
+  const opacity = document.getElementById("editorTextOpacity");
+  if (opacity) opacity.value = `${state.textOpacity}`;
+}
+
+function frameRatioValue() {
+  return state.frameRatio === "4:3" ? 4 / 3 : 16 / 9;
+}
+
+function applyFrameAppearance(object, resize = false) {
+  if (!object) return;
+  object.style.setProperty("--frame-opacity", `${state.frameOpacity / 100}`);
+  object.dataset.frameRatio = state.frameRatio;
+  if (!resize) return;
+  const width = parseFloat(object.style.width || "0");
+  if (width > 0) object.style.height = `${width / frameRatioValue()}px`;
+}
+
+function syncFrameSettingsPanel() {
+  document.querySelectorAll("[data-frame-ratio]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.frameRatio === state.frameRatio);
+  });
+  const opacity = document.getElementById("editorFrameOpacity");
+  if (opacity) opacity.value = `${state.frameOpacity}`;
+}
+
 function setCanvasTool(tool) {
   state.canvasTool = tool;
   const stage = document.getElementById("editorCanvasStage");
@@ -1392,6 +1465,15 @@ function setCanvasTool(tool) {
   const lineSettings = document.getElementById("editorLineSettings");
   if (lineSettings) lineSettings.hidden = tool !== "line";
   if (tool === "line") syncLineSettingsPanel();
+  const penSettings = document.getElementById("editorPenSettings");
+  if (penSettings) penSettings.hidden = tool !== "pen";
+  if (tool === "pen") syncPenSettingsPanel();
+  const textSettings = document.getElementById("editorTextSettings");
+  if (textSettings) textSettings.hidden = tool !== "text";
+  if (tool === "text") syncTextSettingsPanel();
+  const frameSettings = document.getElementById("editorFrameSettings");
+  if (frameSettings) frameSettings.hidden = tool !== "frame";
+  if (tool === "frame") syncFrameSettingsPanel();
 
   document.querySelectorAll(".canvas-tool-button[data-canvas-tool]").forEach((button) => {
     button.classList.toggle("active", button.dataset.canvasTool === tool);
@@ -1544,6 +1626,20 @@ function bindCanvasToolbar() {
     object.style.height = `${Math.abs(deltaY)}px`;
   };
 
+  const positionFrame = (object, start, point) => {
+    let width = Math.abs(point.x - start.x);
+    let height = Math.abs(point.y - start.y);
+    const ratio = frameRatioValue();
+    if (height === 0 || width / Math.max(height, 1) > ratio) height = width / ratio;
+    else width = height * ratio;
+    const directionX = point.x < start.x ? -1 : 1;
+    const directionY = point.y < start.y ? -1 : 1;
+    object.style.left = `${Math.min(start.x, start.x + directionX * width)}px`;
+    object.style.top = `${Math.min(start.y, start.y + directionY * height)}px`;
+    object.style.width = `${width}px`;
+    object.style.height = `${height}px`;
+  };
+
   const positionLine = (object, start, point, snapAngle = false) => {
     let deltaX = point.x - start.x;
     let deltaY = point.y - start.y;
@@ -1613,6 +1709,7 @@ function bindCanvasToolbar() {
       text.spellcheck = true;
       text.style.left = `${start.x}px`;
       text.style.top = `${start.y}px`;
+      applyTextAppearance(text);
       drawingLayer.appendChild(text);
       selectObject(text);
       setCanvasTool("select");
@@ -1624,6 +1721,7 @@ function bindCanvasToolbar() {
     if (state.canvasTool === "pen") {
       object = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       object.classList.add("canvas-object", "canvas-pen-object");
+      applyPenAppearance(object);
       object.setAttribute("viewBox", `0 0 ${stageContent.offsetWidth} ${stageContent.offsetHeight}`);
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute("d", `M ${start.x} ${start.y}`);
@@ -1638,12 +1736,16 @@ function bindCanvasToolbar() {
       } else if (state.canvasTool === "line") {
         object.className = `canvas-object canvas-line-object${state.canvasLine === "arrow" ? " canvas-arrow-object" : ""}`;
         applyLineAppearance(object);
+      } else if (state.canvasTool === "frame") {
+        object.className = "canvas-object canvas-frame-object";
+        applyFrameAppearance(object);
       } else {
         object.className = `canvas-object canvas-${state.canvasTool}-object`;
       }
       drawingLayer.appendChild(object);
       drawSession = {tool: state.canvasTool, object, start, pointerId: event.pointerId};
       if (state.canvasTool === "line") positionLine(object, start, start);
+      else if (state.canvasTool === "frame") positionFrame(object, start, start);
       else positionBox(object, start, start);
     }
     stageContent.setPointerCapture?.(event.pointerId);
@@ -1658,6 +1760,8 @@ function bindCanvasToolbar() {
       drawSession.path.setAttribute("d", pathData);
     } else if (drawSession.tool === "line") {
       positionLine(drawSession.object, drawSession.start, point, event.shiftKey);
+    } else if (drawSession.tool === "frame") {
+      positionFrame(drawSession.object, drawSession.start, point);
     } else {
       positionBox(drawSession.object, drawSession.start, point, event.shiftKey);
     }
@@ -2172,6 +2276,90 @@ function bindEditorLineSettings() {
   syncLineSettingsPanel();
 }
 
+function bindEditorPenSettings() {
+  const updateSelectedPen = () => {
+    document.querySelectorAll(".canvas-pen-object.is-selected").forEach(applyPenAppearance);
+    syncPenSettingsPanel();
+  };
+  document.querySelectorAll("[data-pen-stroke]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.penStroke = button.dataset.penStroke;
+      state.penStrokeCustom = false;
+      updateSelectedPen();
+    });
+  });
+  document.querySelectorAll("[data-pen-width]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.penStrokeWidth = Number(button.dataset.penWidth);
+      updateSelectedPen();
+    });
+  });
+  const strokePicker = document.getElementById("editorPenStrokePicker");
+  strokePicker?.addEventListener("input", () => {
+    state.penStroke = strokePicker.value;
+    state.penStrokeCustom = true;
+    updateSelectedPen();
+  });
+  document.getElementById("editorPenOpacity")?.addEventListener("input", (event) => {
+    state.penOpacity = Number(event.target.value);
+    updateSelectedPen();
+  });
+  syncPenSettingsPanel();
+}
+
+function bindEditorTextSettings() {
+  const updateSelectedText = () => {
+    document.querySelectorAll(".canvas-text-object.is-selected").forEach(applyTextAppearance);
+    syncTextSettingsPanel();
+  };
+  document.getElementById("editorTextTypography")?.addEventListener("change", (event) => {
+    state.textTypography = Number(event.target.value);
+    updateSelectedText();
+  });
+  document.querySelectorAll("[data-text-align]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.textAlign = button.dataset.textAlign;
+      updateSelectedText();
+    });
+  });
+  document.querySelectorAll("[data-text-stroke]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.textStroke = button.dataset.textStroke;
+      state.textStrokeCustom = false;
+      updateSelectedText();
+    });
+  });
+  const strokePicker = document.getElementById("editorTextStrokePicker");
+  strokePicker?.addEventListener("input", () => {
+    state.textStroke = strokePicker.value;
+    state.textStrokeCustom = true;
+    updateSelectedText();
+  });
+  document.getElementById("editorTextOpacity")?.addEventListener("input", (event) => {
+    state.textOpacity = Number(event.target.value);
+    updateSelectedText();
+  });
+  syncTextSettingsPanel();
+}
+
+function bindEditorFrameSettings() {
+  const updateSelectedFrame = (resize = false) => {
+    document.querySelectorAll(".canvas-frame-object.is-selected").forEach((object) => applyFrameAppearance(object, resize));
+    syncFrameSettingsPanel();
+  };
+  document.querySelectorAll("[data-frame-ratio]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.frameRatio = button.dataset.frameRatio;
+      updateSelectedFrame(true);
+    });
+  });
+  document.getElementById("editorFrameOpacity")?.addEventListener("input", (event) => {
+    state.frameOpacity = Number(event.target.value);
+    updateSelectedFrame();
+  });
+  syncFrameSettingsPanel();
+}
+
 function init() {
   renderCategoryPills("desktopCategoryPills", "desktop");
   renderCategoryPills("mobileCategoryPills", "mobile");
@@ -2196,6 +2384,9 @@ function init() {
   bindEditorBackgroundSwatches();
   bindEditorShapeSettings();
   bindEditorLineSettings();
+  bindEditorPenSettings();
+  bindEditorTextSettings();
+  bindEditorFrameSettings();
   initActions();
   syncConversationPrompt();
   syncMobileConversationPrompt();
