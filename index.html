@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=28" />
+    <link rel="stylesheet" href="styles.css?v=29" />
   </head>
   <body>
     <div id="app">
@@ -493,24 +493,24 @@
                 </button>
                 <span class="canvas-toolbar-divider" aria-hidden="true"></span>
                 <div class="canvas-tool-group" data-canvas-tool-group="shape">
-                  <button class="canvas-tool-button" type="button" data-canvas-tool="shape" data-tooltip="Rectangle" aria-label="Rectangle">
+                  <button class="canvas-tool-button" id="canvasShapeToolButton" type="button" data-canvas-tool="shape" data-tooltip="Rectangle" aria-label="Rectangle">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M13.7143 1.71429C14.0286 1.71429 14.2857 1.97143 14.2857 2.28571V13.7143C14.2857 14.0286 14.0286 14.2857 13.7143 14.2857H2.28571C1.97143 14.2857 1.71429 14.0286 1.71429 13.7143V2.28571C1.71429 1.97143 1.97143 1.71429 2.28571 1.71429H13.7143ZM2.28571 0C1.025 0 0 1.025 0 2.28571V13.7143C0 14.975 1.025 16 2.28571 16H13.7143C14.975 16 16 14.975 16 13.7143V2.28571C16 1.025 14.975 0 13.7143 0H2.28571Z" fill="currentColor"/>
                     </svg>
                   </button>
-                  <button class="canvas-tool-chevron" type="button" data-canvas-tool="shape" aria-label="Rectangle options">
+                  <button class="canvas-tool-chevron" type="button" data-canvas-menu-toggle="shape" aria-label="Rectangle options" aria-expanded="false" aria-controls="canvasShapeMenu">
                     <svg xmlns="http://www.w3.org/2000/svg" width="8" height="5" viewBox="0 0 8 5" fill="none" aria-hidden="true">
                       <path d="M0.7 0.8L4 4L7.3 0.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </button>
                 </div>
                 <div class="canvas-tool-group" data-canvas-tool-group="line">
-                  <button class="canvas-tool-button" type="button" data-canvas-tool="line" data-tooltip="Line" aria-label="Line">
+                  <button class="canvas-tool-button" id="canvasLineToolButton" type="button" data-canvas-tool="line" data-tooltip="Line" aria-label="Line">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="none" aria-hidden="true">
                       <path d="M8 15.9944C8 15.3623 8.51071 14.8516 9.14286 14.8516H22.8571C23.4893 14.8516 24 15.3623 24 15.9944C24 16.6266 23.4893 17.1373 22.8571 17.1373H9.14286C8.51071 17.1373 8 16.6266 8 15.9944Z" fill="currentColor"/>
                     </svg>
                   </button>
-                  <button class="canvas-tool-chevron" type="button" data-canvas-tool="line" aria-label="Line options">
+                  <button class="canvas-tool-chevron" type="button" data-canvas-menu-toggle="line" aria-label="Line options" aria-expanded="false" aria-controls="canvasLineMenu">
                     <svg xmlns="http://www.w3.org/2000/svg" width="8" height="5" viewBox="0 0 8 5" fill="none" aria-hidden="true">
                       <path d="M0.7 0.8L4 4L7.3 0.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -537,6 +537,46 @@
                     <path d="M2.5 1C1.11929 1 0 2.11929 0 3.5V12.5C0 13.8807 1.11929 15 2.5 15H13.5C14.8807 15 16 13.8807 16 12.5V3.5C16 2.11929 14.8807 1 13.5 1H2.5ZM2 3.5C2 3.22386 2.22386 3 2.5 3C2.77614 3 3 3.22386 3 3.5C3 3.77614 2.77614 4 2.5 4C2.22386 4 2 3.77614 2 3.5ZM2 12.5V11.8284L5.29289 8.53553C5.68342 8.14501 6.31658 8.14501 6.70711 8.53553L8 9.82843L10.2929 7.53553C10.6834 7.14501 11.3166 7.14501 11.7071 7.53553L14 9.82843V12.5C14 12.7761 13.7761 13 13.5 13H2.5C2.22386 13 2 12.7761 2 12.5Z" fill="currentColor"/>
                   </svg>
                 </button>
+                <div class="canvas-tool-menu canvas-shape-menu" id="canvasShapeMenu" role="menu" aria-label="Shape options" hidden>
+                  <button class="canvas-tool-menu-option selected" type="button" role="menuitemradio" aria-checked="true" data-canvas-shape-option="rectangle" data-tool-label="Rectangle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M13.7143 1.71429C14.0286 1.71429 14.2857 1.97143 14.2857 2.28571V13.7143C14.2857 14.0286 14.0286 14.2857 13.7143 14.2857H2.28571C1.97143 14.2857 1.71429 14.0286 1.71429 13.7143V2.28571C1.71429 1.97143 1.97143 1.71429 2.28571 1.71429H13.7143ZM2.28571 0C1.025 0 0 1.025 0 2.28571V13.7143C0 14.975 1.025 16 2.28571 16H13.7143C14.975 16 16 14.975 16 13.7143V2.28571C16 1.025 14.975 0 13.7143 0H2.28571Z" fill="currentColor"/>
+                    </svg>
+                    <span>Rectangle</span>
+                  </button>
+                  <button class="canvas-tool-menu-option" type="button" role="menuitemradio" aria-checked="false" data-canvas-shape-option="ellipse" data-tool-label="Ellipse">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M14.5 8C14.5 6.27609 13.8152 4.62279 12.5962 3.40381C11.3772 2.18482 9.72391 1.5 8 1.5C6.27609 1.5 4.62279 2.18482 3.40381 3.40381C2.18482 4.62279 1.5 6.27609 1.5 8C1.5 9.72391 2.18482 11.3772 3.40381 12.5962C4.62279 13.8152 6.27609 14.5 8 14.5C9.72391 14.5 11.3772 13.8152 12.5962 12.5962C13.8152 11.3772 14.5 9.72391 14.5 8ZM0 8C0 5.87827 0.842855 3.84344 2.34315 2.34315C3.84344 0.842855 5.87827 0 8 0C10.1217 0 12.1566 0.842855 13.6569 2.34315C15.1571 3.84344 16 5.87827 16 8C16 10.1217 15.1571 12.1566 13.6569 13.6569C12.1566 15.1571 10.1217 16 8 16C5.87827 16 3.84344 15.1571 2.34315 13.6569C0.842855 12.1566 0 10.1217 0 8Z" fill="currentColor"/>
+                    </svg>
+                    <span>Ellipse</span>
+                  </button>
+                  <button class="canvas-tool-menu-option" type="button" role="menuitemradio" aria-checked="false" data-canvas-shape-option="diamond" data-tool-label="Diamond">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M7.78125 1.59063L1.59063 7.78125C1.53125 7.84062 1.5 7.91875 1.5 8C1.5 8.08125 1.53125 8.1625 1.59063 8.21875L7.78125 14.4094C7.84062 14.4688 7.91875 14.5 8 14.5C8.08125 14.5 8.1625 14.4688 8.21875 14.4094L14.4094 8.21875C14.4688 8.15938 14.5 8.08125 14.5 8C14.5 7.91875 14.4688 7.8375 14.4094 7.78125L8.21875 1.59063C8.15938 1.53125 8.08125 1.5 8 1.5C7.91875 1.5 7.8375 1.53125 7.78125 1.59063ZM0.53125 6.71875L6.71875 0.53125C7.05937 0.190625 7.51875 0 8 0C8.48125 0 8.94063 0.190625 9.28125 0.53125L15.4688 6.71875C15.8094 7.05937 16 7.51875 16 8C16 8.48125 15.8094 8.94063 15.4688 9.28125L9.28125 15.4688C8.94063 15.8094 8.48125 16 8 16C7.51875 16 7.05937 15.8094 6.71875 15.4688L0.53125 9.28125C0.190625 8.94063 0 8.48125 0 8C0 7.51875 0.190625 7.05937 0.53125 6.71875Z" fill="currentColor"/>
+                    </svg>
+                    <span>Diamond</span>
+                  </button>
+                  <button class="canvas-tool-menu-option" type="button" role="menuitemradio" aria-checked="false" data-canvas-shape-option="star" data-tool-label="Star">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M8.00025 0C8.26199 0 8.50337 0.15525 8.6226 0.39878L10.7601 4.7884L15.4103 5.56161C15.6691 5.60423 15.8843 5.79601 15.9658 6.0578C16.0472 6.3196 15.9803 6.60575 15.7971 6.80057L12.4672 10.2861L13.203 15.1536C13.2437 15.4246 13.1361 15.6985 12.9238 15.8599C12.7115 16.0212 12.4294 16.0456 12.1968 15.9208L8.00025 13.6864L3.80374 15.9208C3.57108 16.0456 3.28899 16.0212 3.07669 15.8599C2.86439 15.6985 2.75679 15.4276 2.79751 15.1536L3.53037 10.2861L0.203404 6.80057C0.0172799 6.60575 -0.0467003 6.3196 0.034729 6.0578C0.116158 5.79601 0.328456 5.60423 0.590193 5.56161L5.24038 4.7884L7.38081 0.39878C7.50004 0.15525 7.74142 0 8.00316 0H8.00025ZM8.00025 2.33789L6.31932 5.78383C6.21753 5.99083 6.0285 6.13695 5.80748 6.17348L2.15771 6.7823L4.76926 9.51897C4.9263 9.68335 4.999 9.91775 4.96411 10.1491L4.38828 13.9695L7.68326 12.2161C7.88102 12.1095 8.11658 12.1095 8.31725 12.2161L11.6122 13.9695L11.0364 10.1491C11.0015 9.91775 11.0742 9.68335 11.2312 9.51897L13.8428 6.7823L10.193 6.17348C9.972 6.13695 9.78297 5.99083 9.68118 5.78383L8.00025 2.33789Z" fill="currentColor"/>
+                    </svg>
+                    <span>Star</span>
+                  </button>
+                </div>
+                <div class="canvas-tool-menu canvas-line-menu" id="canvasLineMenu" role="menu" aria-label="Line options" hidden>
+                  <button class="canvas-tool-menu-option selected" type="button" role="menuitemradio" aria-checked="true" data-canvas-line-option="line" data-tool-label="Line">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                      <path d="M8 15.9944C8 15.3623 8.51071 14.8516 9.14286 14.8516H22.8571C23.4893 14.8516 24 15.3623 24 15.9944C24 16.6266 23.4893 17.1373 22.8571 17.1373H9.14286C8.51071 17.1373 8 16.6266 8 15.9944Z" fill="currentColor"/>
+                    </svg>
+                    <span>Line</span>
+                  </button>
+                  <button class="canvas-tool-menu-option" type="button" role="menuitemradio" aria-checked="false" data-canvas-line-option="arrow" data-tool-label="Arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+                      <path d="M15.7797 6.53515C16.0734 6.2413 16.0734 5.76613 15.7797 5.4754L10.5302 0.220391C10.2365 -0.0734638 9.76155 -0.0734638 9.47095 0.220391C9.18035 0.514247 9.17723 0.989417 9.47095 1.28015L13.4393 5.25032H0.749927C0.334342 5.25032 0 5.58481 0 6.00059C0 6.41636 0.334342 6.75085 0.749927 6.75085H13.4393L9.47095 10.721C9.17723 11.0149 9.17723 11.49 9.47095 11.7808C9.76467 12.0715 10.2396 12.0746 10.5302 11.7808L15.7797 6.53515Z" fill="currentColor"/>
+                    </svg>
+                    <span>Arrow</span>
+                  </button>
+                </div>
               </div>
               <input class="canvas-import-input" id="canvasImportInput" type="file" accept="image/*" hidden />
               <div class="canvas-stage" id="editorCanvasStage">
@@ -1239,6 +1279,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=18"></script>
+    <script src="app.js?v=19"></script>
   </body>
 </html>

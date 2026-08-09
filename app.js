@@ -337,6 +337,8 @@ const state = {
   editorState: "text",
   zoom: 100,
   canvasTool: "select",
+  canvasShape: "rectangle",
+  canvasLine: "line",
   canvasPanX: 0,
   canvasPanY: 0,
   currentEditorTemplate: templateCatalog[0],
@@ -1285,7 +1287,68 @@ function bindCanvasToolbar() {
   const stageContent = document.getElementById("editorCanvasStageContent");
   const drawingLayer = document.getElementById("canvasDrawingLayer");
   const importInput = document.getElementById("canvasImportInput");
+  const shapeToolButton = document.getElementById("canvasShapeToolButton");
+  const lineToolButton = document.getElementById("canvasLineToolButton");
   if (!stage || !stageContent || !drawingLayer) return;
+
+  const closeToolMenus = () => {
+    document.querySelectorAll(".canvas-tool-menu").forEach((menu) => {
+      menu.hidden = true;
+    });
+    document.querySelectorAll("[data-canvas-menu-toggle]").forEach((toggle) => {
+      toggle.setAttribute("aria-expanded", "false");
+    });
+  };
+
+  const updateToolChoice = (type, option) => {
+    const isShape = type === "shape";
+    const toolButton = isShape ? shapeToolButton : lineToolButton;
+    const optionSelector = isShape ? "[data-canvas-shape-option]" : "[data-canvas-line-option]";
+    const value = isShape ? option.dataset.canvasShapeOption : option.dataset.canvasLineOption;
+    const label = option.dataset.toolLabel;
+    if (isShape) state.canvasShape = value;
+    else state.canvasLine = value;
+
+    document.querySelectorAll(optionSelector).forEach((item) => {
+      const selected = item === option;
+      item.classList.toggle("selected", selected);
+      item.setAttribute("aria-checked", String(selected));
+    });
+
+    const icon = option.querySelector("svg")?.cloneNode(true);
+    if (toolButton && icon) toolButton.replaceChildren(icon);
+    toolButton?.setAttribute("data-tooltip", label);
+    toolButton?.setAttribute("aria-label", label);
+    document.querySelector(`[data-canvas-menu-toggle="${type}"]`)?.setAttribute("aria-label", `${label} options`);
+    closeToolMenus();
+    setCanvasTool(type);
+  };
+
+  document.querySelectorAll("[data-canvas-menu-toggle]").forEach((toggle) => {
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const menu = document.getElementById(toggle.getAttribute("aria-controls"));
+      const willOpen = menu?.hidden ?? false;
+      closeToolMenus();
+      if (!menu || !willOpen) return;
+      menu.hidden = false;
+      toggle.setAttribute("aria-expanded", "true");
+    });
+  });
+
+  document.querySelectorAll("[data-canvas-shape-option]").forEach((option) => {
+    option.addEventListener("click", () => updateToolChoice("shape", option));
+  });
+  document.querySelectorAll("[data-canvas-line-option]").forEach((option) => {
+    option.addEventListener("click", () => updateToolChoice("line", option));
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".canvas-main-toolbar")) closeToolMenus();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeToolMenus();
+  });
 
   const selectObject = (object) => {
     drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((item) => {
@@ -1332,6 +1395,7 @@ function bindCanvasToolbar() {
   document.querySelectorAll("[data-canvas-tool]").forEach((button) => {
     button.addEventListener("click", () => {
       const tool = button.dataset.canvasTool;
+      closeToolMenus();
       setCanvasTool(tool);
       if (tool === "import") {
         importInput?.click();
@@ -1404,7 +1468,13 @@ function bindCanvasToolbar() {
       drawSession = {tool: "pen", object, path, points: [start], pointerId: event.pointerId};
     } else {
       object = document.createElement("div");
-      object.className = `canvas-object canvas-${state.canvasTool === "shape" ? "shape" : state.canvasTool}-object`;
+      if (state.canvasTool === "shape") {
+        object.className = `canvas-object canvas-shape-object canvas-${state.canvasShape}-object`;
+      } else if (state.canvasTool === "line") {
+        object.className = `canvas-object canvas-line-object${state.canvasLine === "arrow" ? " canvas-arrow-object" : ""}`;
+      } else {
+        object.className = `canvas-object canvas-${state.canvasTool}-object`;
+      }
       drawingLayer.appendChild(object);
       drawSession = {tool: state.canvasTool, object, start, pointerId: event.pointerId};
       if (state.canvasTool === "line") positionLine(object, start, start);

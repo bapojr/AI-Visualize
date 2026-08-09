@@ -3519,6 +3519,71 @@ a {
   margin-left: -1px;
 }
 
+.canvas-tool-menu {
+  position: absolute;
+  top: 44px;
+  z-index: 40;
+  display: flex;
+  width: 145px;
+  padding: 4px 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+.canvas-tool-menu[hidden] {
+  display: none;
+}
+
+.canvas-shape-menu {
+  left: 92px;
+  height: 168px;
+}
+
+.canvas-line-menu {
+  left: 152px;
+  height: 88px;
+}
+
+.canvas-tool-menu-option {
+  display: flex;
+  width: 145px;
+  height: 40px;
+  padding: 10px 12px;
+  flex: 0 0 40px;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: left;
+}
+
+.canvas-tool-menu-option svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.canvas-tool-menu-option:hover,
+.canvas-tool-menu-option:focus-visible {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.canvas-tool-menu-option.selected {
+  color: var(--Blue-10, #0054f1);
+}
+
 .canvas-toolbar-divider {
   width: 1px;
   height: 32px;
@@ -3626,6 +3691,33 @@ a {
   background: rgba(237, 243, 255, 0.3);
 }
 
+.canvas-ellipse-object {
+  border-radius: 50%;
+}
+
+.canvas-diamond-object,
+.canvas-star-object {
+  border: 0;
+  background: #5d6a81;
+}
+
+.canvas-diamond-object {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.canvas-star-object {
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 94%, 50% 72%, 21% 94%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.canvas-diamond-object::after,
+.canvas-star-object::after {
+  position: absolute;
+  inset: 2px;
+  background: rgba(237, 243, 255, 0.85);
+  clip-path: inherit;
+  content: "";
+}
+
 .canvas-frame-object {
   min-width: 1px;
   min-height: 1px;
@@ -3638,6 +3730,18 @@ a {
   transform-origin: 0 50%;
   border-radius: 999px;
   background: #5d6a81;
+}
+
+.canvas-arrow-object::after {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #5d6a81;
+  border-right: 2px solid #5d6a81;
+  content: "";
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .canvas-pen-object {
