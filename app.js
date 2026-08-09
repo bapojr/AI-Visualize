@@ -335,7 +335,7 @@ const state = {
   selectedVariant: 1,
   activeOverlay: null,
   editorState: "text",
-  zoom: 100,
+  zoom: 50,
   currentEditorTemplate: templateCatalog[0],
   editorBackground: "#F5F7F9",
   editorTitle: "Untitled",
@@ -1522,6 +1522,24 @@ function initActions() {
     }
   });
 
+  document.getElementById("canvasZoomIn")?.addEventListener("click", () => {
+    setCanvasZoom(state.zoom + 10);
+  });
+
+  document.getElementById("canvasZoomOut")?.addEventListener("click", () => {
+    setCanvasZoom(state.zoom - 10);
+  });
+
+  document.getElementById("canvasZoomReset")?.addEventListener("click", () => {
+    setCanvasZoom(50);
+  });
+
+  document.getElementById("editorCanvasStage")?.addEventListener("wheel", (event) => {
+    if (!event.deltaY) return;
+    event.preventDefault();
+    setCanvasZoom(state.zoom + (event.deltaY < 0 ? 5 : -5));
+  }, { passive: false });
+
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       if (state.activeOverlay) {
@@ -1531,6 +1549,11 @@ function initActions() {
       }
     }
   });
+}
+
+function setCanvasZoom(nextZoom) {
+  state.zoom = Math.min(200, Math.max(10, nextZoom));
+  updateZoom();
 }
 
 function updateZoom() {

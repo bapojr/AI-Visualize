@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=26" />
+    <link rel="stylesheet" href="styles.css?v=27" />
   </head>
   <body>
     <div id="app">
@@ -480,7 +480,7 @@
           <main class="editor-main">
             <aside class="editor-sidepanel" aria-label="Editor controls"></aside>
             <section class="canvas-shell">
-              <div class="canvas-stage">
+              <div class="canvas-stage" id="editorCanvasStage">
                 <div class="canvas-card" id="editorCanvas">
                   <div class="editor-canvas-media-shell" id="editorCanvasMediaShell">
                     <div class="editor-canvas-stage-content" id="editorCanvasStageContent">
@@ -530,9 +530,28 @@
                     </div>
                   </div>
                 </div>
-                <div class="canvas-controls">
-                  <span id="canvasZoomPill">100%</span>
-                  <button class="icon-ghost small">#</button>
+                <div class="canvas-zoom-controls" role="group" aria-label="Canvas zoom controls">
+                  <span class="canvas-zoom-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M7.71429 0C7.24018 0 6.85714 0.383036 6.85714 0.857143C6.85714 1.33125 7.24018 1.71429 7.71429 1.71429H9.07232L6 4.78661L2.92768 1.71429H4.28571C4.75982 1.71429 5.14286 1.33125 5.14286 0.857143C5.14286 0.383036 4.75982 0 4.28571 0H0.857143C0.383036 0 0 0.383036 0 0.857143V4.28571C0 4.75982 0.383036 5.14286 0.857143 5.14286C1.33125 5.14286 1.71429 4.75982 1.71429 4.28571V2.92768L4.78661 6L1.71429 9.07232V7.71429C1.71429 7.24018 1.33125 6.85714 0.857143 6.85714C0.383036 6.85714 0 7.24018 0 7.71429V11.1429C0 11.617 0.383036 12 0.857143 12H4.28571C4.75982 12 5.14286 11.617 5.14286 11.1429C5.14286 10.6688 4.75982 10.2857 4.28571 10.2857H2.92768L6 7.21339L9.07232 10.2857H7.71429C7.24018 10.2857 6.85714 10.6688 6.85714 11.1429C6.85714 11.617 7.24018 12 7.71429 12H11.1429C11.617 12 12 11.617 12 11.1429V7.71429C12 7.24018 11.617 6.85714 11.1429 6.85714C10.6688 6.85714 10.2857 7.24018 10.2857 7.71429V9.07232L7.21339 6L10.2857 2.92768V4.28571C10.2857 4.75982 10.6688 5.14286 11.1429 5.14286C11.617 5.14286 12 4.75982 12 4.28571V0.857143C12 0.383036 11.617 0 11.1429 0H7.71429Z" fill="#13161B"/>
+                    </svg>
+                  </span>
+                  <output class="canvas-zoom-value" id="canvasZoomPill" aria-live="polite">50%</output>
+                  <button class="canvas-zoom-button" id="canvasZoomIn" type="button" aria-label="Zoom in">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M6.85714 0.857143C6.85714 0.383036 6.47411 0 6 0C5.52589 0 5.14286 0.383036 5.14286 0.857143V5.14286H0.857143C0.383036 5.14286 0 5.52589 0 6C0 6.47411 0.383036 6.85714 0.857143 6.85714H5.14286V11.1429C5.14286 11.617 5.52589 12 6 12C6.47411 12 6.85714 11.617 6.85714 11.1429V6.85714H11.1429C11.617 6.85714 12 6.47411 12 6C12 5.52589 11.617 5.14286 11.1429 5.14286H6.85714V0.857143Z" fill="#13161B"/>
+                    </svg>
+                  </button>
+                  <button class="canvas-zoom-button" id="canvasZoomOut" type="button" aria-label="Zoom out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="2" viewBox="0 0 12 2" fill="none" aria-hidden="true">
+                      <path d="M0 0.857143C0 0.383036 0.383036 0 0.857143 0H11.1429C11.617 0 12 0.383036 12 0.857143C12 1.33125 11.617 1.71429 11.1429 1.71429H0.857143C0.383036 1.71429 0 1.33125 0 0.857143Z" fill="#13161B"/>
+                    </svg>
+                  </button>
+                  <button class="canvas-zoom-button" id="canvasZoomReset" type="button" aria-label="Reset zoom to 50%">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M0.562477 4.50031H3.93734C4.16467 4.50031 4.37091 4.36438 4.45763 4.15345C4.54434 3.94252 4.49747 3.70112 4.33576 3.53941L3.24127 2.44492C5.00604 1.07154 7.56063 1.19576 9.18244 2.81756C10.9402 4.5753 10.9402 7.42284 9.18244 9.18058C7.4247 10.9383 4.57716 10.9383 2.81942 9.18058C2.58036 8.94153 2.37412 8.68139 2.20069 8.40718C1.97804 8.05797 1.514 7.95485 1.1648 8.1775C0.815592 8.40015 0.712471 8.86419 0.935118 9.2134C1.1648 9.57901 1.439 9.92587 1.75774 10.2423C4.10139 12.5859 7.89811 12.5859 10.2418 10.2423C12.5854 7.89861 12.5854 4.10189 10.2418 1.75823C8.03405 -0.451833 4.53028 -0.57839 2.17257 1.37856L0.960898 0.164548C0.799186 0.00517966 0.55779 -0.0440371 0.346861 0.0426781C0.135932 0.129393 0 0.335635 0 0.562969V3.93783C0 4.24954 0.250771 4.50031 0.562477 4.50031Z" fill="#13161B"/>
+                    </svg>
+                  </button>
                 </div>
               </div>
 
@@ -1160,6 +1179,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=15"></script>
+    <script src="app.js?v=16"></script>
   </body>
 </html>
