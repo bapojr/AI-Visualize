@@ -6850,6 +6850,68 @@ a {
   scrollbar-color: var(--Gray-7, #cad5e7) transparent;
 }
 
+.editor-segment-detail {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  background: var(--Gray-1, #fff);
+}
+
+.editor-segment-detail[hidden],
+.editor-inspector-scroll[hidden] {
+  display: none;
+}
+
+.editor-segment-detail-header {
+  display: flex;
+  height: 48px;
+  padding: 0 12px;
+  flex: 0 0 48px;
+  align-items: center;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+}
+
+.editor-segment-detail-header button {
+  display: inline-flex;
+  height: 32px;
+  padding: 0 8px;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--Gray-12, #13161b);
+  font: 500 14px/20px "IBM Plex Sans", sans-serif;
+  cursor: pointer;
+}
+
+.editor-segment-detail-header button:hover,
+.editor-segment-detail-header button:focus-visible {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-segment-detail-header svg {
+  width: 8px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.editor-segment-detail-scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--Gray-7, #cad5e7) transparent;
+}
+
 .editor-inspector-prompt,
 .editor-inspector-objects {
   padding: 20px 16px;

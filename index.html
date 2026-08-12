@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=52" />
+    <link rel="stylesheet" href="styles.css?v=53" />
   </head>
   <body>
     <div id="app">
@@ -911,88 +911,6 @@
                     </div>
                   </section>
                 </div>
-                <div class="editor-segment-graphic-settings" id="editorSegmentGraphicSettings" hidden>
-                  <div class="editor-canvas-settings-heading" id="editorSegmentGraphicHeading">Illustration</div>
-                  <section class="editor-segment-settings-section" aria-label="Illustration appearance">
-                    <label class="editor-segment-color-row" for="editorSegmentFillColor">
-                      <input id="editorSegmentFillColor" type="color" value="#91A6BC" aria-label="Illustration fill color" />
-                      <span class="editor-segment-color-dot" id="editorSegmentFillSwatch" aria-hidden="true"></span>
-                      <span>Fill</span>
-                      <output id="editorSegmentFillValue">#91A6BC</output>
-                    </label>
-                    <button class="editor-segment-color-row" id="editorSegmentStrokeToggle" type="button" aria-label="Toggle illustration stroke">
-                      <span class="editor-segment-color-dot is-none" id="editorSegmentStrokeSwatch" aria-hidden="true"></span>
-                      <span>Stroke</span>
-                      <output id="editorSegmentStrokeValue">None</output>
-                    </button>
-                    <div class="editor-segment-range-control">
-                      <div><label for="editorSegmentStrokeWidth">Stroke width</label><output id="editorSegmentStrokeWidthValue">1 px</output></div>
-                      <input id="editorSegmentStrokeWidth" type="range" min="0" max="12" step="1" value="1" />
-                    </div>
-                    <div class="editor-segment-range-control">
-                      <div><label for="editorSegmentStrokeOpacity">Stroke opacity</label><output id="editorSegmentStrokeOpacityValue">100%</output></div>
-                      <input id="editorSegmentStrokeOpacity" type="range" min="0" max="100" step="1" value="100" />
-                    </div>
-                    <div class="editor-segment-range-control">
-                      <div><label for="editorSegmentBorderDash">Border dash</label><output id="editorSegmentBorderDashValue">0</output></div>
-                      <input id="editorSegmentBorderDash" type="range" min="0" max="20" step="1" value="0" />
-                    </div>
-                    <div class="editor-segment-range-control">
-                      <div><label for="editorSegmentOpacity">Opacity</label><output id="editorSegmentOpacityValue">100%</output></div>
-                      <input id="editorSegmentOpacity" type="range" min="0" max="100" step="1" value="100" />
-                    </div>
-                  </section>
-                </div>
-                <div class="editor-segment-text-settings" id="editorSegmentTextSettings" hidden>
-                  <div class="editor-canvas-settings-heading">Text</div>
-                  <section class="editor-segment-settings-section editor-segment-text-section" aria-label="Text properties">
-                    <label class="editor-segment-field-label" for="editorSegmentTextValue">Text</label>
-                    <textarea id="editorSegmentTextValue" rows="3" aria-label="Selected text"></textarea>
-                    <div class="editor-segment-text-grid">
-                      <label class="editor-segment-field">
-                        <span>Font family</span>
-                        <span class="editor-segment-select-wrap">
-                          <select id="editorSegmentFontFamily" aria-label="Text font family">
-                            <option value="IBM Plex Sans">IBM Plex Sans</option>
-                            <option value="IBM Plex Serif">IBM Plex Serif</option>
-                            <option value="Arial">Arial</option>
-                            <option value="Helvetica">Helvetica</option>
-                          </select>
-                          <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
-                        </span>
-                      </label>
-                      <div class="editor-segment-field">
-                        <span>Style</span>
-                        <div class="editor-segment-style-buttons" role="group" aria-label="Text style">
-                          <button id="editorSegmentItalic" type="button" aria-pressed="false" aria-label="Italic">I</button>
-                          <button id="editorSegmentUnderline" type="button" aria-pressed="false" aria-label="Underline">U</button>
-                        </div>
-                      </div>
-                      <label class="editor-segment-field">
-                        <span>Weight</span>
-                        <span class="editor-segment-select-wrap">
-                          <select id="editorSegmentFontWeight" aria-label="Text weight">
-                            <option value="400">Regular</option>
-                            <option value="500">Medium</option>
-                            <option value="600">Semibold</option>
-                            <option value="700">Bold</option>
-                          </select>
-                          <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
-                        </span>
-                      </label>
-                      <label class="editor-segment-field">
-                        <span>Size</span>
-                        <input id="editorSegmentFontSize" type="number" min="8" max="96" step="0.1" value="16" aria-label="Text size" />
-                      </label>
-                    </div>
-                    <label class="editor-segment-color-row editor-segment-text-color-row" for="editorSegmentTextColor">
-                      <input id="editorSegmentTextColor" type="color" value="#000000" aria-label="Text color" />
-                      <span class="editor-segment-color-dot" id="editorSegmentTextColorSwatch" aria-hidden="true"></span>
-                      <span>Text color</span>
-                      <output id="editorSegmentTextColorValue">#000000</output>
-                    </label>
-                  </section>
-                </div>
               </div>
               <div class="editor-panel-view" id="editorLeftLibraryView" role="tabpanel" aria-labelledby="editorLeftLibraryTab" data-editor-panel-view="left" data-panel-view="library" hidden></div>
               <footer class="editor-panel-footer">
@@ -1278,7 +1196,7 @@
               <div class="editor-panel-header editor-right-panel-header">
                 <div class="editor-panel-tabs" role="tablist" aria-label="Right panel views">
                   <button class="editor-panel-tab selected" id="editorRightChatTab" type="button" role="tab" aria-selected="true" aria-controls="editorRightChatView" data-editor-panel-tab="right" data-panel-view="chat">Chat</button>
-                  <button class="editor-panel-tab" id="editorRightEditTab" type="button" role="tab" aria-selected="false" aria-controls="editorRightEditView" data-editor-panel-tab="right" data-panel-view="edit">Edit</button>
+                  <button class="editor-panel-tab" id="editorRightEditTab" type="button" role="tab" aria-selected="false" aria-controls="editorRightEditView" data-editor-panel-tab="right" data-panel-view="edit">Segment</button>
                 </div>
               </div>
               <div class="editor-right-panel-view active" id="editorRightChatView" role="tabpanel" aria-labelledby="editorRightChatTab" data-editor-panel-view="right" data-panel-view="chat">
@@ -1342,6 +1260,98 @@
                     <h2 id="editorInspectorObjectsHeading">Objects</h2>
                     <div class="editor-object-list" id="editorObjectList"></div>
                   </section>
+                </div>
+                <div class="editor-segment-detail" id="editorSegmentDetail" hidden>
+                  <div class="editor-segment-detail-header">
+                    <button id="editorSegmentBack" type="button" aria-label="Back to segments">
+                      <svg viewBox="0 0 10 16" aria-hidden="true"><path d="M8 1 1 8l7 7"/></svg>
+                      <span>Back to segments</span>
+                    </button>
+                  </div>
+                  <div class="editor-segment-detail-scroll">
+                    <div class="editor-segment-graphic-settings" id="editorSegmentGraphicSettings" hidden>
+                      <div class="editor-canvas-settings-heading" id="editorSegmentGraphicHeading">Illustration</div>
+                      <section class="editor-segment-settings-section" aria-label="Illustration appearance">
+                        <label class="editor-segment-color-row" for="editorSegmentFillColor">
+                          <input id="editorSegmentFillColor" type="color" value="#91A6BC" aria-label="Illustration fill color" />
+                          <span class="editor-segment-color-dot" id="editorSegmentFillSwatch" aria-hidden="true"></span>
+                          <span>Fill</span>
+                          <output id="editorSegmentFillValue">#91A6BC</output>
+                        </label>
+                        <button class="editor-segment-color-row" id="editorSegmentStrokeToggle" type="button" aria-label="Toggle illustration stroke">
+                          <span class="editor-segment-color-dot is-none" id="editorSegmentStrokeSwatch" aria-hidden="true"></span>
+                          <span>Stroke</span>
+                          <output id="editorSegmentStrokeValue">None</output>
+                        </button>
+                        <div class="editor-segment-range-control">
+                          <div><label for="editorSegmentStrokeWidth">Stroke width</label><output id="editorSegmentStrokeWidthValue">1 px</output></div>
+                          <input id="editorSegmentStrokeWidth" type="range" min="0" max="12" step="1" value="1" />
+                        </div>
+                        <div class="editor-segment-range-control">
+                          <div><label for="editorSegmentStrokeOpacity">Stroke opacity</label><output id="editorSegmentStrokeOpacityValue">100%</output></div>
+                          <input id="editorSegmentStrokeOpacity" type="range" min="0" max="100" step="1" value="100" />
+                        </div>
+                        <div class="editor-segment-range-control">
+                          <div><label for="editorSegmentBorderDash">Border dash</label><output id="editorSegmentBorderDashValue">0</output></div>
+                          <input id="editorSegmentBorderDash" type="range" min="0" max="20" step="1" value="0" />
+                        </div>
+                        <div class="editor-segment-range-control">
+                          <div><label for="editorSegmentOpacity">Opacity</label><output id="editorSegmentOpacityValue">100%</output></div>
+                          <input id="editorSegmentOpacity" type="range" min="0" max="100" step="1" value="100" />
+                        </div>
+                      </section>
+                    </div>
+                    <div class="editor-segment-text-settings" id="editorSegmentTextSettings" hidden>
+                      <div class="editor-canvas-settings-heading">Text</div>
+                      <section class="editor-segment-settings-section editor-segment-text-section" aria-label="Text properties">
+                        <label class="editor-segment-field-label" for="editorSegmentTextValue">Text</label>
+                        <textarea id="editorSegmentTextValue" rows="3" aria-label="Selected text"></textarea>
+                        <div class="editor-segment-text-grid">
+                          <label class="editor-segment-field">
+                            <span>Font family</span>
+                            <span class="editor-segment-select-wrap">
+                              <select id="editorSegmentFontFamily" aria-label="Text font family">
+                                <option value="IBM Plex Sans">IBM Plex Sans</option>
+                                <option value="IBM Plex Serif">IBM Plex Serif</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Helvetica">Helvetica</option>
+                              </select>
+                              <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                            </span>
+                          </label>
+                          <div class="editor-segment-field">
+                            <span>Style</span>
+                            <div class="editor-segment-style-buttons" role="group" aria-label="Text style">
+                              <button id="editorSegmentItalic" type="button" aria-pressed="false" aria-label="Italic">I</button>
+                              <button id="editorSegmentUnderline" type="button" aria-pressed="false" aria-label="Underline">U</button>
+                            </div>
+                          </div>
+                          <label class="editor-segment-field">
+                            <span>Weight</span>
+                            <span class="editor-segment-select-wrap">
+                              <select id="editorSegmentFontWeight" aria-label="Text weight">
+                                <option value="400">Regular</option>
+                                <option value="500">Medium</option>
+                                <option value="600">Semibold</option>
+                                <option value="700">Bold</option>
+                              </select>
+                              <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                            </span>
+                          </label>
+                          <label class="editor-segment-field">
+                            <span>Size</span>
+                            <input id="editorSegmentFontSize" type="number" min="8" max="96" step="0.1" value="16" aria-label="Text size" />
+                          </label>
+                        </div>
+                        <label class="editor-segment-color-row editor-segment-text-color-row" for="editorSegmentTextColor">
+                          <input id="editorSegmentTextColor" type="color" value="#000000" aria-label="Text color" />
+                          <span class="editor-segment-color-dot" id="editorSegmentTextColorSwatch" aria-hidden="true"></span>
+                          <span>Text color</span>
+                          <output id="editorSegmentTextColorValue">#000000</output>
+                        </label>
+                      </section>
+                    </div>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -1925,6 +1935,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=38"></script>
+    <script src="app.js?v=39"></script>
   </body>
 </html>

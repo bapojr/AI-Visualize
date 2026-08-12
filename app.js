@@ -1320,6 +1320,7 @@ function bindCanvasSelection() {
     imageToolbar?.classList.remove("hidden");
     textToolbar?.classList.add("hidden");
     resetImageToolbarState();
+    setEditorSegmentDetailVisible(false);
     setCanvasTool(state.canvasTool);
   };
 
@@ -1337,6 +1338,7 @@ function bindCanvasSelection() {
     imageToolbar?.classList.add("hidden");
     textToolbar?.classList.add("hidden");
     resetImageToolbarState();
+    setEditorSegmentDetailVisible(false);
     setCanvasTool(state.canvasTool);
   };
 
@@ -1420,6 +1422,7 @@ function bindCanvasSelection() {
       !event.target.closest("#editorImageSettings") &&
       !event.target.closest("#editorSegmentGraphicSettings") &&
       !event.target.closest("#editorSegmentTextSettings") &&
+      !event.target.closest("#editorSegmentDetail") &&
       !event.target.closest("#editorRegionPrompt") &&
       !event.target.closest(".canvas-main-toolbar") &&
       !event.target.closest(".canvas-zoom-controls") &&
@@ -1438,8 +1441,9 @@ function bindCanvasSelection() {
     state.selectedEditorSegmentType = segment.dataset.segmentType;
     state.isEditorFrameSelected = false;
     stageContent?.classList.remove("is-frame-selected");
-    setEditorPanelView("left", "edit");
+    setEditorPanelView("right", "edit");
     setCanvasTool(state.canvasTool);
+    setEditorSegmentDetailVisible(true);
     segmentation.querySelectorAll(".editor-segment").forEach((item) => {
       item.classList.toggle("active", item === segment);
     });
@@ -2280,6 +2284,27 @@ function syncEditorSegmentSettingsPanel() {
   if (textColorValue) textColorValue.textContent = style.textColor;
 }
 
+function setEditorSegmentDetailVisible(visible) {
+  const inspector = document.querySelector("#editorRightEditView > .editor-inspector-scroll");
+  const detail = document.getElementById("editorSegmentDetail");
+  if (inspector) inspector.hidden = visible;
+  if (detail) detail.hidden = !visible;
+}
+
+function clearEditorSegmentSelection() {
+  state.selectedEditorSegmentId = null;
+  state.selectedEditorSegmentType = null;
+  document.querySelectorAll("#editorImageSegmentation .editor-segment").forEach((segment) => {
+    segment.classList.remove("active", "inspector-hover");
+  });
+  document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
+  document.getElementById("editorImageActionStack")?.classList.add("hidden");
+  document.getElementById("editorTextActionStack")?.classList.add("hidden");
+  setEditorSegmentDetailVisible(false);
+  setCanvasTool(state.canvasTool);
+  renderEditorInspector();
+}
+
 function setCanvasTool(tool) {
   state.canvasTool = tool;
   const imageSelected = state.isEditorFrameSelected;
@@ -2288,22 +2313,22 @@ function setCanvasTool(tool) {
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
   const canvasSettings = document.getElementById("editorCanvasSettings");
-  if (canvasSettings) canvasSettings.hidden = imageSelected || segmentSelected || !["select", "hand"].includes(tool);
+  if (canvasSettings) canvasSettings.hidden = imageSelected || !["select", "hand"].includes(tool);
   const shapeSettings = document.getElementById("editorShapeSettings");
-  if (shapeSettings) shapeSettings.hidden = imageSelected || segmentSelected || tool !== "shape";
-  if (!imageSelected && !segmentSelected && tool === "shape") syncShapeSettingsPanel();
+  if (shapeSettings) shapeSettings.hidden = imageSelected || tool !== "shape";
+  if (!imageSelected && tool === "shape") syncShapeSettingsPanel();
   const lineSettings = document.getElementById("editorLineSettings");
-  if (lineSettings) lineSettings.hidden = imageSelected || segmentSelected || tool !== "line";
-  if (!imageSelected && !segmentSelected && tool === "line") syncLineSettingsPanel();
+  if (lineSettings) lineSettings.hidden = imageSelected || tool !== "line";
+  if (!imageSelected && tool === "line") syncLineSettingsPanel();
   const penSettings = document.getElementById("editorPenSettings");
-  if (penSettings) penSettings.hidden = imageSelected || segmentSelected || tool !== "pen";
-  if (!imageSelected && !segmentSelected && tool === "pen") syncPenSettingsPanel();
+  if (penSettings) penSettings.hidden = imageSelected || tool !== "pen";
+  if (!imageSelected && tool === "pen") syncPenSettingsPanel();
   const textSettings = document.getElementById("editorTextSettings");
-  if (textSettings) textSettings.hidden = imageSelected || segmentSelected || tool !== "text";
-  if (!imageSelected && !segmentSelected && tool === "text") syncTextSettingsPanel();
+  if (textSettings) textSettings.hidden = imageSelected || tool !== "text";
+  if (!imageSelected && tool === "text") syncTextSettingsPanel();
   const frameSettings = document.getElementById("editorFrameSettings");
-  if (frameSettings) frameSettings.hidden = imageSelected || segmentSelected || tool !== "frame";
-  if (!imageSelected && !segmentSelected && tool === "frame") syncFrameSettingsPanel();
+  if (frameSettings) frameSettings.hidden = imageSelected || tool !== "frame";
+  if (!imageSelected && tool === "frame") syncFrameSettingsPanel();
   const imageSettings = document.getElementById("editorImageSettings");
   if (imageSettings) imageSettings.hidden = !imageSelected;
   if (imageSelected) syncImageSettingsPanel();
@@ -2348,8 +2373,11 @@ function setEditorPanelView(panel, view) {
   });
 
   if (panel === "right") {
-    document.getElementById("historyPanel")?.setAttribute("aria-label", view === "chat" ? "Editor chat" : "Editor edit");
-    if (view === "edit") renderEditorInspector();
+    document.getElementById("historyPanel")?.setAttribute("aria-label", view === "chat" ? "Editor chat" : "Editor segments");
+    if (view === "edit") {
+      renderEditorInspector();
+      setEditorSegmentDetailVisible(Boolean(state.selectedEditorSegmentId));
+    }
   }
 }
 
@@ -3345,6 +3373,12 @@ function bindEditorInspector() {
       input.focus();
       input.setSelectionRange(input.value.length, input.value.length);
     }, 0);
+  });
+
+  document.getElementById("editorSegmentBack")?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    clearEditorSegmentSelection();
+    document.getElementById("editorRightEditTab")?.focus();
   });
 }
 
