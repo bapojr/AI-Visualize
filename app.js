@@ -3255,33 +3255,6 @@ function bindEditorImageSettings() {
     });
   });
 
-  const flashCopiedState = (button) => {
-    const original = button.textContent;
-    button.textContent = "Copied";
-    window.setTimeout(() => {
-      button.textContent = original;
-    }, 1200);
-  };
-  document.querySelectorAll("[data-image-copy-format]").forEach((button) => {
-    button.addEventListener("click", async () => {
-      const image = document.getElementById("editorCanvasImage");
-      if (!image?.src) return;
-      try {
-        if (button.dataset.imageCopyFormat === "png" && navigator.clipboard?.write && window.ClipboardItem) {
-          const blob = await fetch(image.src).then((response) => response.blob());
-          await navigator.clipboard.write([new ClipboardItem({[blob.type || "image/png"]: blob})]);
-        } else {
-          const width = image.naturalWidth || 1200;
-          const height = image.naturalHeight || 900;
-          const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><image href="${image.src}" width="${width}" height="${height}"/></svg>`;
-          await navigator.clipboard?.writeText(svg);
-        }
-        flashCopiedState(button);
-      } catch (error) {
-        navigator.clipboard?.writeText(image.src);
-      }
-    });
-  });
   syncImageSettingsPanel();
 }
 

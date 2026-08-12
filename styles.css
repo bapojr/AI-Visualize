@@ -4789,8 +4789,7 @@ a {
   transform: rotate(180deg);
 }
 
-.editor-image-layer-section h2,
-.editor-image-copy-section h2 {
+.editor-image-layer-section h2 {
   margin-bottom: 16px;
 }
 
@@ -5083,39 +5082,6 @@ a {
 
 .editor-segment-text-color-row {
   margin-top: 24px;
-}
-
-.editor-copy-section {
-  padding-top: 24px;
-}
-
-.editor-copy-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.editor-copy-actions button {
-  display: inline-flex;
-  height: 36px;
-  padding: 0 14px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--Gray-6, #d8e0ee);
-  border-radius: 18px;
-  background: var(--Gray-1, #fff);
-  color: var(--Gray-12, #13161b);
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  white-space: nowrap;
-}
-
-.editor-copy-actions button:hover {
-  border-color: var(--Blue-9, #0062ff);
-  background: var(--Blue-3, #edf3ff);
-  color: var(--Blue-10, #0054f1);
 }
 
 .canvas-shell {
