@@ -114,6 +114,53 @@ const templateCatalog = [
   },
 ];
 
+const editorLibraryCategories = [
+  {id: "medical-science", name: "Medical Science", icon: "heart", labels: ["Human heart anatomy", "Brain pathways", "Cellular response", "Clinical anatomy", "Immune signaling", "Organ systems"]},
+  {id: "nutrition", name: "Nutrition", icon: "apple", labels: ["Balanced nutrition", "Food groups", "Nutrient absorption", "Healthy metabolism", "Dietary fiber", "Micronutrients"]},
+  {id: "odontology", name: "Odontology", icon: "stethoscope", labels: ["Tooth anatomy", "Dental implant", "Oral microbiome", "Gum health", "Dental arch", "Root canal"]},
+  {id: "pharmacy", name: "Pharmacy", icon: "capsule", labels: ["Drug delivery", "Capsule release", "Pharmacokinetics", "Medication pathway", "Dosage forms", "Therapeutic action"]},
+  {id: "nursing", name: "Nursing", icon: "nursing", labels: ["Patient monitoring", "Clinical care", "Vital signs", "Wound management", "Bedside assessment", "Care pathway"]},
+  {id: "animal-science", name: "Animal Science", icon: "paw", labels: ["Animal anatomy", "Veterinary care", "Companion health", "Animal nutrition", "Wildlife biology", "Livestock science"]},
+  {id: "plant-science", name: "Plant Science", icon: "leaf", labels: ["Leaf anatomy", "Plant transport", "Photosynthesis", "Root structure", "Plant growth", "Crop biology"]},
+  {id: "biology", name: "Biology", icon: "microscope", labels: ["Antigen receptor", "Cell membrane", "Immune cell", "Cell division", "Receptor binding", "Cell signaling"]},
+  {id: "molecular-sciences", name: "Molecular Sciences", icon: "atom", labels: ["Molecular structure", "Protein binding", "DNA mechanism", "RNA delivery", "Chemical interaction", "Molecular pathway"]},
+  {id: "life-science", name: "Life Science", icon: "dna", labels: ["DNA helix", "Cell lifecycle", "Genetic pathway", "Tissue biology", "Protein synthesis", "Biological process"]},
+  {id: "pharmacology", name: "Pharmacology", icon: "flask", labels: ["Dose response", "Drug target", "Receptor action", "Clinical compound", "Therapeutic pathway", "Drug metabolism"]},
+  {id: "environmental-science", name: "Environmental Science", icon: "tree", labels: ["Climate system", "Ecosystem cycle", "Carbon pathway", "Water cycle", "Renewable energy", "Biodiversity"]},
+  {id: "humanities", name: "Humanities", icon: "book", labels: ["Research framework", "Historical timeline", "Cultural studies", "Literature analysis", "Social theory", "Learning model"]},
+  {id: "stem", name: "STEM", icon: "cap", labels: ["Engineering process", "Mathematical model", "Technology system", "Physics diagram", "Learning pathway", "Scientific method"]},
+  {id: "others", name: "Others", icon: "grid", labels: ["Concept diagram", "Process flow", "Research model", "Visual summary", "Comparison chart", "General illustration"]},
+];
+
+const editorLibraryImages = [
+  "ga-inflammation.png",
+  "ga-mrna-delivery.png",
+  "infographic-plant-transport.png",
+  "poster-alzheimers.png",
+  "ga-bacterial-immune-response.png",
+  "infographic-climate-pathways.png",
+  "poster-diabetes.png",
+  "infographic-crispr.png",
+];
+
+const editorLibraryIconPaths = {
+  heart: '<path d="M10.36 1.31c-.75 0-1.45.36-1.89.96L7.53 3.58a.65.65 0 0 1-1.06 0l-.94-1.31a2.33 2.33 0 0 0-4.21 1.37c0 1.36.87 2.69 1.86 3.89 1.12 1.37 2.5 2.57 3.44 3.29.09.07.22.12.38.12s.3-.05.39-.12c.94-.72 2.32-1.93 3.44-3.29.99-1.2 1.86-2.53 1.86-3.89a2.33 2.33 0 0 0-2.33-2.33ZM7.41 1.51A3.64 3.64 0 0 1 14 3.64c0 1.88-1.17 3.53-2.16 4.73-1.21 1.46-2.66 2.73-3.66 3.49-.34.26-.75.39-1.18.39s-.84-.13-1.18-.39c-1-.76-2.45-2.03-3.66-3.49C1.17 7.17 0 5.52 0 3.64A3.64 3.64 0 0 1 6.59 1.51L7 2.07l.41-.56Z"/>',
+  apple: '<path d="M6.13 3.06h.43A2.19 2.19 0 0 0 8.75.88V.44A.44.44 0 0 0 8.31 0h-.43a2.19 2.19 0 0 0-2.19 2.19v.44c0 .24.2.43.44.43ZM3.06 3.5C.98 3.5 0 5.79 0 7.88 0 11.38 2.19 14 4.38 14c.32 0 .72-.09 1.06-.19.45-.14.93-.14 1.38 0 .33.1.73.19 1.06.19 2.19 0 4.38-2.62 4.38-6.12 0-2.09-.98-4.38-3.06-4.38-.75 0-1.63.28-2.26.53-.52.2-1.09.2-1.61 0-.62-.25-1.51-.53-2.26-.53Zm-1.75 4.38c0-.87.21-1.71.56-2.29.33-.55.72-.78 1.19-.78.49 0 1.18.2 1.79.44.82.32 1.73.32 2.55 0 .61-.24 1.3-.44 1.79-.44.47 0 .86.23 1.19.78.35.58.56 1.42.56 2.29 0 1.48-.47 2.73-1.1 3.58-.66.88-1.4 1.23-1.96 1.23-.13 0-.37-.05-.68-.14a3.72 3.72 0 0 0-2.14 0c-.31.09-.56.14-.68.14-.56 0-1.3-.35-1.96-1.23-.64-.85-1.1-2.1-1.1-3.58Z"/>',
+  stethoscope: '<path d="M2 1v3.25a3.25 3.25 0 0 0 6.5 0V1M1 1h2M7.5 1h2M5.25 7.5v1.25a3 3 0 0 0 6 0V7.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="11.25" cy="5.75" r="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+  capsule: '<path d="M0 8.54c0-.99.39-1.93 1.09-2.63l4.82-4.82A3.71 3.71 0 1 1 11.16 6.34l-4.82 4.82A3.71 3.71 0 0 1 0 8.54Zm7.36-.25L3.96 4.89 2.02 6.84a2.4 2.4 0 1 0 3.39 3.4l1.95-1.95Zm.93-.93 1.95-1.95a2.4 2.4 0 1 0-3.4-3.4L4.89 3.96l3.4 3.4Z"/>',
+  nursing: '<path d="M10.36 1.31a2.33 2.33 0 0 0-1.89.96L7 4.31 5.53 2.27a2.33 2.33 0 0 0-4.21 1.37c0 .85.34 1.68.83 2.49h1.23c.08 0 .16-.05.2-.13l.86-1.9a.66.66 0 0 1 1.18-.03l1.43 2.7L8.2 4.91a.66.66 0 0 1 1.13.02l.62 1.09c.04.07.11.11.19.11h1.72c.49-.8.83-1.64.83-2.49a2.33 2.33 0 0 0-2.33-2.33ZM2.49 8.75h1.79c.84.85 1.69 1.58 2.34 2.07.09.07.22.12.38.12s.3-.05.39-.12c.65-.49 1.5-1.22 2.34-2.07h1.79a19.1 19.1 0 0 1-3.34 3.11c-.34.26-.75.39-1.18.39s-.84-.13-1.17-.39a19.1 19.1 0 0 1-3.34-3.11Z"/>',
+  paw: '<path d="M5.25 1.31A1.31 1.31 0 1 1 2.63 1.31a1.31 1.31 0 0 1 2.62 0Zm-.02 4c.2-.31.53-.5.9-.5s.7.19.89.5l1.34 2.15c.24.38.58.62.89.77.49.23.82.72.82 1.28a1.42 1.42 0 0 1-2.23 1.17c-.54-.37-1.2-.48-1.71-.48s-1.17.11-1.71.48a1.42 1.42 0 1 1-1.41-2.45c.31-.15.64-.39.88-.77l1.34-2.15ZM9.63 1.31a1.31 1.31 0 1 1-2.63 0 1.31 1.31 0 0 1 2.63 0Zm2.62 3.06a1.31 1.31 0 1 1-2.63 0 1.31 1.31 0 0 1 2.63 0Zm-9.63 0A1.31 1.31 0 1 1 0 4.37a1.31 1.31 0 0 1 2.62 0Z"/>',
+  leaf: '<path d="M12.89.18c.17-.16.43-.22.66-.15.27.09.45.34.45.63v5.11a6.48 6.48 0 0 1-6.53 6.48 4.87 4.87 0 0 1-4.69-3.59 4.57 4.57 0 0 0-1.47 3.37v.44a.66.66 0 0 1-1.31 0v-.44c0-2.05 1.05-3.86 2.64-4.92A4.82 4.82 0 0 1 7.44 2.63c1.81 0 3.16-.61 4.06-1.21.53-.35.98-.77 1.39-1.24Zm-.2 2c-1.05.81-2.8 1.76-5.25 1.76a3.5 3.5 0 0 0-3.35 2.47 5.89 5.89 0 0 1 1.82-.28h2.18a.66.66 0 0 1 0 1.31H5.91c-.7 0-1.35.16-1.95.43a3.54 3.54 0 0 0 3.51 3.07 5.2 5.2 0 0 0 5.22-5.17V2.18Z"/>',
+  microscope: '<path d="M4.81 1.31v6.13h1.75V1.31H4.81Zm-1.31 0C3.5.59 4.09 0 4.81 0h1.75c.73 0 1.31.59 1.31 1.31V3.5h.88A5.25 5.25 0 0 1 12.22 12.69h1.12a.66.66 0 0 1 0 1.31H.66a.66.66 0 0 1 0-1.31h8.09a3.94 3.94 0 0 0 0-7.88h-.88v2.63c0 .72-.58 1.31-1.31 1.31H4.81c-.72 0-1.31-.59-1.31-1.31V1.31Zm-.22 8.75h4.81a.66.66 0 0 1 0 1.31H3.28a.66.66 0 0 1 0-1.31Z"/>',
+  atom: '<path d="M1.57 10.67c.22.22.86.47 2.2.02.36-.12.75-.28 1.14-.49a15.7 15.7 0 0 1-2.86-2.86c-.21.39-.37.78-.49 1.14-.45 1.34-.2 1.98.01 2.19ZM1.22 6.12C-.12 3.88-.42 1.72.65.65 1.72-.42 3.88-.12 6.12 1.22 8.37-.12 10.53-.42 11.6.65c1.07 1.07.77 3.23-.58 5.47 1.35 2.25 1.65 4.41.58 5.48-1.07 1.07-3.23.77-5.48-.58-2.24 1.35-4.4 1.65-5.47.58-1.07-1.07-.77-3.23.57-5.48Zm4.9-3.33c-.6.42-1.21.93-1.81 1.52-.59.6-1.1 1.21-1.52 1.81.42.61.93 1.22 1.52 1.81.6.6 1.21 1.11 1.81 1.53.61-.42 1.22-.93 1.82-1.53.59-.59 1.1-1.2 1.52-1.81-.42-.6-.93-1.21-1.52-1.81-.6-.59-1.21-1.1-1.82-1.52Zm-.9 3.33a.89.89 0 1 1 1.78 0 .89.89 0 0 1-1.78 0Z"/>',
+  dna: '<path d="M9.84 0c.36 0 .66.29.66.66 0 1.52-.67 2.78-1.59 3.88A18.8 18.8 0 0 1 6.29 7c.94.77 1.88 1.58 2.62 2.46.92 1.1 1.59 2.37 1.59 3.88a.66.66 0 0 1-1.32.06H1.32a.66.66 0 0 1-1.32-.06c0-1.51.67-2.78 1.59-3.88A18.8 18.8 0 0 1 4.21 7a18.8 18.8 0 0 1-2.62-2.46A5.9 5.9 0 0 1 0 .66a.66.66 0 0 1 1.32-.06h7.86A.66.66 0 0 1 9.84 0ZM1.63 2.19c.19.45.47.88.81 1.31h5.62c.34-.43.61-.86.81-1.31H1.63Zm2.05 2.62c.49.45 1.02.9 1.57 1.35.55-.45 1.09-.9 1.57-1.35H3.68Zm-2.05 7h7.23c-.19-.45-.46-.88-.8-1.31H2.44c-.34.43-.62.86-.81 1.31Zm2.05-2.62h3.14c-.48-.45-1.02-.89-1.57-1.34-.55.45-1.08.89-1.57 1.34Z"/>',
+  flask: '<path d="M2.63.66c0-.37.29-.66.65-.66h5.69a.66.66 0 0 1 0 1.31h-.22v4.64l3.3 5.78A1.52 1.52 0 0 1 10.73 14H1.52A1.52 1.52 0 0 1 .2 11.73l3.3-5.78V1.31h-.22a.66.66 0 0 1-.65-.65Zm2.18.65v4.82a.66.66 0 0 1-.09.32L3.66 8.31h4.93L7.52 6.45a.66.66 0 0 1-.09-.32V1.31H4.81Zm-1.9 8.32-1.57 2.75a.21.21 0 0 0 .18.31h9.21a.21.21 0 0 0 .18-.31L9.34 9.63H2.91Z"/>',
+  tree: '<path d="M5.44 0c.17 0 .34.08.45.21l3.3 3.89c.15.17.19.41.09.62-.09.2-.3.34-.53.34h-.61l1.83 2.15c.15.17.18.41.09.62-.1.21-.31.34-.53.34h-.94l2.16 2.54c.15.17.18.41.08.62-.09.2-.3.34-.52.34H6.03v1.75a.58.58 0 0 1-1.17 0v-1.75H.58a.58.58 0 0 1-.44-.96L2.3 8.17h-.94a.58.58 0 0 1-.44-.96l1.82-2.15h-.6a.58.58 0 0 1-.45-.96L5 .21A.58.58 0 0 1 5.44 0ZM3.4 3.89h.61a.58.58 0 0 1 .44.96L2.62 7h.94A.58.58 0 0 1 4 7.96L1.84 10.5h7.2L6.89 7.96A.58.58 0 0 1 7.33 7h.94L6.44 4.85a.58.58 0 0 1 .44-.96h.61L5.44 1.48 3.4 3.89Z"/>',
+  book: '<path d="M6.34 2.24 5.81 2A9.18 9.18 0 0 0 2.28 1.31h-.96v9.63h.96c1.39 0 2.77.24 4.07.72V2.24Zm1.32 9.42a12 12 0 0 1 4.06-.72h.97V1.31h-.97c-1.21 0-2.41.24-3.53.71l-.53.22v9.42ZM6.31.81 7 1.09l.69-.28A10.5 10.5 0 0 1 11.72 0h.97C13.41 0 14 .59 14 1.31v9.63c0 .72-.59 1.31-1.31 1.31h-.97c-1.38 0-2.75.27-4.03.81l-.35.14a.88.88 0 0 1-.68 0l-.35-.14a10.5 10.5 0 0 0-4.03-.81h-.97C.59 12.25 0 11.66 0 10.94V1.31C0 .59.59 0 1.31 0h.97c1.38 0 2.75.27 4.03.81Z"/>',
+  cap: '<path d="M7.75.15A1.97 1.97 0 0 0 6.25.15L.36 2.57A.58.58 0 0 0 0 3.11v7.19a.58.58 0 0 0 1.17 0V3.98l1.16.48v4.1c0 1.29 2.09 2.33 4.67 2.33s4.67-1.04 4.67-2.33v-4.1l1.97-.81a.58.58 0 0 0 0-1.08L7.75.15ZM3.5 8.56V4.94l2.75 1.13c.48.2 1.02.2 1.5 0l2.75-1.13v3.62c-.1.35-1.54 1.16-3.5 1.16s-3.4-.81-3.5-1.16ZM2.12 3.11 6.7 1.23a.8.8 0 0 1 .6 0l4.58 1.88L7.3 5a.8.8 0 0 1-.6 0L2.12 3.11Z"/>',
+  grid: '<path d="M10.5 1.31c.24 0 .44.2.44.44v3.72H6.78V1.31h3.72Zm.44 5.47v3.72c0 .24-.2.44-.44.44H6.78V6.78h4.16ZM5.47 5.47H1.31V1.75c0-.24.2-.44.44-.44h3.72v4.16ZM1.31 6.78h4.16v4.16H1.75a.44.44 0 0 1-.44-.44V6.78ZM1.75 0C.78 0 0 .78 0 1.75v8.75c0 .97.78 1.75 1.75 1.75h8.75c.97 0 1.75-.78 1.75-1.75V1.75C12.25.78 11.47 0 10.5 0H1.75Z"/>',
+};
+
 const variants = [
   {
     id: 1,
@@ -398,6 +445,9 @@ const state = {
   editorRightPanelView: "chat",
   editorSlides: [],
   editorUploads: [],
+  editorLibraryCategoryId: null,
+  editorLibraryQuery: "",
+  editorLibraryReferenceId: null,
   activeEditorSlideId: null,
   currentEditorTemplate: templateCatalog[0],
   editorBackground: "#F5F7F9",
@@ -2814,6 +2864,7 @@ function setEditorPanelView(panel, view) {
   });
 
   if (panel === "left" && view === "uploads") renderEditorUploads();
+  if (panel === "left" && view === "library") renderEditorLibrary();
 
   if (panel === "right") {
     const panelLabels = {chat: "Editor chat", edit: "Editor segments", slides: "Editor slides"};
@@ -2910,6 +2961,181 @@ function renderEditorUploads() {
   });
 
   empty.hidden = state.editorUploads.length > 0;
+}
+
+function editorLibraryCategoryIcon(category) {
+  const paths = editorLibraryIconPaths[category.icon] || editorLibraryIconPaths.grid;
+  return `<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">${paths}</svg>`;
+}
+
+function editorLibraryAssetsFor(category) {
+  const categoryIndex = editorLibraryCategories.findIndex((item) => item.id === category.id);
+  return category.labels.map((title, index) => ({
+    id: `library-${category.id}-${index}`,
+    title,
+    src: editorLibraryImages[(categoryIndex + index) % editorLibraryImages.length],
+    kind: "library",
+    category: category.name,
+  }));
+}
+
+let editorLibraryStatusTimer = null;
+
+function showEditorLibraryStatus(message) {
+  const status = document.getElementById("editorLibraryStatus");
+  if (!status) return;
+  window.clearTimeout(editorLibraryStatusTimer);
+  status.textContent = message;
+  status.classList.add("visible");
+  editorLibraryStatusTimer = window.setTimeout(() => status.classList.remove("visible"), 1800);
+}
+
+function createEditorLibraryAction({label, action, asset, icon}) {
+  const button = document.createElement("button");
+  button.className = "editor-library-asset-action";
+  button.type = "button";
+  button.dataset.libraryAction = action;
+  button.dataset.tooltip = label;
+  button.setAttribute("aria-label", `${label}: ${asset.title}`);
+  if (action === "reference") {
+    button.dataset.libraryReferenceId = asset.id;
+    button.classList.toggle("active", state.editorLibraryReferenceId === asset.id);
+    button.setAttribute("aria-pressed", String(state.editorLibraryReferenceId === asset.id));
+  }
+  button.innerHTML = icon;
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (action === "add") {
+      addUploadedAssetToCanvas(asset);
+      showEditorLibraryStatus(`${asset.title} added to canvas`);
+      return;
+    }
+    state.editorLibraryReferenceId = state.editorLibraryReferenceId === asset.id ? null : asset.id;
+    renderEditorLibrary();
+    showEditorLibraryStatus(state.editorLibraryReferenceId ? `${asset.title} added as reference` : "Reference removed");
+  });
+  return button;
+}
+
+function renderEditorLibraryCategories(results, query) {
+  const list = document.createElement("div");
+  list.className = "editor-library-category-list";
+  const matches = editorLibraryCategories.filter((category) => category.name.toLowerCase().includes(query));
+
+  matches.forEach((category) => {
+    const button = document.createElement("button");
+    button.className = "editor-library-category";
+    button.type = "button";
+    button.setAttribute("aria-label", `Open ${category.name}`);
+    const icon = document.createElement("span");
+    icon.className = "editor-library-category-icon";
+    icon.innerHTML = editorLibraryCategoryIcon(category);
+    const label = document.createElement("span");
+    label.className = "editor-library-category-label";
+    label.textContent = category.name;
+    const chevron = document.createElement("span");
+    chevron.className = "editor-library-chevron";
+    chevron.innerHTML = '<svg viewBox="0 0 5 9" fill="none" aria-hidden="true"><path d="M4.518 3.88a.45.45 0 0 1 0 .635L.768 8.265a.45.45 0 1 1-.636-.636L3.563 4.2.132.767A.45.45 0 1 1 .768.13l3.75 3.75Z" fill="currentColor"/></svg>';
+    button.append(icon, label, chevron);
+    button.addEventListener("click", () => {
+      state.editorLibraryCategoryId = category.id;
+      state.editorLibraryQuery = "";
+      const search = document.getElementById("editorLibrarySearch");
+      if (search) search.value = "";
+      renderEditorLibrary();
+    });
+    list.appendChild(button);
+  });
+
+  if (!matches.length) {
+    const empty = document.createElement("div");
+    empty.className = "editor-library-empty";
+    empty.textContent = "No categories match your search.";
+    list.appendChild(empty);
+  }
+  results.appendChild(list);
+}
+
+function renderEditorLibraryDetail(results, category, query) {
+  const heading = document.createElement("div");
+  heading.className = "editor-library-detail-heading";
+  const back = document.createElement("button");
+  back.className = "editor-library-back";
+  back.type = "button";
+  back.setAttribute("aria-label", "Back to library categories");
+  back.innerHTML = '<svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M12.25 7H1.75M6 2.75 1.75 7 6 11.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  back.addEventListener("click", () => {
+    state.editorLibraryCategoryId = null;
+    state.editorLibraryQuery = "";
+    const search = document.getElementById("editorLibrarySearch");
+    if (search) search.value = "";
+    renderEditorLibrary();
+  });
+  const root = document.createElement("span");
+  root.textContent = "Library /";
+  const title = document.createElement("strong");
+  title.textContent = category.name;
+  heading.append(back, root, title);
+
+  const grid = document.createElement("div");
+  grid.className = "editor-library-asset-grid";
+  const assets = editorLibraryAssetsFor(category).filter((asset) => asset.title.toLowerCase().includes(query));
+  const addIcon = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="1.25" y="1.25" width="13.5" height="13.5" rx="3" stroke="currentColor" stroke-width="1.5"/></svg>';
+  const referenceIcon = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.3.75c0 .42-.32.75-.71.75-.65 0-1.18.56-1.18 1.25a.71.71 0 0 1-1.41 0C0 1.23 1.16 0 2.59 0c.39 0 .71.33.71.75ZM0 5.75A.71.71 0 0 1 1.41 5v3.25a.71.71 0 0 1-1.41 0v-2.5Zm.71 4.75c.39 0 .7.33.7.75 0 .69.53 1.25 1.18 1.25h3.61c.08.53.23 1.03.43 1.5H2.59C1.16 14 0 12.77 0 11.25c0-.42.32-.75.71-.75ZM13.18 5.69a5.3 5.3 0 0 0-1.42-.19V2.75c0-.69-.52-1.25-1.17-1.25a.71.71 0 0 1 0-1.5c1.43 0 2.59 1.23 2.59 2.75v2.94ZM7.53 11.5A4.37 4.37 0 0 1 11.76 7 4.37 4.37 0 0 1 16 11.5a4.37 4.37 0 0 1-4.24 4.5 4.37 4.37 0 0 1-4.23-4.5Zm4.23-2.5c-.26 0-.47.23-.47.5V11H9.88c-.26 0-.47.23-.47.5s.21.5.47.5h1.41v1.5c0 .27.21.5.47.5s.48-.23.48-.5V12h1.41c.26 0 .47-.23.47-.5s-.21-.5-.47-.5h-1.41V9.5c0-.27-.22-.5-.48-.5Z" fill="currentColor"/></svg>';
+
+  assets.forEach((asset) => {
+    const card = document.createElement("article");
+    card.className = "editor-library-asset";
+    const image = document.createElement("img");
+    image.src = asset.src;
+    image.alt = asset.title;
+    const overlay = document.createElement("div");
+    overlay.className = "editor-library-asset-overlay";
+    const name = document.createElement("span");
+    name.className = "editor-library-asset-name";
+    name.textContent = asset.title;
+    const actions = document.createElement("div");
+    actions.className = "editor-library-asset-actions";
+    actions.append(
+      createEditorLibraryAction({label: "Add to canvas", action: "add", asset, icon: addIcon}),
+      createEditorLibraryAction({label: "Add as reference", action: "reference", asset, icon: referenceIcon}),
+    );
+    overlay.append(name, actions);
+    card.append(image, overlay);
+    grid.appendChild(card);
+  });
+
+  results.append(heading);
+  if (assets.length) results.appendChild(grid);
+  else {
+    const empty = document.createElement("div");
+    empty.className = "editor-library-empty";
+    empty.textContent = `No ${category.name} illustrations match your search.`;
+    results.appendChild(empty);
+  }
+}
+
+function renderEditorLibrary() {
+  const results = document.getElementById("editorLibraryResults");
+  const search = document.getElementById("editorLibrarySearch");
+  if (!results || !search) return;
+  const query = state.editorLibraryQuery.trim().toLowerCase();
+  results.innerHTML = "";
+  search.placeholder = state.editorLibraryCategoryId ? "Search illustrations" : "Search library";
+  if (search.value !== state.editorLibraryQuery) search.value = state.editorLibraryQuery;
+  const category = editorLibraryCategories.find((item) => item.id === state.editorLibraryCategoryId);
+  if (category) renderEditorLibraryDetail(results, category, query);
+  else renderEditorLibraryCategories(results, query);
+}
+
+function bindEditorLibrary() {
+  const search = document.getElementById("editorLibrarySearch");
+  if (!search) return;
+  search.addEventListener("input", () => {
+    state.editorLibraryQuery = search.value;
+    renderEditorLibrary();
+    search.focus();
+  });
 }
 
 function ensureEditorSlides() {
@@ -4594,6 +4820,7 @@ function init() {
   bindEditorCrop();
   bindEditorRegionEditing();
   bindCanvasToolbar();
+  bindEditorLibrary();
   setEditorPanelView("left", state.editorLeftPanelView);
   setEditorPanelView("right", state.editorRightPanelView);
   setEditorLeftPanelCollapsed(state.editorLeftPanelCollapsed);
