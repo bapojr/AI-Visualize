@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=55" />
+    <link rel="stylesheet" href="styles.css?v=56" />
   </head>
   <body>
     <div id="app">
@@ -1267,6 +1267,7 @@
                 <div class="editor-panel-tabs" role="tablist" aria-label="Right panel views">
                   <button class="editor-panel-tab selected" id="editorRightChatTab" type="button" role="tab" aria-selected="true" aria-controls="editorRightChatView" data-editor-panel-tab="right" data-panel-view="chat">Chat</button>
                   <button class="editor-panel-tab" id="editorRightEditTab" type="button" role="tab" aria-selected="false" aria-controls="editorRightEditView" data-editor-panel-tab="right" data-panel-view="edit">Segment</button>
+                  <button class="editor-panel-tab" id="editorRightSlidesTab" type="button" role="tab" aria-selected="false" aria-controls="editorRightSlidesView" data-editor-panel-tab="right" data-panel-view="slides">Slides</button>
                 </div>
               </div>
               <div class="editor-right-panel-view active" id="editorRightChatView" role="tabpanel" aria-labelledby="editorRightChatTab" data-editor-panel-view="right" data-panel-view="chat">
@@ -1423,6 +1424,19 @@
                     </div>
                   </div>
                 </div>
+              </div>
+              <div class="editor-right-panel-view editor-slides-view" id="editorRightSlidesView" role="tabpanel" aria-labelledby="editorRightSlidesTab" data-editor-panel-view="right" data-panel-view="slides" hidden>
+                <div class="editor-slides-actions" role="toolbar" aria-label="Slide actions">
+                  <button id="editorSlidesAdd" type="button" aria-label="Add slide">
+                    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12"/></svg>
+                    <span>Add slide</span>
+                  </button>
+                  <button id="editorSlidesPresent" type="button" aria-label="Present slides">
+                    <svg viewBox="0 0 18 14" aria-hidden="true"><rect x="1" y="1" width="16" height="12" rx="1.5"/><path d="m7 4 5 3-5 3V4Z"/></svg>
+                    <span>Present</span>
+                  </button>
+                </div>
+                <div class="editor-slides-list" id="editorSlidesList" aria-label="Slides"></div>
               </div>
             </aside>
           </main>
@@ -2005,6 +2019,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=42"></script>
+    <script src="app.js?v=43"></script>
   </body>
 </html>

@@ -374,6 +374,8 @@ const state = {
   editorLeftPanelCollapsed: false,
   editorLeftPanelView: "edit",
   editorRightPanelView: "chat",
+  editorSlides: [],
+  activeEditorSlideId: null,
   currentEditorTemplate: templateCatalog[0],
   editorBackground: "#F5F7F9",
   editorTitle: "Untitled",
@@ -2635,12 +2637,170 @@ function setEditorPanelView(panel, view) {
   });
 
   if (panel === "right") {
-    document.getElementById("historyPanel")?.setAttribute("aria-label", view === "chat" ? "Editor chat" : "Editor segments");
+    const panelLabels = {chat: "Editor chat", edit: "Editor segments", slides: "Editor slides"};
+    document.getElementById("historyPanel")?.setAttribute("aria-label", panelLabels[view] || "Editor panel");
     if (view === "edit") {
       renderEditorInspector();
       setEditorSegmentDetailVisible(Boolean(state.selectedEditorSegmentId));
     }
+    if (view === "slides") renderEditorSlides();
   }
+}
+
+function ensureEditorSlides() {
+  if (state.editorSlides.length) return;
+  const template = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
+  state.editorSlides = [
+    {id: `slide-${Date.now()}-1`, title: "Untitled", isBlank: true, template: null, editable: true},
+    {id: `slide-${Date.now()}-2`, title: "Flat image", isBlank: false, template, editable: false},
+    {id: `slide-${Date.now()}-3`, title: "Editable figure", isBlank: false, template, editable: true},
+  ];
+  state.activeEditorSlideId = state.editorSlides[2].id;
+}
+
+function selectEditorSlide(slideId) {
+  ensureEditorSlides();
+  const slide = state.editorSlides.find((item) => item.id === slideId);
+  if (!slide) return;
+  state.activeEditorSlideId = slide.id;
+  state.isEditorFrameSelected = false;
+  state.selectedEditorSegmentId = null;
+  state.selectedEditorSegmentType = null;
+  state.isBlankEditor = slide.isBlank;
+  if (slide.template) {
+    state.generatedResultTemplate = slide.template;
+    state.currentEditorTemplate = slide.template;
+  }
+  renderEditorCanvas();
+  renderEditorSlides();
+}
+
+function renderEditorSlides() {
+  const list = document.getElementById("editorSlidesList");
+  if (!list) return;
+  ensureEditorSlides();
+  list.innerHTML = "";
+  state.editorSlides.forEach((slide, index) => {
+    const card = document.createElement("article");
+    const selected = slide.id === state.activeEditorSlideId;
+    card.className = `editor-slide-card ${selected ? "active" : ""}`;
+    card.dataset.slideId = slide.id;
+    const preview = slide.isBlank
+      ? '<span class="editor-slide-blank" aria-hidden="true"></span>'
+      : `<img src="${slide.template?.image || ""}" alt="" />${slide.editable ? '<span class="editor-slide-avatar" aria-label="Edited by Sushrut Baporikar">SB</span>' : ""}`;
+    card.innerHTML = `
+      <label class="editor-slide-name">
+        <strong>${index + 1}</strong>
+        <input type="text" readonly aria-label="Slide ${index + 1} title" data-slide-title />
+      </label>
+      <button class="editor-slide-preview" type="button" data-slide-select>${preview}</button>
+      <button class="editor-slide-more" type="button" aria-label="More options for slide ${index + 1}" aria-haspopup="menu" aria-expanded="false" data-slide-menu-trigger>
+        <svg viewBox="0 0 16 4" aria-hidden="true"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg>
+      </button>
+      <div class="editor-slide-menu" role="menu" hidden>
+        <button type="button" role="menuitem" data-slide-action="rename">Rename</button>
+        <button type="button" role="menuitem" data-slide-action="duplicate">Duplicate</button>
+        <button type="button" role="menuitem" data-slide-action="delete">Delete</button>
+      </div>
+    `;
+    const titleInput = card.querySelector("[data-slide-title]");
+    const previewButton = card.querySelector("[data-slide-select]");
+    const previewImage = card.querySelector(".editor-slide-preview img");
+    if (titleInput) titleInput.value = slide.title;
+    previewButton?.setAttribute("aria-label", `Select slide ${index + 1}: ${slide.title}`);
+    if (previewImage) previewImage.alt = `${slide.title} preview`;
+    list.appendChild(card);
+  });
+}
+
+function bindEditorSlides() {
+  const list = document.getElementById("editorSlidesList");
+  const addButton = document.getElementById("editorSlidesAdd");
+  const presentButton = document.getElementById("editorSlidesPresent");
+  if (!list || !addButton || !presentButton) return;
+
+  const closeMenus = () => {
+    list.querySelectorAll(".editor-slide-menu").forEach((menu) => { menu.hidden = true; });
+    list.querySelectorAll("[data-slide-menu-trigger]").forEach((button) => button.setAttribute("aria-expanded", "false"));
+  };
+
+  const beginRename = (card) => {
+    const input = card?.querySelector("[data-slide-title]");
+    if (!input) return;
+    input.readOnly = false;
+    input.focus();
+    input.select();
+  };
+
+  addButton.addEventListener("click", () => {
+    ensureEditorSlides();
+    const newSlide = {id: `slide-${Date.now()}`, title: "Untitled", isBlank: true, template: null, editable: true};
+    const activeIndex = state.editorSlides.findIndex((slide) => slide.id === state.activeEditorSlideId);
+    state.editorSlides.splice(activeIndex + 1, 0, newSlide);
+    selectEditorSlide(newSlide.id);
+    window.setTimeout(() => beginRename(list.querySelector(`[data-slide-id="${newSlide.id}"]`)), 0);
+  });
+
+  presentButton.addEventListener("click", () => {
+    const stage = document.getElementById("editorCanvasStage");
+    stage?.requestFullscreen?.().catch(() => {});
+  });
+
+  list.addEventListener("click", (event) => {
+    const card = event.target.closest(".editor-slide-card");
+    if (!card) return;
+    if (event.target.closest("[data-slide-select]")) {
+      selectEditorSlide(card.dataset.slideId);
+      return;
+    }
+    const trigger = event.target.closest("[data-slide-menu-trigger]");
+    if (trigger) {
+      event.stopPropagation();
+      const menu = card.querySelector(".editor-slide-menu");
+      const willOpen = menu.hidden;
+      closeMenus();
+      menu.hidden = !willOpen;
+      trigger.setAttribute("aria-expanded", String(willOpen));
+      return;
+    }
+    const actionButton = event.target.closest("[data-slide-action]");
+    if (!actionButton) return;
+    const slideIndex = state.editorSlides.findIndex((slide) => slide.id === card.dataset.slideId);
+    const slide = state.editorSlides[slideIndex];
+    if (!slide) return;
+    if (actionButton.dataset.slideAction === "rename") beginRename(card);
+    if (actionButton.dataset.slideAction === "duplicate") {
+      const copy = {...slide, id: `slide-${Date.now()}`, title: `${slide.title} copy`};
+      state.editorSlides.splice(slideIndex + 1, 0, copy);
+      state.activeEditorSlideId = copy.id;
+      renderEditorSlides();
+    }
+    if (actionButton.dataset.slideAction === "delete" && state.editorSlides.length > 1) {
+      state.editorSlides.splice(slideIndex, 1);
+      const replacement = state.editorSlides[Math.min(slideIndex, state.editorSlides.length - 1)];
+      selectEditorSlide(replacement.id);
+    }
+    closeMenus();
+  });
+
+  list.addEventListener("dblclick", (event) => beginRename(event.target.closest(".editor-slide-card")));
+  list.addEventListener("keydown", (event) => {
+    const input = event.target.closest("[data-slide-title]");
+    if (!input || event.key !== "Enter") return;
+    event.preventDefault();
+    input.blur();
+  });
+  list.addEventListener("focusout", (event) => {
+    const input = event.target.closest("[data-slide-title]");
+    if (!input || input.readOnly) return;
+    const slide = state.editorSlides.find((item) => item.id === input.closest(".editor-slide-card")?.dataset.slideId);
+    if (slide) slide.title = input.value.trim() || "Untitled";
+    input.value = slide?.title || "Untitled";
+    input.readOnly = true;
+  });
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("#editorRightSlidesView")) closeMenus();
+  });
 }
 
 function setEditorLeftPanelCollapsed(collapsed) {
@@ -3872,6 +4032,7 @@ function init() {
   bindEditorImageSettings();
   bindEditorSegmentSettings();
   bindEditorInspector();
+  bindEditorSlides();
   bindEditorShareMenu();
   bindEditorExportMenu();
   initActions();

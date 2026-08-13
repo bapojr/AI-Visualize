@@ -7106,6 +7106,253 @@ a {
   overflow: hidden;
 }
 
+.editor-slides-view {
+  padding: 0;
+  align-items: stretch;
+  gap: 0;
+  background: var(--Gray-1, #fff);
+}
+
+.editor-slides-actions {
+  display: flex;
+  width: 100%;
+  height: 52px;
+  padding: 8px 12px;
+  flex: 0 0 52px;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+}
+
+.editor-slides-actions button {
+  display: inline-flex;
+  height: 34px;
+  padding: 0 10px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  font: 500 14px/20px "IBM Plex Sans", sans-serif;
+}
+
+.editor-slides-actions button:hover,
+.editor-slides-actions button:focus-visible {
+  border-color: var(--Blue-5, #c9d8fa);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-slides-actions svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.editor-slides-actions #editorSlidesPresent svg path {
+  fill: currentColor;
+  stroke: none;
+}
+
+.editor-slides-list {
+  display: flex;
+  min-height: 0;
+  padding: 16px;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 18px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--Gray-7, #cad5e7) transparent;
+}
+
+.editor-slide-card {
+  position: relative;
+  display: grid;
+  width: 100%;
+  gap: 8px;
+  color: var(--Gray-11, #5d6a81);
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.editor-slide-name {
+  display: flex;
+  min-width: 0;
+  height: 28px;
+  padding: 0 42px 0 4px;
+  align-items: center;
+  gap: 6px;
+  color: var(--Gray-11, #5d6a81);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.editor-slide-name strong {
+  color: var(--Gray-10, #7d8aa1);
+  font-weight: 600;
+}
+
+.editor-slide-name input {
+  width: 100%;
+  min-width: 0;
+  height: 26px;
+  padding: 2px 5px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.editor-slide-name input:not([readonly]),
+.editor-slide-name input:focus {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-12, #13161b);
+}
+
+.editor-slide-preview {
+  position: relative;
+  display: flex;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+  box-shadow: none;
+}
+
+.editor-slide-card.active .editor-slide-preview {
+  border: 2px solid var(--Blue-9, #0062ff);
+  box-shadow: 0 0 0 1px rgba(0, 98, 255, 0.08);
+}
+
+.editor-slide-preview:hover,
+.editor-slide-preview:focus-visible {
+  border-color: var(--Blue-9, #0062ff);
+  outline: none;
+}
+
+.editor-slide-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.editor-slide-blank {
+  width: calc(100% - 24px);
+  height: calc(100% - 24px);
+  border: 1px dashed var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  background: var(--Gray-2, #f8f9fd);
+}
+
+.editor-slide-avatar {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--Gray-1, #fff);
+  border-radius: 50%;
+  background: var(--Blue-9, #0062ff);
+  color: #fff;
+  font: 500 13px/16px "IBM Plex Sans", sans-serif;
+}
+
+.editor-slide-more {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  width: 32px;
+  height: 28px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+}
+
+.editor-slide-more:hover,
+.editor-slide-more:focus-visible,
+.editor-slide-more[aria-expanded="true"] {
+  border-color: var(--Blue-5, #c9d8fa);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-slide-more svg {
+  width: 16px;
+  height: 4px;
+  fill: currentColor;
+}
+
+.editor-slide-menu {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  z-index: 12;
+  display: flex;
+  width: 148px;
+  padding: 4px 0;
+  flex-direction: column;
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.editor-slide-menu[hidden] {
+  display: none;
+}
+
+.editor-slide-menu button {
+  display: flex;
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  font: 500 14px/20px "IBM Plex Sans", sans-serif;
+  text-align: left;
+}
+
+.editor-slide-menu button:hover,
+.editor-slide-menu button:focus-visible {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+}
+
+.editor-slide-menu button[data-slide-action="delete"]:hover,
+.editor-slide-menu button[data-slide-action="delete"]:focus-visible {
+  background: #fff1f3;
+  color: #c91f37;
+}
+
 .editor-inspector-scroll {
   width: 100%;
   min-height: 0;
