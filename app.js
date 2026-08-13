@@ -369,6 +369,28 @@ const state = {
   textOpacity: 100,
   frameRatio: "16:9",
   frameOpacity: 100,
+  tableRows: 3,
+  tableColumns: 3,
+  tableStyle: "plain",
+  tableAlternating: false,
+  tableHeaderFill: "#EDF3FF",
+  tableBodyFill: "#FFFFFF",
+  tableOutlineColor: "#BCC7DC",
+  tableOutlineWidth: 1,
+  tableOutlineDash: 0,
+  tableOutlineMode: "all",
+  tableFont: "IBM Plex Sans",
+  tableFontSize: 14,
+  tableTextColor: "#13161B",
+  tableLineHeight: 1.15,
+  tableAlign: "left",
+  tableVerticalAlign: "top",
+  tableListStyle: "none",
+  tableBold: false,
+  tableItalic: false,
+  tableUnderline: false,
+  tableTransparency: 0,
+  selectedTableCell: null,
   canvasPanX: 0,
   canvasPanY: 0,
   editorLeftPanelCollapsed: false,
@@ -2202,6 +2224,138 @@ function syncFrameSettingsPanel() {
   if (opacity) opacity.value = `${state.frameOpacity}`;
 }
 
+function selectedCanvasTable() {
+  return document.querySelector(".canvas-table-object.is-selected");
+}
+
+function selectedCanvasTableCell() {
+  return selectedCanvasTable()?.querySelector("td.is-selected, th.is-selected") || null;
+}
+
+function tableDashStyle(value) {
+  return Number(value) > 0 ? "dashed" : "solid";
+}
+
+function applyTableTextAppearance(target) {
+  if (!target) return;
+  target.style.fontFamily = state.tableFont;
+  target.style.fontSize = `${state.tableFontSize}px`;
+  target.style.color = state.tableTextColor;
+  target.style.lineHeight = `${state.tableLineHeight}`;
+  target.style.textAlign = state.tableAlign;
+  target.style.verticalAlign = state.tableVerticalAlign;
+  target.style.fontWeight = state.tableBold ? "700" : "400";
+  target.style.fontStyle = state.tableItalic ? "italic" : "normal";
+  target.style.textDecoration = state.tableUnderline ? "underline" : "none";
+  target.dataset.listStyle = state.tableListStyle;
+}
+
+function applyTableAppearance(tableObject) {
+  if (!tableObject) return;
+  const table = tableObject.querySelector("table");
+  if (!table) return;
+  tableObject.dataset.tableStyle = state.tableStyle;
+  tableObject.dataset.outlineMode = state.tableOutlineMode;
+  tableObject.classList.toggle("has-alternating-rows", state.tableAlternating);
+  tableObject.style.opacity = `${1 - state.tableTransparency / 100}`;
+  table.style.setProperty("--table-header-fill", state.tableHeaderFill);
+  table.style.setProperty("--table-body-fill", state.tableBodyFill);
+  table.style.setProperty("--table-outline", state.tableOutlineColor);
+  table.style.setProperty("--table-outline-width", `${state.tableOutlineWidth}px`);
+  table.style.setProperty("--table-outline-style", tableDashStyle(state.tableOutlineDash));
+  table.querySelectorAll("th, td").forEach(applyTableTextAppearance);
+}
+
+function createCanvasTable(rows, columns) {
+  const object = document.createElement("div");
+  object.className = "canvas-object canvas-table-object is-selected";
+  object.dataset.rows = `${rows}`;
+  object.dataset.columns = `${columns}`;
+  object.style.width = `${Math.max(180, columns * 88)}px`;
+  const table = document.createElement("table");
+  const body = document.createElement("tbody");
+  for (let rowIndex = 0; rowIndex < rows; rowIndex += 1) {
+    const row = document.createElement("tr");
+    for (let columnIndex = 0; columnIndex < columns; columnIndex += 1) {
+      const cell = document.createElement(rowIndex === 0 ? "th" : "td");
+      cell.contentEditable = "true";
+      cell.spellcheck = true;
+      cell.textContent = rowIndex === 0 ? `Heading ${columnIndex + 1}` : `Cell ${rowIndex}, ${columnIndex + 1}`;
+      row.appendChild(cell);
+    }
+    body.appendChild(row);
+  }
+  table.appendChild(body);
+  object.appendChild(table);
+  applyTableAppearance(object);
+  return object;
+}
+
+function updateTableControlOutput(input) {
+  const row = input?.closest("label");
+  const output = row?.querySelector("output");
+  if (!output) return;
+  output.textContent = input.type === "color" ? input.value.toUpperCase() : input.value;
+}
+
+function syncTableSettingsPanel() {
+  const table = selectedCanvasTable();
+  const cell = selectedCanvasTableCell();
+  const context = document.getElementById("editorTableContext");
+  const whole = document.getElementById("editorTableWholeControls");
+  const cellControls = document.getElementById("editorTableCellControls");
+  if (context) {
+    context.querySelector("strong").textContent = cell ? "Cell" : "Table";
+    context.querySelector("span").textContent = cell ? "Back to table options" : "Select a cell to see available options";
+    context.classList.toggle("is-cell-context", Boolean(cell));
+    context.tabIndex = cell ? 0 : -1;
+    context.setAttribute("role", cell ? "button" : "status");
+  }
+  if (whole) whole.hidden = Boolean(cell);
+  if (cellControls) cellControls.hidden = !cell;
+  document.querySelectorAll("[data-table-style]").forEach((button) => button.classList.toggle("active", button.dataset.tableStyle === state.tableStyle));
+  document.querySelectorAll("[data-table-outline]").forEach((button) => button.classList.toggle("active", button.dataset.tableOutline === state.tableOutlineMode));
+  document.querySelectorAll("[data-table-align]").forEach((button) => button.classList.toggle("active", button.dataset.tableAlign === state.tableAlign));
+  document.querySelectorAll("[data-table-valign]").forEach((button) => button.classList.toggle("active", button.dataset.tableValign === state.tableVerticalAlign));
+  document.querySelectorAll("[data-table-list]").forEach((button) => button.classList.toggle("active", button.dataset.tableList === state.tableListStyle));
+  document.querySelector('[data-table-decoration="bold"]')?.classList.toggle("active", state.tableBold);
+  document.querySelector('[data-table-decoration="italic"]')?.classList.toggle("active", state.tableItalic);
+  document.querySelector('[data-table-decoration="underline"]')?.classList.toggle("active", state.tableUnderline);
+  const alternating = document.getElementById("editorTableAlternating");
+  if (alternating) alternating.checked = state.tableAlternating;
+  const fields = {
+    editorTableHeaderFill: state.tableHeaderFill,
+    editorTableBodyFill: state.tableBodyFill,
+    editorTableOutlineColor: state.tableOutlineColor,
+    editorTableOutlineWidth: state.tableOutlineWidth,
+    editorTableOutlineDash: state.tableOutlineDash,
+    editorTableFont: state.tableFont,
+    editorTableLineHeight: state.tableLineHeight,
+    editorTableTextColor: state.tableTextColor,
+    editorTableTransparency: state.tableTransparency,
+  };
+  Object.entries(fields).forEach(([id, value]) => {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.value = `${value}`;
+    updateTableControlOutput(input);
+  });
+  const fontSize = document.getElementById("editorTableFontSize");
+  if (fontSize) fontSize.textContent = `${state.tableFontSize}`;
+  if (cell) {
+    const fill = document.getElementById("editorTableCellFill");
+    const outline = document.getElementById("editorTableCellOutline");
+    const width = document.getElementById("editorTableCellOutlineWidth");
+    const dash = document.getElementById("editorTableCellOutlineDash");
+    if (fill) fill.value = cell.dataset.cellFill || "#FFFFFF";
+    if (outline) outline.value = cell.dataset.cellOutline || state.tableOutlineColor;
+    if (width) width.value = cell.dataset.cellOutlineWidth || `${state.tableOutlineWidth}`;
+    if (dash) dash.value = cell.dataset.cellOutlineDash || "0";
+    [fill, outline, width, dash].forEach(updateTableControlOutput);
+  }
+  if (table) applyTableAppearance(table);
+}
+
 function currentImagePrompt() {
   if (state.prompt.trim()) return state.prompt.trim();
   const template = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
@@ -2575,10 +2729,11 @@ function setCanvasTool(tool) {
   const imageSelected = state.isEditorFrameSelected;
   const segmentSelected = Boolean(state.selectedEditorSegmentId) && !imageSelected;
   const textSegmentSelected = segmentSelected && state.selectedEditorSegmentType === "text";
+  const tableSelected = Boolean(selectedCanvasTable());
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
   const canvasSettings = document.getElementById("editorCanvasSettings");
-  if (canvasSettings) canvasSettings.hidden = imageSelected || !["select", "hand"].includes(tool);
+  if (canvasSettings) canvasSettings.hidden = imageSelected || tableSelected || !["select", "hand"].includes(tool);
   const shapeSettings = document.getElementById("editorShapeSettings");
   if (shapeSettings) shapeSettings.hidden = imageSelected || tool !== "shape";
   if (!imageSelected && tool === "shape") syncShapeSettingsPanel();
@@ -2594,6 +2749,9 @@ function setCanvasTool(tool) {
   const frameSettings = document.getElementById("editorFrameSettings");
   if (frameSettings) frameSettings.hidden = imageSelected || tool !== "frame";
   if (!imageSelected && tool === "frame") syncFrameSettingsPanel();
+  const tableSettings = document.getElementById("editorTableSettings");
+  if (tableSettings) tableSettings.hidden = imageSelected || !tableSelected || tool !== "select";
+  if (!imageSelected && tableSelected && tool === "select") syncTableSettingsPanel();
   const imageSettings = document.getElementById("editorImageSettings");
   if (imageSettings) imageSettings.hidden = !imageSelected;
   if (imageSelected) syncImageSettingsPanel();
@@ -2916,6 +3074,10 @@ function bindCanvasToolbar() {
   const importInput = document.getElementById("canvasImportInput");
   const shapeToolButton = document.getElementById("canvasShapeToolButton");
   const lineToolButton = document.getElementById("canvasLineToolButton");
+  const tableToolButton = document.getElementById("canvasTableToolButton");
+  const tableMenu = document.getElementById("canvasTableMenu");
+  const tableGrid = document.getElementById("canvasTableSizeGrid");
+  const tableLabel = document.getElementById("canvasTableSizeLabel");
   if (!stage || !stageContent || !drawingLayer) return;
 
   document.getElementById("editorUploadsAdd")?.addEventListener("click", () => importInput?.click());
@@ -2927,7 +3089,42 @@ function bindCanvasToolbar() {
     document.querySelectorAll("[data-canvas-menu-toggle]").forEach((toggle) => {
       toggle.setAttribute("aria-expanded", "false");
     });
+    if (tableMenu) tableMenu.hidden = true;
+    tableToolButton?.setAttribute("aria-expanded", "false");
   };
+
+  if (tableGrid && !tableGrid.children.length) {
+    for (let row = 1; row <= 10; row += 1) {
+      for (let column = 1; column <= 10; column += 1) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.dataset.tableRows = `${row}`;
+        cell.dataset.tableColumns = `${column}`;
+        cell.setAttribute("role", "gridcell");
+        cell.setAttribute("aria-label", `${row} rows by ${column} columns`);
+        const preview = () => {
+          tableGrid.querySelectorAll("button").forEach((item) => {
+            item.classList.toggle("preview", Number(item.dataset.tableRows) <= row && Number(item.dataset.tableColumns) <= column);
+          });
+          if (tableLabel) tableLabel.textContent = `${row} × ${column}`;
+        };
+        cell.addEventListener("mouseenter", preview);
+        cell.addEventListener("focus", preview);
+        cell.addEventListener("click", (event) => {
+          event.stopPropagation();
+          state.tableRows = row;
+          state.tableColumns = column;
+          closeToolMenus();
+          setCanvasTool("table");
+        });
+        tableGrid.appendChild(cell);
+      }
+    }
+    tableGrid.addEventListener("mouseleave", () => {
+      tableGrid.querySelectorAll("button").forEach((item) => item.classList.remove("preview"));
+      if (tableLabel) tableLabel.textContent = "Select table size";
+    });
+  }
 
   const updateToolChoice = (type, option) => {
     const isShape = type === "shape";
@@ -2985,6 +3182,8 @@ function bindCanvasToolbar() {
       item.classList.remove("is-selected");
     });
     object?.classList.add("is-selected");
+    if (!object?.classList.contains("canvas-table-object")) state.selectedTableCell = null;
+    setCanvasTool(state.canvasTool === "table" ? "select" : state.canvasTool);
   };
 
   const pointInCanvas = (event) => {
@@ -3039,6 +3238,16 @@ function bindCanvasToolbar() {
   document.querySelectorAll("[data-canvas-tool]").forEach((button) => {
     button.addEventListener("click", () => {
       const tool = button.dataset.canvasTool;
+      if (tool === "table") {
+        const willOpen = tableMenu?.hidden ?? false;
+        closeToolMenus();
+        if (tableMenu && willOpen) {
+          tableMenu.hidden = false;
+          tableToolButton?.setAttribute("aria-expanded", "true");
+          if (tableLabel) tableLabel.textContent = "Select table size";
+        }
+        return;
+      }
       closeToolMenus();
       setCanvasTool(tool);
       if (tool === "import") {
@@ -3081,7 +3290,7 @@ function bindCanvasToolbar() {
 
   let drawSession = null;
   stageContent.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || !["shape", "line", "pen", "text", "frame"].includes(state.canvasTool)) return;
+    if (event.button !== 0 || !["shape", "line", "pen", "text", "frame", "table"].includes(state.canvasTool)) return;
     event.preventDefault();
     event.stopPropagation();
     const start = pointInCanvas(event);
@@ -3098,6 +3307,16 @@ function bindCanvasToolbar() {
       selectObject(text);
       setCanvasTool("select");
       window.setTimeout(() => text.focus(), 0);
+      return;
+    }
+
+    if (state.canvasTool === "table") {
+      const table = createCanvasTable(state.tableRows, state.tableColumns);
+      table.style.left = `${start.x}px`;
+      table.style.top = `${start.y}px`;
+      drawingLayer.appendChild(table);
+      selectObject(table);
+      setCanvasTool("select");
       return;
     }
 
@@ -3171,6 +3390,17 @@ function bindCanvasToolbar() {
     if (!object) return;
     event.stopPropagation();
     selectObject(object);
+    if (object.classList.contains("canvas-table-object")) {
+      object.querySelectorAll("th.is-selected, td.is-selected").forEach((cell) => cell.classList.remove("is-selected"));
+      const cell = event.target.closest("th, td");
+      if (cell) {
+        cell.classList.add("is-selected");
+        state.selectedTableCell = {row: cell.parentElement.rowIndex, column: cell.cellIndex};
+      } else {
+        state.selectedTableCell = null;
+      }
+      setCanvasTool("select");
+    }
   });
 
   importInput?.addEventListener("change", () => {
@@ -3747,6 +3977,129 @@ function bindEditorFrameSettings() {
   syncFrameSettingsPanel();
 }
 
+function bindEditorTableSettings() {
+  const table = () => selectedCanvasTable();
+  const targets = () => {
+    const selectedCell = selectedCanvasTableCell();
+    return selectedCell ? [selectedCell] : [...(table()?.querySelectorAll("th, td") || [])];
+  };
+  const updateWholeTable = () => {
+    applyTableAppearance(table());
+    syncTableSettingsPanel();
+  };
+  const updateText = () => {
+    targets().forEach(applyTableTextAppearance);
+    syncTableSettingsPanel();
+  };
+  const clearCellSelection = () => {
+    table()?.querySelectorAll("th.is-selected, td.is-selected").forEach((cell) => cell.classList.remove("is-selected"));
+    state.selectedTableCell = null;
+    syncTableSettingsPanel();
+  };
+  document.getElementById("editorTableContext")?.addEventListener("click", () => {
+    if (selectedCanvasTableCell()) clearCellSelection();
+  });
+  document.getElementById("editorTableContext")?.addEventListener("keydown", (event) => {
+    if (selectedCanvasTableCell() && ["Enter", " "].includes(event.key)) {
+      event.preventDefault();
+      clearCellSelection();
+    }
+  });
+
+  document.querySelectorAll("[data-table-style]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.tableStyle = button.dataset.tableStyle;
+      const presets = {
+        plain: ["#EDF3FF", "#FFFFFF", "#BCC7DC"],
+        minimal: ["#FFFFFF", "#FFFFFF", "#D8E0EE"],
+        blue: ["#EDF3FF", "#FFFFFF", "#8AABDF"],
+        navy: ["#051E57", "#FFFFFF", "#D8E0EE"],
+      };
+      [state.tableHeaderFill, state.tableBodyFill, state.tableOutlineColor] = presets[state.tableStyle];
+      updateWholeTable();
+    });
+  });
+  document.getElementById("editorTableReset")?.addEventListener("click", () => {
+    Object.assign(state, {tableStyle: "plain", tableAlternating: false, tableHeaderFill: "#EDF3FF", tableBodyFill: "#FFFFFF", tableOutlineColor: "#BCC7DC", tableOutlineWidth: 1, tableOutlineDash: 0, tableOutlineMode: "all", tableFont: "IBM Plex Sans", tableFontSize: 14, tableTextColor: "#13161B", tableLineHeight: 1.15, tableAlign: "left", tableVerticalAlign: "top", tableListStyle: "none", tableBold: false, tableItalic: false, tableUnderline: false, tableTransparency: 0});
+    updateWholeTable();
+  });
+  document.getElementById("editorTableAlternating")?.addEventListener("change", (event) => {
+    state.tableAlternating = event.target.checked;
+    updateWholeTable();
+  });
+  document.getElementById("editorTableAddRow")?.addEventListener("click", () => {
+    const body = table()?.querySelector("tbody");
+    if (!body) return;
+    const row = document.createElement("tr");
+    const columns = body.rows[0]?.cells.length || state.tableColumns;
+    for (let index = 0; index < columns; index += 1) {
+      const cell = document.createElement("td");
+      cell.contentEditable = "true";
+      cell.textContent = `Cell ${body.rows.length}, ${index + 1}`;
+      row.appendChild(cell);
+    }
+    body.appendChild(row);
+    table().dataset.rows = `${body.rows.length}`;
+    updateWholeTable();
+  });
+  document.getElementById("editorTableAddColumn")?.addEventListener("click", () => {
+    const rows = table()?.querySelectorAll("tr");
+    if (!rows?.length) return;
+    rows.forEach((row, rowIndex) => {
+      const cell = document.createElement(rowIndex === 0 ? "th" : "td");
+      cell.contentEditable = "true";
+      cell.textContent = rowIndex === 0 ? `Heading ${row.cells.length + 1}` : `Cell ${rowIndex}, ${row.cells.length + 1}`;
+      row.appendChild(cell);
+    });
+    table().dataset.columns = `${rows[0].cells.length}`;
+    table().style.width = `${Math.max(180, rows[0].cells.length * 88)}px`;
+    updateWholeTable();
+  });
+
+  const wholeInputs = {
+    editorTableHeaderFill: ["tableHeaderFill", false], editorTableBodyFill: ["tableBodyFill", false], editorTableOutlineColor: ["tableOutlineColor", false],
+    editorTableOutlineWidth: ["tableOutlineWidth", true], editorTableOutlineDash: ["tableOutlineDash", true], editorTableTransparency: ["tableTransparency", true],
+  };
+  Object.entries(wholeInputs).forEach(([id, [key, numeric]]) => {
+    document.getElementById(id)?.addEventListener("input", (event) => {
+      state[key] = numeric ? Number(event.target.value) : event.target.value;
+      updateTableControlOutput(event.target);
+      updateWholeTable();
+    });
+  });
+  document.querySelectorAll("[data-table-outline]").forEach((button) => button.addEventListener("click", () => { state.tableOutlineMode = button.dataset.tableOutline; updateWholeTable(); }));
+
+  const cellInputs = {
+    editorTableCellFill: ["cellFill", "backgroundColor", false], editorTableCellOutline: ["cellOutline", "borderColor", false],
+    editorTableCellOutlineWidth: ["cellOutlineWidth", "borderWidth", true], editorTableCellOutlineDash: ["cellOutlineDash", "borderStyle", true],
+  };
+  Object.entries(cellInputs).forEach(([id, [dataKey, styleKey, numeric]]) => {
+    document.getElementById(id)?.addEventListener("input", (event) => {
+      const cell = selectedCanvasTableCell();
+      if (!cell) return;
+      const value = numeric ? Number(event.target.value) : event.target.value;
+      cell.dataset[dataKey] = `${value}`;
+      if (styleKey === "borderWidth") cell.style[styleKey] = `${value}px`;
+      else if (styleKey === "borderStyle") cell.style[styleKey] = tableDashStyle(value);
+      else cell.style[styleKey] = value;
+      updateTableControlOutput(event.target);
+    });
+  });
+
+  document.getElementById("editorTableFont")?.addEventListener("change", (event) => { state.tableFont = event.target.value; updateText(); });
+  document.getElementById("editorTableLineHeight")?.addEventListener("change", (event) => { state.tableLineHeight = Number(event.target.value); updateText(); });
+  document.getElementById("editorTableTextColor")?.addEventListener("input", (event) => { state.tableTextColor = event.target.value; updateTableControlOutput(event.target); updateText(); });
+  document.querySelectorAll("[data-table-font-step]").forEach((button) => button.addEventListener("click", () => { state.tableFontSize = Math.max(8, Math.min(72, state.tableFontSize + Number(button.dataset.tableFontStep))); updateText(); }));
+  document.querySelectorAll("[data-table-align]").forEach((button) => button.addEventListener("click", () => { state.tableAlign = button.dataset.tableAlign; updateText(); }));
+  document.querySelectorAll("[data-table-valign]").forEach((button) => button.addEventListener("click", () => { state.tableVerticalAlign = button.dataset.tableValign; updateText(); }));
+  document.querySelectorAll("[data-table-list]").forEach((button) => button.addEventListener("click", () => { state.tableListStyle = button.dataset.tableList; updateText(); }));
+  document.querySelectorAll("[data-table-decoration]").forEach((button) => button.addEventListener("click", () => {
+    const key = {bold: "tableBold", italic: "tableItalic", underline: "tableUnderline"}[button.dataset.tableDecoration];
+    state[key] = !state[key];
+    updateText();
+  }));
+}
+
 function bindEditorImageSettings() {
   const setRotation = (value) => {
     const rotation = Number(value);
@@ -4124,6 +4477,7 @@ function init() {
   bindEditorPenSettings();
   bindEditorTextSettings();
   bindEditorFrameSettings();
+  bindEditorTableSettings();
   bindEditorImageSettings();
   bindEditorSegmentSettings();
   bindEditorInspector();

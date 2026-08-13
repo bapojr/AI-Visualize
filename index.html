@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=57" />
+    <link rel="stylesheet" href="styles.css?v=58" />
   </head>
   <body>
     <div id="app">
@@ -857,6 +857,73 @@
                     <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
                   </section>
                 </div>
+                <div class="editor-table-settings" id="editorTableSettings" hidden>
+                  <div class="editor-canvas-settings-heading editor-table-settings-heading">
+                    <span class="editor-table-heading-icon" aria-hidden="true">
+                      <svg viewBox="0 0 16 16"><path d="M13.714 0A2.286 2.286 0 0 1 16 2.286v11.428A2.286 2.286 0 0 1 13.714 16H2.286A2.286 2.286 0 0 1 0 13.714V2.286A2.286 2.286 0 0 1 2.286 0h11.428ZM1.714 10v3.714c0 .315.257.572.572.572h4.857V10H1.714Zm7.143 0v4.286h4.857a.572.572 0 0 0 .572-.572V10H8.857ZM1.714 8.286h5.429V4.57H1.714v3.715Zm7.143 0h5.429V4.57H8.857v3.715Z" fill="currentColor"/></svg>
+                    </span>
+                    <span>Table</span>
+                  </div>
+                  <div class="editor-table-scroll">
+                    <section class="editor-table-context" id="editorTableContext">
+                      <strong>Table</strong>
+                      <span>Select a cell to see available options</span>
+                    </section>
+                    <div id="editorTableWholeControls">
+                      <section class="editor-table-section">
+                        <div class="editor-table-section-title"><h2>Quick style</h2><button id="editorTableReset" type="button">Reset</button></div>
+                        <div class="editor-table-quick-styles" role="group" aria-label="Table quick styles">
+                          <button class="active" type="button" data-table-style="plain" aria-label="Plain header table"><span></span></button>
+                          <button type="button" data-table-style="minimal" aria-label="Minimal table"><span></span></button>
+                          <button type="button" data-table-style="blue" aria-label="Blue grid table"><span></span></button>
+                          <button type="button" data-table-style="navy" aria-label="Navy header table"><span></span></button>
+                        </div>
+                        <label class="editor-table-check"><input id="editorTableAlternating" type="checkbox" /><span>Alternating rows</span></label>
+                        <div class="editor-table-inline-actions">
+                          <button id="editorTableAddRow" type="button"><span>+</span>Add row</button>
+                          <button id="editorTableAddColumn" type="button"><span>+</span>Add column</button>
+                        </div>
+                      </section>
+                      <section class="editor-table-section">
+                        <h2>Fill &amp; outline</h2>
+                        <label class="editor-table-color-row"><span>Header fill</span><input id="editorTableHeaderFill" type="color" value="#EDF3FF" /><output>#EDF3FF</output></label>
+                        <label class="editor-table-color-row"><span>Body fill</span><input id="editorTableBodyFill" type="color" value="#FFFFFF" /><output>#FFFFFF</output></label>
+                        <label class="editor-table-color-row"><span>Outline</span><input id="editorTableOutlineColor" type="color" value="#BCC7DC" /><output>#BCC7DC</output></label>
+                        <label class="editor-table-range-row"><span>Thickness</span><input id="editorTableOutlineWidth" type="range" min="0" max="6" value="1" /><output>1</output></label>
+                        <label class="editor-table-range-row"><span>Dash</span><input id="editorTableOutlineDash" type="range" min="0" max="8" value="0" /><output>0</output></label>
+                        <div class="editor-table-outline-options" role="group" aria-label="Table outline placement">
+                          <button class="active" type="button" data-table-outline="all">All</button><button type="button" data-table-outline="clear">Clear</button>
+                          <button type="button" data-table-outline="outside">Outside</button><button type="button" data-table-outline="inside">Inside</button>
+                          <button type="button" data-table-outline="horizontal">Horizontal</button><button type="button" data-table-outline="vertical">Vertical</button>
+                          <button type="button" data-table-outline="top">Top</button><button type="button" data-table-outline="bottom">Bottom</button>
+                          <button type="button" data-table-outline="left">Left</button><button type="button" data-table-outline="right">Right</button>
+                        </div>
+                      </section>
+                    </div>
+                    <section class="editor-table-section editor-table-cell-controls" id="editorTableCellControls" hidden>
+                      <h2>Cell</h2>
+                      <label class="editor-table-color-row"><span>Fill color</span><input id="editorTableCellFill" type="color" value="#FFFFFF" /><output>#FFFFFF</output></label>
+                      <label class="editor-table-color-row"><span>Outline color</span><input id="editorTableCellOutline" type="color" value="#BCC7DC" /><output>#BCC7DC</output></label>
+                      <label class="editor-table-range-row"><span>Thickness</span><input id="editorTableCellOutlineWidth" type="range" min="0" max="6" value="1" /><output>1</output></label>
+                      <label class="editor-table-range-row"><span>Dash</span><input id="editorTableCellOutlineDash" type="range" min="0" max="8" value="0" /><output>0</output></label>
+                    </section>
+                    <section class="editor-table-section editor-table-text-section">
+                      <h2>Text</h2>
+                      <label class="editor-table-select-row"><span>Font</span><select id="editorTableFont"><option>IBM Plex Sans</option><option>IBM Plex Serif</option><option>Manrope</option></select></label>
+                      <div class="editor-table-stepper-row"><span>Size</span><div><button type="button" data-table-font-step="-1">−</button><output id="editorTableFontSize">14</output><button type="button" data-table-font-step="1">+</button></div></div>
+                      <label class="editor-table-color-row"><span>Color</span><input id="editorTableTextColor" type="color" value="#13161B" /><output>#13161B</output></label>
+                      <label class="editor-table-select-row"><span>Line spacing</span><select id="editorTableLineHeight"><option value="1">1</option><option value="1.15" selected>1.15</option><option value="1.5">1.5</option><option value="2">2</option></select></label>
+                      <div class="editor-table-button-row"><span>Horizontal</span><div role="group" aria-label="Horizontal alignment"><button class="active" type="button" data-table-align="left">≡</button><button type="button" data-table-align="center">≡</button><button type="button" data-table-align="right">≡</button><button type="button" data-table-align="justify">☰</button></div></div>
+                      <div class="editor-table-button-row"><span>Vertical</span><div role="group" aria-label="Vertical alignment"><button class="active" type="button" data-table-valign="top">↑</button><button type="button" data-table-valign="middle">↕</button><button type="button" data-table-valign="bottom">↓</button></div></div>
+                      <div class="editor-table-button-row"><span>List style</span><div role="group" aria-label="List style"><button class="active" type="button" data-table-list="none">—</button><button type="button" data-table-list="bullet">•</button><button type="button" data-table-list="number">1.</button></div></div>
+                      <div class="editor-table-button-row"><span>Decoration</span><div role="group" aria-label="Text decoration"><button type="button" data-table-decoration="bold"><b>B</b></button><button type="button" data-table-decoration="italic"><i>I</i></button><button type="button" data-table-decoration="underline"><u>U</u></button></div></div>
+                    </section>
+                    <section class="editor-table-section">
+                      <h2>Style</h2>
+                      <label class="editor-table-range-row"><span>Transparency</span><input id="editorTableTransparency" type="range" min="0" max="100" value="0" /><output>0</output></label>
+                    </section>
+                  </div>
+                </div>
                 <div class="editor-image-settings" id="editorImageSettings" hidden>
                   <div class="editor-canvas-settings-heading">Image</div>
                   <section class="editor-image-settings-section editor-image-prompt-section" aria-labelledby="editorImagePromptHeading">
@@ -1033,6 +1100,11 @@
                     <path d="M3 0H4V3H12V0H13V3H16V4H13V12H16V13H13V16H12V13H4V16H3V13H0V12H3V4H0V3H3V0ZM4 4V12H12V4H4Z" fill="currentColor"/>
                   </svg>
                 </button>
+                <button class="canvas-tool-button" id="canvasTableToolButton" type="button" data-canvas-tool="table" data-tooltip="Table" aria-label="Table" aria-expanded="false" aria-controls="canvasTableMenu">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M13.7143 0C14.975 0 16 1.025 16 2.28571V13.7143C16 14.975 14.975 16 13.7143 16H2.28571L2.05357 15.9893C0.9 15.8714 0 14.8964 0 13.7143V2.28571C0 1.025 1.025 0 2.28571 0H13.7143ZM1.71429 10V13.7143C1.71429 14.0286 1.97143 14.2857 2.28571 14.2857H7.14286V10H1.71429ZM8.85714 10V14.2857H13.7143C14.0286 14.2857 14.2857 14.0286 14.2857 13.7143V10H8.85714ZM1.71429 8.28571H7.14286V4.57143H1.71429V8.28571ZM8.85714 8.28571H14.2857V4.57143H8.85714V8.28571Z" fill="currentColor"/>
+                  </svg>
+                </button>
                 <span class="canvas-toolbar-divider" aria-hidden="true"></span>
                 <button class="canvas-tool-button" id="canvasImportButton" type="button" data-canvas-tool="import" data-tooltip="Import" aria-label="Import">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -1078,6 +1150,10 @@
                     </svg>
                     <span>Arrow</span>
                   </button>
+                </div>
+                <div class="canvas-table-menu" id="canvasTableMenu" aria-label="Select table size" hidden>
+                  <div class="canvas-table-size-grid" id="canvasTableSizeGrid" role="grid" aria-label="Table size grid"></div>
+                  <div class="canvas-table-size-label" id="canvasTableSizeLabel">Select table size</div>
                 </div>
               </div>
               <input class="canvas-import-input" id="canvasImportInput" type="file" accept="image/*" hidden />
@@ -2038,6 +2114,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=44"></script>
+    <script src="app.js?v=45"></script>
   </body>
 </html>
