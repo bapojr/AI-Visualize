@@ -1360,6 +1360,7 @@ function bindCanvasSelection() {
   };
 
   const selectWholeImage = () => {
+    clearCanvasObjectSelection();
     state.selectedEditorSegmentId = null;
     state.selectedEditorSegmentType = "frame";
     state.isEditorFrameSelected = true;
@@ -1377,6 +1378,7 @@ function bindCanvasSelection() {
   };
 
   const clearEditorSelection = () => {
+    clearCanvasObjectSelection();
     setEditorCropMode(false);
     setEditorRegionMode(false, {clear: true});
     state.selectedEditorSegmentId = null;
@@ -1489,6 +1491,7 @@ function bindCanvasSelection() {
     const segment = event.target.closest(".editor-segment");
     if (!segment) return;
     event.stopPropagation();
+    clearCanvasObjectSelection();
     state.selectedEditorSegmentId = segment.dataset.segmentId;
     state.selectedEditorSegmentType = segment.dataset.segmentType;
     state.isEditorFrameSelected = false;
@@ -2232,6 +2235,14 @@ function selectedCanvasTableCell() {
   return selectedCanvasTable()?.querySelector("td.is-selected, th.is-selected") || null;
 }
 
+function clearCanvasObjectSelection() {
+  document.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
+  document.querySelectorAll(".canvas-table-object th.is-selected, .canvas-table-object td.is-selected").forEach((cell) => {
+    cell.classList.remove("is-selected");
+  });
+  state.selectedTableCell = null;
+}
+
 function tableDashStyle(value) {
   return Number(value) > 0 ? "dashed" : "solid";
 }
@@ -2771,6 +2782,7 @@ function setCanvasTool(tool) {
 
 function updateCanvasTransform() {
   const stageContent = document.getElementById("editorCanvasStageContent");
+  const workspaceLayer = document.getElementById("canvasWorkspaceLayer");
   if (!stageContent) return;
   stageContent.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
   stageContent.style.setProperty("--canvas-pan-x", `${state.canvasPanX}px`);
@@ -2778,6 +2790,9 @@ function updateCanvasTransform() {
   stageContent.style.setProperty("--editor-image-rotation", `${state.imageRotation}deg`);
   stageContent.style.setProperty("--editor-image-flip-x", `${state.imageFlipX}`);
   stageContent.style.setProperty("--editor-image-flip-y", `${state.imageFlipY}`);
+  workspaceLayer?.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
+  workspaceLayer?.style.setProperty("--canvas-pan-x", `${state.canvasPanX}px`);
+  workspaceLayer?.style.setProperty("--canvas-pan-y", `${state.canvasPanY}px`);
   syncEditorImageTransformControls();
 }
 
@@ -3069,8 +3084,10 @@ function setEditorLeftPanelCollapsed(collapsed) {
 
 function bindCanvasToolbar() {
   const stage = document.getElementById("editorCanvasStage");
+  const mediaShell = document.getElementById("editorCanvasMediaShell");
   const stageContent = document.getElementById("editorCanvasStageContent");
   const drawingLayer = document.getElementById("canvasDrawingLayer");
+  const workspaceLayer = document.getElementById("canvasWorkspaceLayer");
   const importInput = document.getElementById("canvasImportInput");
   const shapeToolButton = document.getElementById("canvasShapeToolButton");
   const lineToolButton = document.getElementById("canvasLineToolButton");
@@ -3078,7 +3095,7 @@ function bindCanvasToolbar() {
   const tableMenu = document.getElementById("canvasTableMenu");
   const tableGrid = document.getElementById("canvasTableSizeGrid");
   const tableLabel = document.getElementById("canvasTableSizeLabel");
-  if (!stage || !stageContent || !drawingLayer) return;
+  if (!stage || !mediaShell || !stageContent || !drawingLayer || !workspaceLayer) return;
 
   document.getElementById("editorUploadsAdd")?.addEventListener("click", () => importInput?.click());
 
@@ -3178,12 +3195,36 @@ function bindCanvasToolbar() {
   });
 
   const selectObject = (object) => {
-    drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((item) => {
+    const previousTable = selectedCanvasTable();
+    document.querySelectorAll(".canvas-object.is-selected").forEach((item) => {
       item.classList.remove("is-selected");
     });
     object?.classList.add("is-selected");
-    if (!object?.classList.contains("canvas-table-object")) state.selectedTableCell = null;
+    if (object?.classList.contains("canvas-table-object")) {
+      state.isEditorFrameSelected = false;
+      state.selectedEditorSegmentId = null;
+      state.selectedEditorSegmentType = null;
+      stageContent.classList.remove("is-frame-selected");
+      document.querySelectorAll("#editorImageSegmentation .editor-segment").forEach((segment) => {
+        segment.classList.remove("active", "is-multi-selected", "inspector-hover");
+      });
+      document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
+      document.getElementById("editorImageActionStack")?.classList.add("hidden");
+      document.getElementById("editorTextActionStack")?.classList.add("hidden");
+      setEditorSegmentDetailVisible(false);
+    }
+    if (!object?.classList.contains("canvas-table-object") || previousTable !== object) {
+      document.querySelectorAll(".canvas-table-object th.is-selected, .canvas-table-object td.is-selected").forEach((cell) => {
+        cell.classList.remove("is-selected");
+      });
+      state.selectedTableCell = null;
+    }
     setCanvasTool(state.canvasTool === "table" ? "select" : state.canvasTool);
+  };
+
+  const clearObjectSelection = () => {
+    clearCanvasObjectSelection();
+    setCanvasTool("select");
   };
 
   const pointInCanvas = (event) => {
@@ -3192,6 +3233,15 @@ function bindCanvasToolbar() {
     return {
       x: Math.min(stageContent.offsetWidth, Math.max(0, (event.clientX - rect.left) / scale)),
       y: Math.min(stageContent.offsetHeight, Math.max(0, (event.clientY - rect.top) / scale)),
+    };
+  };
+
+  const pointInWorkspace = (event) => {
+    const rect = workspaceLayer.getBoundingClientRect();
+    const scale = state.zoom / 100;
+    return {
+      x: Math.min(workspaceLayer.offsetWidth, Math.max(0, (event.clientX - rect.left) / scale)),
+      y: Math.min(workspaceLayer.offsetHeight, Math.max(0, (event.clientY - rect.top) / scale)),
     };
   };
 
@@ -3289,8 +3339,33 @@ function bindCanvasToolbar() {
   stage.addEventListener("pointercancel", endPan);
 
   let drawSession = null;
+  let tableDragSession = null;
+  let suppressTableClick = false;
+  mediaShell.addEventListener("click", (event) => {
+    if (!suppressTableClick) return;
+    event.preventDefault();
+    event.stopPropagation();
+    suppressTableClick = false;
+  }, true);
+  mediaShell.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || state.canvasTool !== "table" || event.target.closest(".canvas-table-object")) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const start = pointInWorkspace(event);
+    const table = createCanvasTable(state.tableRows, state.tableColumns);
+    workspaceLayer.appendChild(table);
+    const maxLeft = Math.max(0, workspaceLayer.offsetWidth - table.offsetWidth);
+    const maxTop = Math.max(0, workspaceLayer.offsetHeight - table.offsetHeight);
+    table.style.left = `${Math.max(0, Math.min(maxLeft, start.x - table.offsetWidth / 2))}px`;
+    table.style.top = `${Math.max(0, Math.min(maxTop, start.y - table.offsetHeight / 2))}px`;
+    selectObject(table);
+    setCanvasTool("select");
+    suppressTableClick = true;
+    window.setTimeout(() => { suppressTableClick = false; }, 120);
+  });
+
   stageContent.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || !["shape", "line", "pen", "text", "frame", "table"].includes(state.canvasTool)) return;
+    if (event.button !== 0 || !["shape", "line", "pen", "text", "frame"].includes(state.canvasTool)) return;
     event.preventDefault();
     event.stopPropagation();
     const start = pointInCanvas(event);
@@ -3307,16 +3382,6 @@ function bindCanvasToolbar() {
       selectObject(text);
       setCanvasTool("select");
       window.setTimeout(() => text.focus(), 0);
-      return;
-    }
-
-    if (state.canvasTool === "table") {
-      const table = createCanvasTable(state.tableRows, state.tableColumns);
-      table.style.left = `${start.x}px`;
-      table.style.top = `${start.y}px`;
-      drawingLayer.appendChild(table);
-      selectObject(table);
-      setCanvasTool("select");
       return;
     }
 
@@ -3384,10 +3449,60 @@ function bindCanvasToolbar() {
   stageContent.addEventListener("pointerup", endDrawing);
   stageContent.addEventListener("pointercancel", endDrawing);
 
-  drawingLayer.addEventListener("click", (event) => {
+  workspaceLayer.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || state.canvasTool !== "select") return;
+    const table = event.target.closest(".canvas-table-object");
+    if (!table) return;
+    event.preventDefault();
+    event.stopPropagation();
+    selectObject(table);
+    tableDragSession = {
+      pointerId: event.pointerId,
+      table,
+      startX: event.clientX,
+      startY: event.clientY,
+      left: parseFloat(table.style.left || "0"),
+      top: parseFloat(table.style.top || "0"),
+      moved: false,
+    };
+    table.setPointerCapture?.(event.pointerId);
+  });
+
+  workspaceLayer.addEventListener("pointermove", (event) => {
+    if (!tableDragSession || event.pointerId !== tableDragSession.pointerId) return;
+    const scale = state.zoom / 100;
+    const deltaX = (event.clientX - tableDragSession.startX) / scale;
+    const deltaY = (event.clientY - tableDragSession.startY) / scale;
+    if (!tableDragSession.moved && Math.hypot(deltaX, deltaY) < 4) return;
+    event.preventDefault();
+    tableDragSession.moved = true;
+    tableDragSession.table.classList.add("is-dragging");
+    const maxLeft = Math.max(0, workspaceLayer.offsetWidth - tableDragSession.table.offsetWidth);
+    const maxTop = Math.max(0, workspaceLayer.offsetHeight - tableDragSession.table.offsetHeight);
+    tableDragSession.table.style.left = `${Math.max(0, Math.min(maxLeft, tableDragSession.left + deltaX))}px`;
+    tableDragSession.table.style.top = `${Math.max(0, Math.min(maxTop, tableDragSession.top + deltaY))}px`;
+  });
+
+  const endTableDrag = (event) => {
+    if (!tableDragSession || event.pointerId !== tableDragSession.pointerId) return;
+    tableDragSession.table.releasePointerCapture?.(event.pointerId);
+    tableDragSession.table.classList.remove("is-dragging");
+    suppressTableClick = tableDragSession.moved;
+    tableDragSession = null;
+    if (suppressTableClick) window.setTimeout(() => { suppressTableClick = false; }, 0);
+  };
+  workspaceLayer.addEventListener("pointerup", endTableDrag);
+  workspaceLayer.addEventListener("pointercancel", endTableDrag);
+
+  const handleObjectClick = (event) => {
     if (state.canvasTool !== "select") return;
     const object = event.target.closest(".canvas-object");
     if (!object) return;
+    if (object.classList.contains("canvas-table-object") && suppressTableClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     event.stopPropagation();
     selectObject(object);
     if (object.classList.contains("canvas-table-object")) {
@@ -3396,11 +3511,23 @@ function bindCanvasToolbar() {
       if (cell) {
         cell.classList.add("is-selected");
         state.selectedTableCell = {row: cell.parentElement.rowIndex, column: cell.cellIndex};
+        cell.focus();
       } else {
         state.selectedTableCell = null;
       }
       setCanvasTool("select");
     }
+  };
+  drawingLayer.addEventListener("click", handleObjectClick);
+  workspaceLayer.addEventListener("click", handleObjectClick);
+
+  mediaShell.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || state.canvasTool !== "select" || event.target.closest(".canvas-object")) return;
+    clearObjectSelection();
+  });
+  mediaShell.addEventListener("click", (event) => {
+    if (state.canvasTool !== "select" || event.target.closest(".canvas-object")) return;
+    clearObjectSelection();
   });
 
   importInput?.addEventListener("change", () => {
