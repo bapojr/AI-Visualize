@@ -375,6 +375,7 @@ const state = {
   editorLeftPanelView: "edit",
   editorRightPanelView: "chat",
   editorSlides: [],
+  editorUploads: [],
   activeEditorSlideId: null,
   currentEditorTemplate: templateCatalog[0],
   editorBackground: "#F5F7F9",
@@ -1247,6 +1248,9 @@ function renderEditorCanvas() {
     return;
   }
 
+  if (document.getElementById("editorDesktopScreen")?.classList.contains("active")) {
+    rememberGeneratedEditorUpload(activeTemplate);
+  }
   state.currentEditorTemplate = activeTemplate;
   stageContent?.classList.remove("is-blank-canvas");
   const croppedImage = state.editorCroppedImages[activeTemplate.id];
@@ -2636,6 +2640,8 @@ function setEditorPanelView(panel, view) {
     panelView.hidden = !selected;
   });
 
+  if (panel === "left" && view === "uploads") renderEditorUploads();
+
   if (panel === "right") {
     const panelLabels = {chat: "Editor chat", edit: "Editor segments", slides: "Editor slides"};
     document.getElementById("historyPanel")?.setAttribute("aria-label", panelLabels[view] || "Editor panel");
@@ -2645,6 +2651,92 @@ function setEditorPanelView(panel, view) {
     }
     if (view === "slides") renderEditorSlides();
   }
+}
+
+function rememberGeneratedEditorUpload(template) {
+  if (!template?.id || !template?.image) return;
+  const existing = state.editorUploads.find((item) => item.sourceId === template.id && item.kind === "generated");
+  const croppedImage = state.editorCroppedImages[template.id];
+  const source = croppedImage?.src || template.image;
+  if (existing) {
+    existing.src = source;
+    existing.template = template;
+    return;
+  }
+  state.editorUploads.unshift({
+    id: `generated-${template.id}`,
+    sourceId: template.id,
+    title: template.title,
+    src: source,
+    kind: "generated",
+    template,
+  });
+}
+
+function addUploadedAssetToCanvas(asset) {
+  const drawingLayer = document.getElementById("canvasDrawingLayer");
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  if (!drawingLayer || !stageContent || !asset?.src) return;
+
+  drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
+  const image = document.createElement("img");
+  image.className = "canvas-object canvas-imported-image is-selected";
+  image.alt = asset.title || "Uploaded image";
+  image.draggable = false;
+  image.src = asset.src;
+  image.style.left = `${Math.max(0, (stageContent.offsetWidth - 180) / 2)}px`;
+  image.style.top = "40px";
+  drawingLayer.appendChild(image);
+  setCanvasTool("select");
+}
+
+function renderEditorUploads() {
+  const grid = document.getElementById("editorUploadsGrid");
+  const empty = document.getElementById("editorUploadsEmpty");
+  if (!grid || !empty) return;
+
+  if (!state.isBlankEditor) {
+    rememberGeneratedEditorUpload(state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0]);
+  }
+
+  grid.innerHTML = "";
+  state.editorUploads.forEach((asset) => {
+    const card = document.createElement("button");
+    card.className = "editor-upload-card";
+    card.type = "button";
+    card.setAttribute("aria-label", `${asset.kind === "generated" ? "Open" : "Add"} ${asset.title}`);
+    const preview = document.createElement("span");
+    preview.className = "editor-upload-card-preview";
+    const image = document.createElement("img");
+    image.src = asset.src;
+    image.alt = "";
+    preview.appendChild(image);
+    const copy = document.createElement("span");
+    copy.className = "editor-upload-card-copy";
+    const title = document.createElement("strong");
+    title.className = "editor-upload-card-title";
+    title.textContent = asset.title;
+    const type = document.createElement("small");
+    type.className = "editor-upload-card-type";
+    type.textContent = asset.kind === "generated" ? "Generated" : "Uploaded";
+    copy.append(title, type);
+    card.append(preview, copy);
+    card.addEventListener("click", () => {
+      if (asset.kind === "generated" && asset.template) {
+        state.isBlankEditor = false;
+        state.generatedResultTemplate = asset.template;
+        state.currentEditorTemplate = asset.template;
+        renderEditorCanvas();
+        setEditorPanelView("left", "edit");
+        return;
+      }
+      addUploadedAssetToCanvas(asset);
+      setEditorPanelView("left", "edit");
+    });
+    grid.appendChild(card);
+  });
+
+  empty.hidden = state.editorUploads.length > 0;
 }
 
 function ensureEditorSlides() {
@@ -2825,6 +2917,8 @@ function bindCanvasToolbar() {
   const shapeToolButton = document.getElementById("canvasShapeToolButton");
   const lineToolButton = document.getElementById("canvasLineToolButton");
   if (!stage || !stageContent || !drawingLayer) return;
+
+  document.getElementById("editorUploadsAdd")?.addEventListener("click", () => importInput?.click());
 
   const closeToolMenus = () => {
     document.querySelectorAll(".canvas-tool-menu").forEach((menu) => {
@@ -3085,19 +3179,20 @@ function bindCanvasToolbar() {
       setCanvasTool("select");
       return;
     }
-    const image = document.createElement("img");
-    const objectUrl = URL.createObjectURL(file);
-    image.className = "canvas-object canvas-imported-image is-selected";
-    image.alt = file.name;
-    image.draggable = false;
-    image.src = objectUrl;
-    image.style.left = `${Math.max(0, (stageContent.offsetWidth - 180) / 2)}px`;
-    image.style.top = "40px";
-    image.addEventListener("load", () => URL.revokeObjectURL(objectUrl), {once: true});
-    drawingLayer.appendChild(image);
-    selectObject(image);
-    importInput.value = "";
-    setCanvasTool("select");
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      const asset = {
+        id: `upload-${Date.now()}`,
+        title: file.name,
+        src: String(reader.result),
+        kind: "uploaded",
+      };
+      state.editorUploads.unshift(asset);
+      addUploadedAssetToCanvas(asset);
+      if (state.editorLeftPanelView === "uploads") renderEditorUploads();
+      importInput.value = "";
+    }, {once: true});
+    reader.readAsDataURL(file);
   });
 
   setCanvasTool(state.canvasTool);

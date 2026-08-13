@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=56" />
+    <link rel="stylesheet" href="styles.css?v=57" />
   </head>
   <body>
     <div id="app">
@@ -590,6 +590,7 @@
                 <div class="editor-panel-tabs" role="tablist" aria-label="Editor panel views">
                   <button class="editor-panel-tab selected" id="editorLeftEditTab" type="button" role="tab" aria-selected="true" aria-controls="editorLeftEditView" data-editor-panel-tab="left" data-panel-view="edit">Edit</button>
                   <button class="editor-panel-tab" id="editorLeftLibraryTab" type="button" role="tab" aria-selected="false" aria-controls="editorLeftLibraryView" data-editor-panel-tab="left" data-panel-view="library">Library</button>
+                  <button class="editor-panel-tab" id="editorLeftUploadsTab" type="button" role="tab" aria-selected="false" aria-controls="editorLeftUploadsView" data-editor-panel-tab="left" data-panel-view="uploads">Uploads</button>
                 </div>
                 <button class="editor-panel-toggle" id="editorLeftPanelCollapse" type="button" aria-label="Close editor side panel" aria-controls="editorLeftPanel" aria-expanded="true">
                   <img src="assets/sidebar/sidebar.svg" alt="" aria-hidden="true" />
@@ -941,6 +942,24 @@
                 </div>
               </div>
               <div class="editor-panel-view" id="editorLeftLibraryView" role="tabpanel" aria-labelledby="editorLeftLibraryTab" data-editor-panel-view="left" data-panel-view="library" hidden></div>
+              <div class="editor-panel-view editor-uploads-view" id="editorLeftUploadsView" role="tabpanel" aria-labelledby="editorLeftUploadsTab" data-editor-panel-view="left" data-panel-view="uploads" hidden>
+                <div class="editor-uploads-header">
+                  <div>
+                    <h2>Uploads</h2>
+                    <p>Uploaded and generated visuals</p>
+                  </div>
+                  <button class="editor-uploads-add" id="editorUploadsAdd" type="button" aria-label="Upload an image">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M8 10.75V2.5M8 2.5L4.75 5.75M8 2.5l3.25 3.25M2.5 10.75v1.75c0 .552.448 1 1 1h9c.552 0 1-.448 1-1v-1.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="editor-uploads-grid" id="editorUploadsGrid" aria-live="polite"></div>
+                <div class="editor-uploads-empty" id="editorUploadsEmpty" hidden>
+                  <span>No uploads yet</span>
+                  <small>Upload or generate a visual to see it here.</small>
+                </div>
+              </div>
               <footer class="editor-panel-footer">
                 <section class="editor-panel-usage" aria-label="Usage">
                   <span class="editor-panel-usage-ring" aria-hidden="true"></span>
@@ -2019,6 +2038,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=43"></script>
+    <script src="app.js?v=44"></script>
   </body>
 </html>

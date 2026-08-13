@@ -3624,8 +3624,8 @@ a {
   width: 100%;
   height: 56px;
   min-height: 56px;
-  padding: 11px 12px;
-  align-items: center;
+  padding: 0 12px;
+  align-items: stretch;
   justify-content: space-between;
   gap: 8px;
   border-bottom: 1px solid var(--Gray-5, #e4eaf7);
@@ -3634,35 +3634,51 @@ a {
 
 .editor-panel-tabs {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  min-width: 0;
+  height: 100%;
+  align-items: stretch;
+  gap: 12px;
 }
 
 .editor-panel-tab {
+  position: relative;
   display: inline-flex;
-  height: 34px;
-  padding: 0 12px;
+  height: 100%;
+  padding: 0 3px;
   align-items: center;
   justify-content: center;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  border: 0;
+  border-radius: 0;
   background: transparent;
-  color: var(--Gray-11, #5d6a81);
+  color: var(--Blue-12, #051e57);
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
 }
 
+.editor-panel-tab::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+  content: "";
+}
+
 .editor-panel-tab:hover {
-  background: var(--Blue-3, #edf3ff);
   color: var(--Blue-10, #0054f1);
 }
 
 .editor-panel-tab.selected {
-  border-color: var(--Blue-9, #0062ff);
-  background: var(--Blue-3, #edf3ff);
-  color: var(--Blue-10, #0054f1);
+  background: transparent;
+  color: var(--Blue-9, #0062ff);
+}
+
+.editor-panel-tab.selected::after {
+  background: var(--Blue-9, #0062ff);
 }
 
 .editor-panel-tab:focus-visible,
@@ -3677,6 +3693,7 @@ a {
   height: 32px;
   padding: 4px;
   flex: 0 0 32px;
+  align-self: center;
   align-items: center;
   justify-content: center;
   border: 0;
@@ -3703,6 +3720,161 @@ a {
 
 .editor-panel-view.active {
   display: block;
+}
+
+.editor-uploads-view {
+  padding: 16px 12px 20px;
+  background: var(--Gray-1, #fff);
+}
+
+.editor-uploads-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.editor-uploads-header h2,
+.editor-uploads-header p {
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.editor-uploads-header h2 {
+  color: var(--Gray-12, #13161b);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.editor-uploads-header p {
+  margin-top: 2px;
+  color: var(--Gray-10, #7d8aa1);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.editor-uploads-add {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+}
+
+.editor-uploads-add:hover {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-uploads-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 10px;
+}
+
+.editor-upload-card {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+  text-align: left;
+}
+
+.editor-upload-card:hover {
+  border-color: var(--Blue-9, #0062ff);
+  box-shadow: 0 0 0 1px var(--Blue-3, #edf3ff);
+}
+
+.editor-upload-card-preview {
+  display: flex;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: 6px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+  background: var(--Gray-2, #f8f9fd);
+}
+
+.editor-upload-card-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.editor-upload-card-copy {
+  display: block;
+  padding: 7px 8px 8px;
+}
+
+.editor-upload-card-title,
+.editor-upload-card-type {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.editor-upload-card-title {
+  color: var(--Gray-12, #13161b);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 15px;
+}
+
+.editor-upload-card-type {
+  margin-top: 2px;
+  color: var(--Gray-10, #7d8aa1);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 14px;
+}
+
+.editor-uploads-empty {
+  min-height: 180px;
+  padding: 32px 18px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px dashed var(--Gray-6, #d8e0ee);
+  border-radius: 8px;
+  color: var(--Gray-11, #5d6a81);
+  text-align: center;
+}
+
+.editor-uploads-empty:not([hidden]) {
+  display: flex;
+}
+
+.editor-uploads-empty span,
+.editor-uploads-empty small {
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.editor-uploads-empty span {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.editor-uploads-empty small {
+  max-width: 160px;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 16px;
 }
 
 .editor-panel-footer {
