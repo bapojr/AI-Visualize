@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=54" />
+    <link rel="stylesheet" href="styles.css?v=55" />
   </head>
   <body>
     <div id="app">
@@ -1124,6 +1124,48 @@
                       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 0.75C4 0.334375 3.66563 0 3.25 0C2.83437 0 2.5 0.334375 2.5 0.75V2.5H0.75C0.334375 2.5 0 2.83437 0 3.25C0 3.66563 0.334375 4 0.75 4H2.5V11.75C2.5 12.7156 3.28438 13.5 4.25 13.5H10.5V12H4.25C4.1125 12 4 11.8875 4 11.75V0.75ZM12 15.25C12 15.6656 12.3344 16 12.75 16C13.1656 16 13.5 15.6656 13.5 15.25V13.5H15.25C15.6656 13.5 16 13.1656 16 12.75C16 12.3344 15.6656 12 15.25 12H13.5V4.25C13.5 3.28438 12.7156 2.5 11.75 2.5H5.5V4H11.75C11.8875 4 12 4.1125 12 4.25V15.25Z" fill="currentColor"/></svg>
                       <span>Crop</span>
                     </button>
+                    <button class="editor-image-more-trigger" id="editorImageMoreTrigger" type="button" aria-label="More image actions" aria-haspopup="menu" aria-controls="editorImageMoreMenu" aria-expanded="false">
+                      <svg viewBox="0 0 4 16" aria-hidden="true"><path d="M2 4A2 2 0 1 1 2 0a2 2 0 0 1 0 4Zm0 8a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" fill="currentColor"/></svg>
+                    </button>
+                  </div>
+                  <div class="editor-image-more-menu" id="editorImageMoreMenu" role="menu" aria-label="More image actions" hidden>
+                    <div class="editor-image-more-select" id="editorImageMoreSelect">
+                      <button class="editor-image-more-option" type="button" role="menuitem" data-image-more-action="select" aria-haspopup="menu" aria-controls="editorImageSelectMenu" aria-expanded="false">
+                        <svg viewBox="0 0 16 15" aria-hidden="true"><path d="M1.778 1.111a.667.667 0 1 1 0 1.334.667.667 0 0 1 0-1.334Zm1.648 1.334h9.148c.18.444.536.803.981.98v7.371c-.445.18-.803.536-.981.981H3.426a1.784 1.784 0 0 0-.981-.981v-7.37ZM1.778 0C.797 0 0 .797 0 1.778c0 .747.458 1.386 1.111 1.648v7.37A1.778 1.778 0 1 0 3.426 13.11h9.148a1.778 1.778 0 1 0 2.315-2.314v-7.37A1.778 1.778 0 1 0 12.574 1.11H3.426A1.778 1.778 0 0 0 1.778 0Zm12.447 1.111a.667.667 0 1 1 0 1.334.667.667 0 0 1 0-1.334ZM1.778 11.78a.667.667 0 1 1 0 1.333.667.667 0 0 1 0-1.334Zm12.447 0a.667.667 0 1 1 0 1.333.667.667 0 0 1 0-1.334ZM5.334 4.89h2.445v1.556H5.334V4.89Zm-.222-1.112a.889.889 0 0 0-.889.89v2c0 .491.397.889.889.889H8a.889.889 0 0 0 .89-.89v-2A.889.889 0 0 0 8 3.779H5.112Zm2 5.112v.667c0 .492.398.889.89.889h2.889a.889.889 0 0 0 .889-.889v-2a.889.889 0 0 0-.89-.889h-.666c0 .406-.108.783-.297 1.111h.742v1.556H8.224V8.88c-.072.008-.147.01-.222.01h-.89Z" fill="currentColor"/></svg>
+                        <span>Select</span>
+                        <svg class="editor-image-more-chevron" viewBox="0 0 8 12" aria-hidden="true"><path d="m2 1 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </button>
+                      <div class="editor-image-select-menu" id="editorImageSelectMenu" role="menu" aria-label="Select image elements" hidden>
+                        <button type="button" role="menuitem" data-image-select-action="all">Select all</button>
+                        <button type="button" role="menuitem" data-image-select-action="text">Select all text</button>
+                        <button type="button" role="menuitem" data-image-select-action="icons">Select all icons</button>
+                        <button type="button" role="menuitem" data-image-select-action="lines">Select all lines and arrows</button>
+                        <button type="button" role="menuitem" data-image-select-action="lines-text">Select all lines, arrows and text</button>
+                        <button type="button" role="menuitem" data-image-select-action="connectors">Select all connector lines and arrows</button>
+                      </div>
+                    </div>
+                    <button class="editor-image-more-option" type="button" role="menuitemcheckbox" aria-checked="false" data-image-more-action="favorite">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0c.262 0 .503.155.623.399l2.137 4.389 4.65.774a.697.697 0 0 1 .388 1.239l-3.33 3.485.735 4.868a.7.7 0 0 1-1.006.767L8 13.686 3.804 15.92a.7.7 0 0 1-1.006-.767l.733-4.868L.203 6.8a.697.697 0 0 1 .387-1.24l4.65-.773L7.381.4A.69.69 0 0 1 8 0Zm0 2.338-1.681 3.446a.7.7 0 0 1-.512.39l-3.65.608L4.77 9.519a.72.72 0 0 1 .195.63l-.576 3.82 3.295-1.753a.673.673 0 0 1 .634 0l3.295 1.753-.576-3.82a.72.72 0 0 1 .195-.63l2.611-2.737-3.65-.608a.7.7 0 0 1-.512-.39L8 2.338Z" fill="currentColor"/></svg><span>Favorite</span>
+                    </button>
+                    <button class="editor-image-more-option" type="button" role="menuitem" data-image-more-action="cut">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 1.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4ZM7 3.5A3.5 3.5 0 1 0 5.516 6.363L7.306 8l-1.79 1.638A3.5 3.5 0 1 0 7 12.5c0-.64-.172-1.238-.472-1.756l9.228-8.44a.75.75 0 1 0-1.012-1.107L8.419 6.984 6.528 5.256C6.828 4.74 7 4.141 7 3.5Zm7.744 11.303a.75.75 0 0 0 1.012-1.106l-5.175-4.735-1.122 1.007 5.285 4.834ZM3.5 10.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" fill="currentColor"/></svg><span>Cut</span>
+                    </button>
+                    <button class="editor-image-more-option" type="button" role="menuitem" data-image-more-action="copy">
+                      <svg viewBox="0 0 14 16" aria-hidden="true"><path d="M12 10.5H6a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5h4.172a.5.5 0 0 1 .353.147l1.828 1.828a.5.5 0 0 1 .147.353V10a.5.5 0 0 1-.5.5ZM6 12h6a2 2 0 0 0 2-2V3.828a2 2 0 0 0-.584-1.416L11.584.584A2 2 0 0 0 10.172 0H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2ZM2 4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-.5H8.5v.5a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 .5-.5h.5V4H2Z" fill="currentColor"/></svg><span>Copy</span>
+                    </button>
+                    <button class="editor-image-more-option" type="button" role="menuitem" data-image-more-action="duplicate">
+                      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 14.5h7a.5.5 0 0 0 .5-.5v-1.5H11V14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1.5v1.5H2a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5ZM14.5 9V2a.5.5 0 0 0-.5-.5H7a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5ZM7 11a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7Zm3.5-8a.75.75 0 0 1 .75.75v1h1a.75.75 0 0 1 0 1.5h-1v1a.75.75 0 0 1-1.5 0v-1h-1a.75.75 0 0 1 0-1.5h1v-1A.75.75 0 0 1 10.5 3Z" fill="currentColor"/></svg><span>Duplicate</span>
+                    </button>
+                    <button class="editor-image-more-option" type="button" role="menuitem" data-image-more-action="paste">
+                      <svg viewBox="0 0 12 16" aria-hidden="true"><path d="M7.25 3h-2.5a.75.75 0 0 1 0-1.5h2.5a.75.75 0 0 1 0 1.5Zm0 1.5a2.25 2.25 0 0 0 2.238-2H10a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h.513a2.25 2.25 0 0 0 2.237 2h2.5ZM9.122 1A2.25 2.25 0 0 0 7.25 0h-2.5a2.25 2.25 0 0 0-1.872 1H2a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-.878Z" fill="currentColor"/></svg><span>Paste</span>
+                    </button>
+                    <button class="editor-image-more-option is-delete" type="button" role="menuitem" data-image-more-action="delete">
+                      <svg viewBox="0 0 14 16" aria-hidden="true"><path d="M5.036 0a.97.97 0 0 0-.91.63l-.49 1.31H.727a.727.727 0 0 0 0 1.454h12.121a.727.727 0 0 0 0-1.455H9.94L9.448.63A.97.97 0 0 0 8.54 0H5.036ZM.97 4.848v9.213A1.94 1.94 0 0 0 2.91 16h7.757a1.94 1.94 0 0 0 1.94-1.94V4.849H11.15v9.213a.485.485 0 0 1-.485.485H2.91a.485.485 0 0 1-.485-.485V4.848H.97Zm4.848 2.182a.727.727 0 0 0-1.454 0v5.334a.727.727 0 0 0 1.454 0V7.03Zm3.394 0a.727.727 0 0 0-1.454 0v5.334a.727.727 0 0 0 1.454 0V7.03Z" fill="currentColor"/></svg><span>Delete</span>
+                    </button>
+                    <span class="editor-image-more-divider" role="separator"></span>
+                    <button class="editor-image-more-option" type="button" role="menuitem" data-image-more-action="copy-name">
+                      <svg viewBox="0 0 14 16" aria-hidden="true"><path d="M12 10.5H6a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5h4.172a.5.5 0 0 1 .353.147l1.828 1.828a.5.5 0 0 1 .147.353V10a.5.5 0 0 1-.5.5ZM6 12h6a2 2 0 0 0 2-2V3.828a2 2 0 0 0-.584-1.416L11.584.584A2 2 0 0 0 10.172 0H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2ZM2 4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-.5H8.5v.5a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 .5-.5h.5V4H2Z" fill="currentColor"/></svg><span>Copy upload name</span>
+                    </button>
                   </div>
                   <div class="editor-region-toolbar" id="editorRegionToolbar" role="toolbar" aria-label="Edit image region" hidden>
                     <span class="editor-region-toolbar-title">
@@ -1963,6 +2005,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=41"></script>
+    <script src="app.js?v=42"></script>
   </body>
 </html>

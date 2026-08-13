@@ -398,6 +398,8 @@ const state = {
   imageOpacity: 100,
   imageLayer: 1,
   imagePromptExpanded: false,
+  imageClipboard: null,
+  imageFavorite: false,
   editorExportFormat: "png",
   editorExportDpi: "96",
   editorExportCertificate: true,
@@ -1335,7 +1337,7 @@ function bindCanvasSelection() {
     state.isEditorFrameSelected = true;
     stageContent?.classList.add("is-frame-selected");
     segmentation?.querySelectorAll(".editor-segment").forEach((segment) => {
-      segment.classList.remove("active");
+      segment.classList.remove("active", "is-multi-selected");
     });
     document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
     document.activeElement?.closest?.(".editor-segment")?.blur();
@@ -1354,7 +1356,7 @@ function bindCanvasSelection() {
     state.isEditorFrameSelected = false;
     stageContent?.classList.remove("is-frame-selected");
     segmentation?.querySelectorAll(".editor-segment").forEach((segment) => {
-      segment.classList.remove("active");
+      segment.classList.remove("active", "is-multi-selected");
     });
     document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
     imageToolbar?.classList.add("hidden");
@@ -1467,6 +1469,7 @@ function bindCanvasSelection() {
     setCanvasTool(state.canvasTool);
     setEditorSegmentDetailVisible(true);
     segmentation.querySelectorAll(".editor-segment").forEach((item) => {
+      item.classList.remove("is-multi-selected");
       item.classList.toggle("active", item === segment);
     });
     document.querySelectorAll(".editor-object-item").forEach((item) => {
@@ -1479,6 +1482,192 @@ function bindCanvasSelection() {
     } else {
       imageToolbar?.classList.remove("hidden");
       textToolbar?.classList.add("hidden");
+    }
+  });
+}
+
+function bindEditorImageMoreMenu() {
+  const trigger = document.getElementById("editorImageMoreTrigger");
+  const menu = document.getElementById("editorImageMoreMenu");
+  const selectWrap = document.getElementById("editorImageMoreSelect");
+  const selectTrigger = menu?.querySelector('[data-image-more-action="select"]');
+  const selectMenu = document.getElementById("editorImageSelectMenu");
+  const drawingLayer = document.getElementById("canvasDrawingLayer");
+  const segmentation = document.getElementById("editorImageSegmentation");
+  if (!trigger || !menu || !selectWrap || !selectTrigger || !selectMenu || !drawingLayer || !segmentation) return;
+
+  const setSelectOpen = (open) => {
+    selectMenu.hidden = !open;
+    selectTrigger.setAttribute("aria-expanded", String(open));
+  };
+
+  const setOpen = (open) => {
+    menu.hidden = !open;
+    trigger.setAttribute("aria-expanded", String(open));
+    if (!open) setSelectOpen(false);
+  };
+
+  const imageSnapshot = () => {
+    const template = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
+    const image = document.getElementById("editorCanvasImage");
+    return {
+      template,
+      src: image?.currentSrc || image?.src || template.image,
+      alt: image?.alt || template.title,
+      orientation: image?.classList.contains("orientation-landscape") ? "landscape" : "portrait",
+    };
+  };
+
+  const copyImage = async () => {
+    const snapshot = imageSnapshot();
+    state.imageClipboard = snapshot;
+    try {
+      await navigator.clipboard?.writeText(snapshot.src);
+    } catch (error) {
+      // The editor clipboard remains available when browser clipboard permission is denied.
+    }
+    return snapshot;
+  };
+
+  const addImageCopy = (snapshot) => {
+    const stageContent = document.getElementById("editorCanvasStageContent");
+    if (!stageContent || !snapshot?.src) return;
+    drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
+    const image = document.createElement("img");
+    image.className = "canvas-object canvas-imported-image is-selected";
+    image.src = snapshot.src;
+    image.alt = `${snapshot.alt} copy`;
+    image.draggable = false;
+    const copyIndex = drawingLayer.querySelectorAll(".canvas-imported-image").length;
+    image.style.left = `${Math.max(12, (stageContent.offsetWidth - 180) / 2 + copyIndex * 14)}px`;
+    image.style.top = `${40 + copyIndex * 14}px`;
+    drawingLayer.appendChild(image);
+  };
+
+  const pasteImage = () => {
+    const snapshot = state.imageClipboard;
+    if (!snapshot) return;
+    if (state.isBlankEditor) {
+      state.isBlankEditor = false;
+      state.currentEditorTemplate = snapshot.template;
+      state.generatedResultTemplate = snapshot.template;
+      if (snapshot.src !== snapshot.template.image) {
+        state.editorCroppedImages[snapshot.template.id] = {src: snapshot.src, orientation: snapshot.orientation};
+      }
+      renderEditorCanvas();
+      return;
+    }
+    addImageCopy(snapshot);
+  };
+
+  const clearMultiSelection = () => {
+    drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
+    segmentation.querySelectorAll(".editor-segment.is-multi-selected").forEach((segment) => segment.classList.remove("is-multi-selected"));
+  };
+
+  const applySelection = (action) => {
+    clearMultiSelection();
+    const objectSelectors = {
+      all: ".canvas-object",
+      text: ".canvas-text-object",
+      icons: ".canvas-shape-object, .canvas-imported-image, .canvas-frame-object",
+      lines: ".canvas-line-object, .canvas-pen-object",
+      "lines-text": ".canvas-line-object, .canvas-pen-object, .canvas-text-object",
+      connectors: ".canvas-arrow-object",
+    };
+    const segmentSelectors = {
+      all: ".editor-segment",
+      text: '.editor-segment[data-segment-type="text"]',
+      icons: '.editor-segment[data-segment-type="graphic"], .editor-segment[data-segment-type="callout"]',
+      lines: '.editor-segment[data-segment-type="callout"]',
+      "lines-text": '.editor-segment[data-segment-type="callout"], .editor-segment[data-segment-type="text"]',
+      connectors: '.editor-segment[data-segment-type="callout"]',
+    };
+    drawingLayer.querySelectorAll(objectSelectors[action] || "").forEach((object) => object.classList.add("is-selected"));
+    segmentation.querySelectorAll(segmentSelectors[action] || "").forEach((segment) => segment.classList.add("is-multi-selected"));
+    setSelectOpen(false);
+    setOpen(false);
+  };
+
+  trigger.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setOpen(menu.hidden);
+  });
+  menu.addEventListener("click", (event) => event.stopPropagation());
+  selectWrap.addEventListener("mouseenter", () => setSelectOpen(true));
+  selectWrap.addEventListener("mouseleave", () => setSelectOpen(false));
+  selectWrap.addEventListener("focusin", () => setSelectOpen(true));
+  selectWrap.addEventListener("focusout", (event) => {
+    if (!selectWrap.contains(event.relatedTarget)) setSelectOpen(false);
+  });
+  selectTrigger.addEventListener("click", () => setSelectOpen(true));
+
+  selectMenu.querySelectorAll("[data-image-select-action]").forEach((button) => {
+    button.addEventListener("click", () => applySelection(button.dataset.imageSelectAction));
+  });
+
+  menu.querySelectorAll("[data-image-more-action]").forEach((button) => {
+    if (button === selectTrigger) return;
+    button.addEventListener("click", async () => {
+      const action = button.dataset.imageMoreAction;
+      if (action === "favorite") {
+        state.imageFavorite = !state.imageFavorite;
+        button.setAttribute("aria-checked", String(state.imageFavorite));
+        setOpen(false);
+        return;
+      }
+      if (action === "copy") await copyImage();
+      if (action === "cut") {
+        await copyImage();
+        state.isBlankEditor = true;
+        state.isEditorFrameSelected = false;
+        renderEditorCanvas();
+      }
+      if (action === "duplicate") addImageCopy(await copyImage());
+      if (action === "paste") pasteImage();
+      if (action === "delete") {
+        state.isBlankEditor = true;
+        state.isEditorFrameSelected = false;
+        renderEditorCanvas();
+      }
+      if (action === "copy-name") {
+        const snapshot = imageSnapshot();
+        try {
+          await navigator.clipboard?.writeText(snapshot.alt);
+        } catch (error) {
+          state.imageClipboard = snapshot;
+        }
+      }
+      setOpen(false);
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("#editorImageActionStack")) setOpen(false);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !menu.hidden) {
+      setOpen(false);
+      trigger.focus();
+      return;
+    }
+    if ((!event.metaKey && !event.ctrlKey) || event.target?.closest?.("input, textarea, [contenteditable='true']")) return;
+    const key = event.key.toLowerCase();
+    if (key === "c" && state.isEditorFrameSelected) {
+      event.preventDefault();
+      copyImage();
+    }
+    if (key === "x" && state.isEditorFrameSelected) {
+      event.preventDefault();
+      copyImage().then(() => {
+        state.isBlankEditor = true;
+        state.isEditorFrameSelected = false;
+        renderEditorCanvas();
+      });
+    }
+    if (key === "v" && state.imageClipboard) {
+      event.preventDefault();
+      pasteImage();
     }
   });
 }
@@ -3666,6 +3855,7 @@ function init() {
   initLandingHeadingTyping();
   updateEditorToolbar("text");
   bindCanvasSelection();
+  bindEditorImageMoreMenu();
   bindEditorCrop();
   bindEditorRegionEditing();
   bindCanvasToolbar();
