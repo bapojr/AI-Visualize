@@ -381,6 +381,13 @@ const state = {
   selectedEditorSegmentType: null,
   isEditorFrameSelected: false,
   imageRotation: 0,
+  imageFlipX: 1,
+  imageFlipY: 1,
+  imageWidth: null,
+  imageHeight: null,
+  imageUnits: "in",
+  imageAspectLocked: true,
+  imageTransformTemplateId: null,
   isEditorCropping: false,
   editorCropRect: null,
   editorCroppedImages: {},
@@ -1198,6 +1205,21 @@ function renderEditorCanvas() {
   const actionStack = document.getElementById("editorImageActionStack");
   const textActionStack = document.getElementById("editorTextActionStack");
   if (!canvas || !image) return;
+
+  if (state.imageTransformTemplateId !== activeTemplate.id) {
+    state.imageTransformTemplateId = activeTemplate.id;
+    state.imageRotation = 0;
+    state.imageFlipX = 1;
+    state.imageFlipY = 1;
+    state.imageWidth = null;
+    state.imageHeight = null;
+    if (stageContent) {
+      stageContent.style.width = "";
+      stageContent.style.height = "";
+    }
+    image.style.width = "";
+    image.style.height = "";
+  }
 
   setEditorCropMode(false);
   setEditorRegionMode(false, {clear: true});
@@ -2095,6 +2117,53 @@ function applyImageAppearance() {
   if (!image) return;
   image.style.opacity = `${state.imageOpacity / 100}`;
   image.style.setProperty("--image-layer", `${state.imageLayer}`);
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  if (stageContent && state.imageWidth && state.imageHeight) {
+    stageContent.style.width = `${state.imageWidth}px`;
+    stageContent.style.height = `${state.imageHeight}px`;
+    image.style.width = "100%";
+    image.style.height = "100%";
+  }
+}
+
+const imageUnitFactors = {px: 1, in: 96, cm: 96 / 2.54, mm: 96 / 25.4};
+
+function imageDimensionPrecision(unit) {
+  return unit === "px" ? 0 : 2;
+}
+
+function syncEditorImageTransformControls() {
+  const image = document.getElementById("editorCanvasImage");
+  if (!image) return;
+  const renderedWidth = state.imageWidth || image.getBoundingClientRect().width || image.naturalWidth;
+  const renderedHeight = state.imageHeight || image.getBoundingClientRect().height || image.naturalHeight;
+  if (!renderedWidth || !renderedHeight) return;
+  if (!state.imageWidth || !state.imageHeight) {
+    state.imageWidth = renderedWidth;
+    state.imageHeight = renderedHeight;
+  }
+  const factor = imageUnitFactors[state.imageUnits] || 1;
+  const precision = imageDimensionPrecision(state.imageUnits);
+  const rotation = Math.round(state.imageRotation * 10) / 10;
+  const rotationInput = document.getElementById("editorImageRotation");
+  const rotationSlider = document.getElementById("editorImageRotationSlider");
+  if (rotationInput) rotationInput.value = `${rotation}`;
+  if (rotationSlider) rotationSlider.value = `${Math.round(rotation)}`;
+  const units = document.getElementById("editorImageUnits");
+  if (units) units.value = state.imageUnits;
+  const width = document.getElementById("editorImageWidth");
+  const height = document.getElementById("editorImageHeight");
+  if (width) width.value = (state.imageWidth / factor).toFixed(precision);
+  if (height) height.value = (state.imageHeight / factor).toFixed(precision);
+  document.querySelectorAll("[data-image-flip]").forEach((button) => {
+    const pressed = button.dataset.imageFlip === "horizontal" ? state.imageFlipX < 0 : state.imageFlipY < 0;
+    button.classList.toggle("active", pressed);
+    button.setAttribute("aria-pressed", String(pressed));
+  });
+  const lock = document.getElementById("editorImageAspectLock");
+  lock?.classList.toggle("active", state.imageAspectLocked);
+  lock?.setAttribute("aria-pressed", String(state.imageAspectLocked));
+  lock?.setAttribute("aria-label", state.imageAspectLocked ? "Unlock aspect ratio" : "Lock aspect ratio");
 }
 
 function syncImageSettingsPanel() {
@@ -2112,6 +2181,7 @@ function syncImageSettingsPanel() {
   const opacity = document.getElementById("editorImageOpacity");
   if (opacity) opacity.value = `${state.imageOpacity}`;
   applyImageAppearance();
+  window.requestAnimationFrame(syncEditorImageTransformControls);
 }
 
 function selectedEditorRegion() {
@@ -2353,6 +2423,9 @@ function updateCanvasTransform() {
   stageContent.style.setProperty("--canvas-pan-x", `${state.canvasPanX}px`);
   stageContent.style.setProperty("--canvas-pan-y", `${state.canvasPanY}px`);
   stageContent.style.setProperty("--editor-image-rotation", `${state.imageRotation}deg`);
+  stageContent.style.setProperty("--editor-image-flip-x", `${state.imageFlipX}`);
+  stageContent.style.setProperty("--editor-image-flip-y", `${state.imageFlipY}`);
+  syncEditorImageTransformControls();
 }
 
 function setEditorPanelView(panel, view) {
@@ -3231,6 +3304,31 @@ function bindEditorFrameSettings() {
 }
 
 function bindEditorImageSettings() {
+  const setRotation = (value) => {
+    const rotation = Number(value);
+    if (!Number.isFinite(rotation)) return;
+    state.imageRotation = Math.max(-180, Math.min(180, rotation));
+    updateCanvasTransform();
+  };
+
+  const updateImageDimension = (dimension, value) => {
+    const factor = imageUnitFactors[state.imageUnits] || 1;
+    const nextPixels = Number(value) * factor;
+    if (!Number.isFinite(nextPixels) || nextPixels <= 0) return;
+    const previousWidth = state.imageWidth || 1;
+    const previousHeight = state.imageHeight || 1;
+    const ratio = previousWidth / previousHeight;
+    if (dimension === "width") {
+      state.imageWidth = nextPixels;
+      if (state.imageAspectLocked) state.imageHeight = nextPixels / ratio;
+    } else {
+      state.imageHeight = nextPixels;
+      if (state.imageAspectLocked) state.imageWidth = nextPixels * ratio;
+    }
+    applyImageAppearance();
+    syncEditorImageTransformControls();
+  };
+
   document.getElementById("editorImagePromptToggle")?.addEventListener("click", () => {
     state.imagePromptExpanded = !state.imagePromptExpanded;
     syncImageSettingsPanel();
@@ -3253,6 +3351,34 @@ function bindEditorImageSettings() {
       if (action === "front") state.imageLayer = 4;
       applyImageAppearance();
     });
+  });
+  document.querySelectorAll("[data-image-flip]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.dataset.imageFlip === "horizontal") state.imageFlipX *= -1;
+      else state.imageFlipY *= -1;
+      updateCanvasTransform();
+    });
+  });
+  document.getElementById("editorImageRotation")?.addEventListener("input", (event) => setRotation(event.target.value));
+  document.getElementById("editorImageRotationSlider")?.addEventListener("input", (event) => setRotation(event.target.value));
+  document.getElementById("editorImageUnits")?.addEventListener("change", (event) => {
+    state.imageUnits = event.target.value;
+    syncEditorImageTransformControls();
+  });
+  document.getElementById("editorImageWidth")?.addEventListener("input", (event) => updateImageDimension("width", event.target.value));
+  document.getElementById("editorImageHeight")?.addEventListener("input", (event) => updateImageDimension("height", event.target.value));
+  document.getElementById("editorImageAspectLock")?.addEventListener("click", () => {
+    state.imageAspectLocked = !state.imageAspectLocked;
+    syncEditorImageTransformControls();
+  });
+  document.getElementById("editorCanvasImage")?.addEventListener("load", () => {
+    if (!state.imageWidth || !state.imageHeight) {
+      const image = document.getElementById("editorCanvasImage");
+      state.imageWidth = image?.getBoundingClientRect().width || image?.naturalWidth || null;
+      state.imageHeight = image?.getBoundingClientRect().height || image?.naturalHeight || null;
+    }
+    applyImageAppearance();
+    syncEditorImageTransformControls();
   });
 
   syncImageSettingsPanel();

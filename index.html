@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=53" />
+    <link rel="stylesheet" href="styles.css?v=54" />
   </head>
   <body>
     <div id="app">
@@ -880,20 +880,62 @@
                     <div class="editor-shape-opacity-labels" aria-hidden="true"><span>0</span><span>100</span></div>
                   </section>
                   <section class="editor-image-settings-section editor-image-layer-section" aria-labelledby="editorImageLayerHeading">
-                    <h2 id="editorImageLayerHeading">Layer</h2>
-                    <div class="editor-image-layer-actions" role="group" aria-label="Image layer controls">
-                      <button type="button" data-image-layer-action="back" aria-label="Send image to back">
-                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13h10M8 2v8m-3-3 3 3 3-3"/></svg>
+                    <h2 id="editorImageLayerHeading">Arrange</h2>
+                    <div class="editor-image-layer-actions" role="group" aria-label="Image arrange controls">
+                      <button type="button" data-image-layer-action="forward">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 11.5 8 14l5-2.5M8 12V2m-3 3 3-3 3 3"/></svg>
+                        <span>Bring forward</span>
                       </button>
-                      <button type="button" data-image-layer-action="backward" aria-label="Send image backward">
-                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v10m-4-4 4 4 4-4"/></svg>
+                      <button type="button" data-image-layer-action="front">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.5 8 2l5 2.5M3 8l5-2.5L13 8M8 12V5.5m-3 3 3-3 3 3"/></svg>
+                        <span>Bring to front</span>
                       </button>
-                      <button type="button" data-image-layer-action="forward" aria-label="Bring image forward">
-                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14V4m-4 4 4-4 4 4"/></svg>
+                      <button type="button" data-image-layer-action="backward">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.5 8 2l5 2.5M8 4v10m-3-3 3 3 3-3"/></svg>
+                        <span>Send backward</span>
                       </button>
-                      <button type="button" data-image-layer-action="front" aria-label="Bring image to front">
-                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3h10M8 14V6m-3 3 3-3 3 3"/></svg>
+                      <button type="button" data-image-layer-action="back">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 11.5 8 14l5-2.5M3 8l5 2.5L13 8M8 4v6.5m-3-3 3 3 3-3"/></svg>
+                        <span>Send to back</span>
                       </button>
+                    </div>
+                  </section>
+                  <section class="editor-image-settings-section editor-image-flip-section" aria-labelledby="editorImageFlipHeading">
+                    <h2 id="editorImageFlipHeading">Flip</h2>
+                    <div class="editor-image-flip-actions" role="group" aria-label="Image flip controls">
+                      <button type="button" data-image-flip="horizontal" aria-pressed="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M1.5 0H9C9.82734 0 10.5 0.672656 10.5 1.5V9C10.5 9.82734 9.82734 10.5 9 10.5H1.5C0.672656 10.5 0 9.82734 0 9V1.5C0 0.672656 0.672656 0 1.5 0ZM5.25 9H9V1.5H5.25V9Z" fill="currentColor"/></svg>
+                        <span>Flip horizontal</span>
+                      </button>
+                      <button type="button" data-image-flip="vertical" aria-pressed="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M0 1.5L0.00703125 1.34766C0.084375 0.590625 0.724219 0 1.5 0H9L9.15234 0.00703123C9.85781 0.0796875 10.4203 0.639844 10.4906 1.34531L10.4977 1.49766V8.99766C10.4977 9.825 9.825 10.4977 8.99766 10.4977L1.5 10.5C0.672656 10.5 0 9.82734 0 9V1.5ZM9 5.25V1.5H1.5V5.25H9Z" fill="currentColor"/></svg>
+                        <span>Flip vertical</span>
+                      </button>
+                    </div>
+                  </section>
+                  <section class="editor-image-settings-section editor-image-transform-section" aria-labelledby="editorImageTransformHeading">
+                    <h2 id="editorImageTransformHeading">Transform</h2>
+                    <div class="editor-image-transform-row">
+                      <label for="editorImageRotation">Rotation</label>
+                      <div class="editor-image-rotation-controls">
+                        <span class="editor-image-number-wrap"><input id="editorImageRotation" type="number" min="-180" max="180" step="1" value="0" aria-label="Image rotation in degrees" /><span aria-hidden="true">°</span></span>
+                        <input id="editorImageRotationSlider" type="range" min="-180" max="180" step="1" value="0" aria-label="Image rotation" />
+                      </div>
+                    </div>
+                    <label class="editor-image-transform-row" for="editorImageUnits">
+                      <span>Units</span>
+                      <span class="editor-image-units-wrap">
+                        <select id="editorImageUnits" aria-label="Image dimension units"><option value="in">in. (inches)</option><option value="px">px (pixels)</option><option value="cm">cm (centimeters)</option><option value="mm">mm (millimeters)</option></select>
+                        <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+                      </span>
+                    </label>
+                    <div class="editor-image-transform-row editor-image-dimensions-row">
+                      <span>Dimensions</span>
+                      <div class="editor-image-dimension-fields">
+                        <label><input id="editorImageWidth" type="number" min="0.01" step="0.01" aria-label="Image width" /><span>W</span></label>
+                        <label><input id="editorImageHeight" type="number" min="0.01" step="0.01" aria-label="Image height" /><span>H</span></label>
+                        <button id="editorImageAspectLock" class="active" type="button" aria-pressed="true" aria-label="Unlock aspect ratio"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2M3 7h10v8H3V7Z"/></svg></button>
+                      </div>
                     </div>
                   </section>
                 </div>
@@ -1921,6 +1963,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=40"></script>
+    <script src="app.js?v=41"></script>
   </body>
 </html>
