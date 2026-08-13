@@ -6819,7 +6819,8 @@ a {
   position: absolute;
   left: 50%;
   bottom: 88px;
-  width: min(665px, calc(100% - 32px));
+  width: 705px;
+  height: 40px;
   transform: translateX(-50%);
   display: block;
   z-index: 6;
@@ -6833,16 +6834,11 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  overflow-x: auto;
+  overflow: visible;
   border: 0;
   border-radius: 25px;
   background: var(--Gray-1, #fff);
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
-  scrollbar-width: none;
-}
-
-.editor-image-toolbar::-webkit-scrollbar {
-  display: none;
 }
 
 .editor-image-tool {
