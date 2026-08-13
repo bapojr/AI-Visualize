@@ -3620,6 +3620,8 @@ a {
 }
 
 .editor-panel-header {
+  position: relative;
+  z-index: 2;
   display: flex;
   width: 100%;
   height: 56px;
@@ -3630,6 +3632,7 @@ a {
   gap: 8px;
   border-bottom: 1px solid var(--Gray-5, #e4eaf7);
   background: var(--Gray-1, #fff);
+  overflow: visible;
 }
 
 .editor-panel-tabs {
@@ -3638,6 +3641,7 @@ a {
   height: 100%;
   align-items: stretch;
   gap: 12px;
+  overflow: visible;
 }
 
 .editor-panel-tab {
@@ -3660,10 +3664,11 @@ a {
 .editor-panel-tab::after {
   position: absolute;
   right: 0;
-  bottom: -1px;
+  bottom: -2px;
   left: 0;
+  z-index: 3;
   height: 4px;
-  border-radius: 4px 4px 0 0;
+  border-radius: 999px;
   background: transparent;
   content: "";
 }
