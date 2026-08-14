@@ -487,6 +487,8 @@ const state = {
   selectedEditorSegmentType: null,
   isEditorFrameSelected: false,
   imageRotation: 0,
+  imageOffsetX: 0,
+  imageOffsetY: 0,
   imageFlipX: 1,
   imageFlipY: 1,
   imageWidth: null,
@@ -1054,6 +1056,8 @@ function createHistoryNode(item, compact = false, isActive = false) {
       state.generatedResultTemplate = nextTemplate;
       state.currentEditorTemplate = nextTemplate;
       state.imageRotation = 0;
+      state.imageOffsetX = 0;
+      state.imageOffsetY = 0;
       renderEditorCanvas();
       updatePreviewVisuals();
       }
@@ -1467,6 +1471,8 @@ function renderEditorCanvas() {
   if (state.imageTransformTemplateId !== activeTemplate.id) {
     state.imageTransformTemplateId = activeTemplate.id;
     state.imageRotation = 0;
+    state.imageOffsetX = 0;
+    state.imageOffsetY = 0;
     state.imageFlipX = 1;
     state.imageFlipY = 1;
     state.imageWidth = null;
@@ -1633,6 +1639,50 @@ function bindCanvasSelection() {
     selectWholeImage();
   });
 
+  let imageMoveSession = null;
+  editorImage?.addEventListener("pointerdown", (event) => {
+    if (
+      event.button !== 0 ||
+      state.canvasTool !== "select" ||
+      state.isEditorCropping ||
+      state.isEditorRegionEditing
+    ) return;
+    event.preventDefault();
+    event.stopPropagation();
+    selectWholeImage();
+    imageMoveSession = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      offsetX: state.imageOffsetX,
+      offsetY: state.imageOffsetY,
+      moved: false,
+    };
+    editorImage.setPointerCapture?.(event.pointerId);
+  });
+
+  editorImage?.addEventListener("pointermove", (event) => {
+    if (!imageMoveSession || event.pointerId !== imageMoveSession.pointerId) return;
+    const scale = state.zoom / 100;
+    const deltaX = (event.clientX - imageMoveSession.startX) / scale;
+    const deltaY = (event.clientY - imageMoveSession.startY) / scale;
+    if (!imageMoveSession.moved && Math.hypot(deltaX, deltaY) < 3) return;
+    imageMoveSession.moved = true;
+    state.imageOffsetX = imageMoveSession.offsetX + deltaX;
+    state.imageOffsetY = imageMoveSession.offsetY + deltaY;
+    stageContent?.classList.add("is-moving");
+    updateCanvasTransform();
+  });
+
+  const endImageMove = (event) => {
+    if (!imageMoveSession || event.pointerId !== imageMoveSession.pointerId) return;
+    if (editorImage?.hasPointerCapture?.(event.pointerId)) editorImage.releasePointerCapture(event.pointerId);
+    imageMoveSession = null;
+    stageContent?.classList.remove("is-moving");
+  };
+  editorImage?.addEventListener("pointerup", endImageMove);
+  editorImage?.addEventListener("pointercancel", endImageMove);
+
   imageToolbar?.addEventListener("click", () => showEditorLeftEditPanel());
   textToolbar?.addEventListener("click", () => showEditorLeftEditPanel());
 
@@ -1760,7 +1810,7 @@ function bindEditorImageMoreMenu() {
   const selectWrap = document.getElementById("editorImageMoreSelect");
   const selectTrigger = menu?.querySelector('[data-image-more-action="select"]');
   const selectMenu = document.getElementById("editorImageSelectMenu");
-  const drawingLayer = document.getElementById("canvasDrawingLayer");
+  const drawingLayer = document.getElementById("canvasWorkspaceLayer");
   const segmentation = document.getElementById("editorImageSegmentation");
   if (!trigger || !menu || !selectWrap || !selectTrigger || !selectMenu || !drawingLayer || !segmentation) return;
 
@@ -1798,8 +1848,8 @@ function bindEditorImageMoreMenu() {
   };
 
   const addImageCopy = (snapshot) => {
-    const stageContent = document.getElementById("editorCanvasStageContent");
-    if (!stageContent || !snapshot?.src) return;
+    const workspaceLayer = document.getElementById("canvasWorkspaceLayer");
+    if (!workspaceLayer || !snapshot?.src) return;
     showEditorLeftEditPanel();
     clearEditorImageSelectionForCanvasObject();
     drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
@@ -1809,8 +1859,8 @@ function bindEditorImageMoreMenu() {
     image.alt = `${snapshot.alt} copy`;
     image.draggable = false;
     const copyIndex = drawingLayer.querySelectorAll(".canvas-imported-image").length;
-    image.style.left = `${Math.max(12, (stageContent.offsetWidth - 180) / 2 + copyIndex * 14)}px`;
-    image.style.top = `${40 + copyIndex * 14}px`;
+    image.style.left = `${Math.max(12, (workspaceLayer.offsetWidth - 180) / 2 + copyIndex * 14)}px`;
+    image.style.top = `${Math.max(12, (workspaceLayer.offsetHeight - 180) / 2 + copyIndex * 14)}px`;
     drawingLayer.appendChild(image);
   };
 
@@ -3527,6 +3577,8 @@ function updateCanvasTransform() {
   stageContent.style.setProperty("--canvas-pan-x", `${state.canvasPanX}px`);
   stageContent.style.setProperty("--canvas-pan-y", `${state.canvasPanY}px`);
   stageContent.style.setProperty("--editor-image-rotation", `${state.imageRotation}deg`);
+  stageContent.style.setProperty("--editor-image-x", `${state.imageOffsetX * state.zoom / 100}px`);
+  stageContent.style.setProperty("--editor-image-y", `${state.imageOffsetY * state.zoom / 100}px`);
   stageContent.style.setProperty("--editor-image-flip-x", `${state.imageFlipX}`);
   stageContent.style.setProperty("--editor-image-flip-y", `${state.imageFlipY}`);
   workspaceLayer?.style.setProperty("--editor-zoom-scale", `${state.zoom / 100}`);
@@ -3588,9 +3640,8 @@ function rememberGeneratedEditorUpload(template) {
 }
 
 function addUploadedAssetToCanvas(asset) {
-  const drawingLayer = document.getElementById("canvasDrawingLayer");
-  const stageContent = document.getElementById("editorCanvasStageContent");
-  if (!drawingLayer || !stageContent || !asset?.src) return;
+  const drawingLayer = document.getElementById("canvasWorkspaceLayer");
+  if (!drawingLayer || !asset?.src) return;
 
   showEditorLeftEditPanel();
   clearEditorImageSelectionForCanvasObject();
@@ -3600,8 +3651,8 @@ function addUploadedAssetToCanvas(asset) {
   image.alt = asset.title || "Uploaded image";
   image.draggable = false;
   image.src = asset.src;
-  image.style.left = `${Math.max(0, (stageContent.offsetWidth - 180) / 2)}px`;
-  image.style.top = "40px";
+  image.style.left = `${Math.max(0, (drawingLayer.offsetWidth - 180) / 2)}px`;
+  image.style.top = `${Math.max(0, (drawingLayer.offsetHeight - 180) / 2)}px`;
   drawingLayer.appendChild(image);
   setCanvasTool("select");
 }
@@ -4307,15 +4358,6 @@ function bindCanvasToolbar() {
     setCanvasTool("select");
   };
 
-  const pointInCanvas = (event) => {
-    const rect = stageContent.getBoundingClientRect();
-    const scale = state.zoom / 100;
-    return {
-      x: Math.min(stageContent.offsetWidth, Math.max(0, (event.clientX - rect.left) / scale)),
-      y: Math.min(stageContent.offsetHeight, Math.max(0, (event.clientY - rect.top) / scale)),
-    };
-  };
-
   const pointInWorkspace = (event) => {
     const rect = workspaceLayer.getBoundingClientRect();
     const scale = state.zoom / 100;
@@ -4460,11 +4502,11 @@ function bindCanvasToolbar() {
     window.setTimeout(() => { suppressTableClick = false; }, 120);
   });
 
-  stageContent.addEventListener("pointerdown", (event) => {
+  mediaShell.addEventListener("pointerdown", (event) => {
     if (event.button !== 0 || !["shape", "line", "pen", "text", "frame"].includes(state.canvasTool)) return;
     event.preventDefault();
     event.stopPropagation();
-    const start = pointInCanvas(event);
+    const start = pointInWorkspace(event);
 
     if (state.canvasTool === "text") {
       const text = document.createElement("div");
@@ -4474,7 +4516,7 @@ function bindCanvasToolbar() {
       text.style.left = `${start.x}px`;
       text.style.top = `${start.y}px`;
       applyTextAppearance(text);
-      drawingLayer.appendChild(text);
+      workspaceLayer.appendChild(text);
       selectObject(text);
       setCanvasTool("select");
       window.setTimeout(() => text.focus(), 0);
@@ -4486,11 +4528,11 @@ function bindCanvasToolbar() {
       object = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       object.classList.add("canvas-object", "canvas-pen-object");
       applyPenAppearance(object);
-      object.setAttribute("viewBox", `0 0 ${stageContent.offsetWidth} ${stageContent.offsetHeight}`);
+      object.setAttribute("viewBox", `0 0 ${workspaceLayer.offsetWidth} ${workspaceLayer.offsetHeight}`);
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute("d", `M ${start.x} ${start.y}`);
       object.appendChild(path);
-      drawingLayer.appendChild(object);
+      workspaceLayer.appendChild(object);
       drawSession = {tool: "pen", object, path, points: [start], pointerId: event.pointerId};
     } else {
       object = document.createElement("div");
@@ -4506,18 +4548,18 @@ function bindCanvasToolbar() {
       } else {
         object.className = `canvas-object canvas-${state.canvasTool}-object`;
       }
-      drawingLayer.appendChild(object);
+      workspaceLayer.appendChild(object);
       drawSession = {tool: state.canvasTool, object, start, pointerId: event.pointerId};
       if (state.canvasTool === "line") positionLine(object, start, start);
       else if (state.canvasTool === "frame") positionFrame(object, start, start);
       else positionBox(object, start, start);
     }
-    stageContent.setPointerCapture?.(event.pointerId);
+    mediaShell.setPointerCapture?.(event.pointerId);
   });
 
-  stageContent.addEventListener("pointermove", (event) => {
+  mediaShell.addEventListener("pointermove", (event) => {
     if (!drawSession || event.pointerId !== drawSession.pointerId) return;
-    const point = pointInCanvas(event);
+    const point = pointInWorkspace(event);
     if (drawSession.tool === "pen") {
       drawSession.points.push(point);
       const pathData = drawSession.points.map((item, index) => `${index ? "L" : "M"} ${item.x} ${item.y}`).join(" ");
@@ -4533,7 +4575,7 @@ function bindCanvasToolbar() {
 
   const endDrawing = (event) => {
     if (!drawSession || event.pointerId !== drawSession.pointerId) return;
-    stageContent.releasePointerCapture?.(event.pointerId);
+    mediaShell.releasePointerCapture?.(event.pointerId);
     const {object, tool, points = []} = drawSession;
     const width = parseFloat(object.style.width || "0");
     const height = parseFloat(object.style.height || "0");
@@ -4542,12 +4584,12 @@ function bindCanvasToolbar() {
     else selectObject(object);
     drawSession = null;
   };
-  stageContent.addEventListener("pointerup", endDrawing);
-  stageContent.addEventListener("pointercancel", endDrawing);
+  mediaShell.addEventListener("pointerup", endDrawing);
+  mediaShell.addEventListener("pointercancel", endDrawing);
 
   workspaceLayer.addEventListener("pointerdown", (event) => {
     if (event.button !== 0 || state.canvasTool !== "select") return;
-    const object = event.target.closest(".canvas-table-object, .canvas-chart-object");
+    const object = event.target.closest(".canvas-object");
     if (!object) return;
     event.preventDefault();
     event.stopPropagation();
@@ -4593,6 +4635,8 @@ function bindCanvasToolbar() {
       startY: event.clientY,
       left: parseFloat(object.style.left || "0"),
       top: parseFloat(object.style.top || "0"),
+      penX: Number(object.dataset.penX) || 0,
+      penY: Number(object.dataset.penY) || 0,
       moved: false,
     };
     object.setPointerCapture?.(event.pointerId);
@@ -4636,7 +4680,7 @@ function bindCanvasToolbar() {
     if (chartResizeSession || chartRotateSession) updateChartTransform(event);
   }, true);
 
-  workspaceLayer.addEventListener("pointermove", (event) => {
+  window.addEventListener("pointermove", (event) => {
     if (chartResizeSession || chartRotateSession) return;
     const scale = state.zoom / 100;
     if (!objectDragSession || event.pointerId !== objectDragSession.pointerId) return;
@@ -4646,11 +4690,20 @@ function bindCanvasToolbar() {
     event.preventDefault();
     objectDragSession.moved = true;
     objectDragSession.object.classList.add("is-dragging");
+    if (objectDragSession.object.classList.contains("canvas-pen-object")) {
+      const x = objectDragSession.penX + deltaX;
+      const y = objectDragSession.penY + deltaY;
+      objectDragSession.object.dataset.penX = `${x}`;
+      objectDragSession.object.dataset.penY = `${y}`;
+      objectDragSession.object.style.setProperty("--pen-translate-x", `${x}px`);
+      objectDragSession.object.style.setProperty("--pen-translate-y", `${y}px`);
+      return;
+    }
     const maxLeft = Math.max(0, workspaceLayer.offsetWidth - objectDragSession.object.offsetWidth);
     const maxTop = Math.max(0, workspaceLayer.offsetHeight - objectDragSession.object.offsetHeight);
     objectDragSession.object.style.left = `${Math.max(0, Math.min(maxLeft, objectDragSession.left + deltaX))}px`;
     objectDragSession.object.style.top = `${Math.max(0, Math.min(maxTop, objectDragSession.top + deltaY))}px`;
-  });
+  }, true);
 
   const endChartTransform = () => {
     if (chartResizeSession) {
@@ -4674,7 +4727,7 @@ function bindCanvasToolbar() {
   window.addEventListener("pointerup", endChartTransform, true);
   window.addEventListener("pointercancel", endChartTransform, true);
 
-  const endTableDrag = (event) => {
+  const endObjectDrag = (event) => {
     if (!objectDragSession || event.pointerId !== objectDragSession.pointerId) return;
     objectDragSession.object.releasePointerCapture?.(event.pointerId);
     objectDragSession.object.classList.remove("is-dragging");
@@ -4682,8 +4735,8 @@ function bindCanvasToolbar() {
     objectDragSession = null;
     if (suppressTableClick) window.setTimeout(() => { suppressTableClick = false; }, 0);
   };
-  workspaceLayer.addEventListener("pointerup", endTableDrag);
-  workspaceLayer.addEventListener("pointercancel", endTableDrag);
+  window.addEventListener("pointerup", endObjectDrag, true);
+  window.addEventListener("pointercancel", endObjectDrag, true);
 
   const handleObjectClick = (event) => {
     if (state.canvasTool !== "select") return;
@@ -4809,6 +4862,8 @@ function initActions() {
       ) {
         state.isBlankEditor = false;
         state.imageRotation = 0;
+        state.imageOffsetX = 0;
+        state.imageOffsetY = 0;
         renderHistory();
       }
       setScreen(destination);
@@ -4963,6 +5018,8 @@ function initActions() {
     state.selectedEditorSegmentType = null;
     state.isEditorFrameSelected = false;
     state.imageRotation = 0;
+    state.imageOffsetX = 0;
+    state.imageOffsetY = 0;
     renderHistory();
     setScreen("editor-desktop");
   });

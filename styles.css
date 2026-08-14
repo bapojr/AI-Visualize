@@ -7431,7 +7431,7 @@ a {
   position: relative;
   display: inline-block;
   transform-origin: center center;
-  transform: translate(var(--canvas-pan-x, 0), var(--canvas-pan-y, 0)) scale(var(--editor-zoom-scale, 1)) rotate(var(--editor-image-rotation, 0deg));
+  transform: translate(calc(var(--canvas-pan-x, 0px) + var(--editor-image-x, 0px)), calc(var(--canvas-pan-y, 0px) + var(--editor-image-y, 0px))) scale(var(--editor-zoom-scale, 1)) rotate(var(--editor-image-rotation, 0deg));
   transition: transform 180ms ease;
 }
 
@@ -7471,7 +7471,8 @@ a {
 
 #editorCanvasStage[data-canvas-tool="select"] .canvas-object {
   pointer-events: auto;
-  cursor: pointer;
+  cursor: move;
+  touch-action: none;
 }
 
 #editorCanvasStage[data-canvas-tool="select"] .canvas-workspace-layer .canvas-table-object {
@@ -7616,6 +7617,7 @@ a {
   height: 100%;
   overflow: visible;
   pointer-events: none !important;
+  transform: translate(var(--pen-translate-x, 0), var(--pen-translate-y, 0));
 }
 
 .canvas-pen-object path {
@@ -7778,10 +7780,10 @@ a {
   transition: none;
 }
 
-#editorCanvasStage[data-canvas-tool="shape"] .editor-canvas-stage-content,
-#editorCanvasStage[data-canvas-tool="line"] .editor-canvas-stage-content,
-#editorCanvasStage[data-canvas-tool="pen"] .editor-canvas-stage-content,
-#editorCanvasStage[data-canvas-tool="frame"] .editor-canvas-stage-content {
+#editorCanvasStage[data-canvas-tool="shape"] .editor-canvas-media-shell,
+#editorCanvasStage[data-canvas-tool="line"] .editor-canvas-media-shell,
+#editorCanvasStage[data-canvas-tool="pen"] .editor-canvas-media-shell,
+#editorCanvasStage[data-canvas-tool="frame"] .editor-canvas-media-shell {
   cursor: crosshair;
 }
 
@@ -7789,8 +7791,18 @@ a {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='24' viewBox='0 0 34 24'%3E%3Cpath d='M5 1v8M1 5h8' stroke='%2313161B' stroke-width='1.7' stroke-linecap='round'/%3E%3Crect x='13' y='4' width='20' height='18' rx='3' fill='white' stroke='%23CAD5E7'/%3E%3Cpath d='M18 8h10v10H18zM18 13h10M23 8v10' fill='none' stroke='%2313161B' stroke-width='1.4'/%3E%3C/svg%3E") 5 5, crosshair;
 }
 
-#editorCanvasStage[data-canvas-tool="text"] .editor-canvas-stage-content {
+#editorCanvasStage[data-canvas-tool="text"] .editor-canvas-media-shell {
   cursor: text;
+}
+
+#editorCanvasStage[data-canvas-tool="select"] .editor-canvas-image {
+  cursor: move;
+  touch-action: none;
+}
+
+.editor-canvas-stage-content.is-moving {
+  transition: none;
+  user-select: none;
 }
 
 .editor-canvas-image.orientation-portrait {
