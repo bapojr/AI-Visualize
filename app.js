@@ -143,6 +143,32 @@ const editorLibraryImages = [
   "infographic-crispr.png",
 ];
 
+function editorLibraryIconSource(content) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#F8F9FD"/><g fill="none" stroke="#1C4DC1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${content}</g></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+const editorLibraryIconAssets = [
+  {id: "gallery-icon-heart", title: "Heart", src: editorLibraryIconSource('<path d="M32 49S13 39 13 25a10 10 0 0 1 19-5 10 10 0 0 1 19 5c0 14-19 24-19 24Z"/>')},
+  {id: "gallery-icon-cell", title: "Cell", src: editorLibraryIconSource('<circle cx="32" cy="32" r="19"/><circle cx="32" cy="32" r="8"/><path d="m16 23 6 3m26-3-6 3M16 41l6-3m26 3-6-3"/>')},
+  {id: "gallery-icon-dna", title: "DNA", src: editorLibraryIconSource('<path d="M21 13c0 13 22 25 22 38M43 13c0 13-22 25-22 38M24 20h16M22 30h20M22 40h20M24 49h16"/>')},
+  {id: "gallery-icon-flask", title: "Laboratory Flask", src: editorLibraryIconSource('<path d="M25 13h14M29 13v13L18 45a4 4 0 0 0 4 6h20a4 4 0 0 0 4-6L35 26V13M23 41h18"/>')},
+  {id: "gallery-icon-leaf", title: "Leaf", src: editorLibraryIconSource('<path d="M48 15C29 15 18 24 18 37c0 8 6 13 14 13 13 0 20-12 16-35Z"/><path d="M16 52c4-13 12-21 25-28"/>')},
+  {id: "gallery-icon-molecule", title: "Molecule", src: editorLibraryIconSource('<circle cx="18" cy="35" r="6"/><circle cx="37" cy="18" r="6"/><circle cx="46" cy="43" r="6"/><path d="m23 31 9-8m8 1 4 13m-20 1 16 4"/>')},
+  {id: "gallery-icon-microscope", title: "Microscope", src: editorLibraryIconSource('<path d="M25 14h12v8H25zM29 22v12m8-8a15 15 0 0 1 5 27M18 51h30M21 42h17M21 35h14"/>')},
+  {id: "gallery-icon-capsule", title: "Capsule", src: editorLibraryIconSource('<path d="M20 44a10 10 0 0 1 0-14l13-13a10 10 0 1 1 14 14L34 44a10 10 0 0 1-14 0Z"/><path d="m27 24 14 14"/>')},
+];
+
+const editorLibraryTemplateAssets = templateCatalog
+  .filter((template) => template.image)
+  .map((template) => ({
+    id: `gallery-template-${template.id}`,
+    title: template.title,
+    src: template.image,
+    kind: "template",
+    category: template.category,
+  }));
+
 const editorLibraryIconPaths = {
   heart: '<path d="M10.36 1.31c-.75 0-1.45.36-1.89.96L7.53 3.58a.65.65 0 0 1-1.06 0l-.94-1.31a2.33 2.33 0 0 0-4.21 1.37c0 1.36.87 2.69 1.86 3.89 1.12 1.37 2.5 2.57 3.44 3.29.09.07.22.12.38.12s.3-.05.39-.12c.94-.72 2.32-1.93 3.44-3.29.99-1.2 1.86-2.53 1.86-3.89a2.33 2.33 0 0 0-2.33-2.33ZM7.41 1.51A3.64 3.64 0 0 1 14 3.64c0 1.88-1.17 3.53-2.16 4.73-1.21 1.46-2.66 2.73-3.66 3.49-.34.26-.75.39-1.18.39s-.84-.13-1.18-.39c-1-.76-2.45-2.03-3.66-3.49C1.17 7.17 0 5.52 0 3.64A3.64 3.64 0 0 1 6.59 1.51L7 2.07l.41-.56Z"/>',
   apple: '<path d="M6.13 3.06h.43A2.19 2.19 0 0 0 8.75.88V.44A.44.44 0 0 0 8.31 0h-.43a2.19 2.19 0 0 0-2.19 2.19v.44c0 .24.2.43.44.43ZM3.06 3.5C.98 3.5 0 5.79 0 7.88 0 11.38 2.19 14 4.38 14c.32 0 .72-.09 1.06-.19.45-.14.93-.14 1.38 0 .33.1.73.19 1.06.19 2.19 0 4.38-2.62 4.38-6.12 0-2.09-.98-4.38-3.06-4.38-.75 0-1.63.28-2.26.53-.52.2-1.09.2-1.61 0-.62-.25-1.51-.53-2.26-.53Zm-1.75 4.38c0-.87.21-1.71.56-2.29.33-.55.72-.78 1.19-.78.49 0 1.18.2 1.79.44.82.32 1.73.32 2.55 0 .61-.24 1.3-.44 1.79-.44.47 0 .86.23 1.19.78.35.58.56 1.42.56 2.29 0 1.48-.47 2.73-1.1 3.58-.66.88-1.4 1.23-1.96 1.23-.13 0-.37-.05-.68-.14a3.72 3.72 0 0 0-2.14 0c-.31.09-.56.14-.68.14-.56 0-1.3-.35-1.96-1.23-.64-.85-1.1-2.1-1.1-3.58Z"/>',
@@ -446,6 +472,7 @@ const state = {
   editorSlides: [],
   editorUploads: [],
   editorLibraryCategoryId: null,
+  editorLibraryType: "illustrations",
   editorLibraryQuery: "",
   editorLibraryReferenceId: null,
   activeEditorSlideId: null,
@@ -3056,6 +3083,45 @@ function renderEditorLibraryCategories(results, query) {
   results.appendChild(list);
 }
 
+function renderEditorLibraryAssetGrid(results, assets, emptyMessage) {
+  if (!assets.length) {
+    const empty = document.createElement("div");
+    empty.className = "editor-library-empty";
+    empty.textContent = emptyMessage;
+    results.appendChild(empty);
+    return;
+  }
+
+  const grid = document.createElement("div");
+  grid.className = "editor-library-asset-grid";
+  const addIcon = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="1.25" y="1.25" width="13.5" height="13.5" rx="3" stroke="currentColor" stroke-width="1.5"/></svg>';
+  const referenceIcon = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.3.75c0 .42-.32.75-.71.75-.65 0-1.18.56-1.18 1.25a.71.71 0 0 1-1.41 0C0 1.23 1.16 0 2.59 0c.39 0 .71.33.71.75ZM0 5.75A.71.71 0 0 1 1.41 5v3.25a.71.71 0 0 1-1.41 0v-2.5Zm.71 4.75c.39 0 .7.33.7.75 0 .69.53 1.25 1.18 1.25h3.61c.08.53.23 1.03.43 1.5H2.59C1.16 14 0 12.77 0 11.25c0-.42.32-.75.71-.75ZM13.18 5.69a5.3 5.3 0 0 0-1.42-.19V2.75c0-.69-.52-1.25-1.17-1.25a.71.71 0 0 1 0-1.5c1.43 0 2.59 1.23 2.59 2.75v2.94ZM7.53 11.5A4.37 4.37 0 0 1 11.76 7 4.37 4.37 0 0 1 16 11.5a4.37 4.37 0 0 1-4.24 4.5 4.37 4.37 0 0 1-4.23-4.5Zm4.23-2.5c-.26 0-.47.23-.47.5V11H9.88c-.26 0-.47.23-.47.5s.21.5.47.5h1.41v1.5c0 .27.21.5.47.5s.48-.23.48-.5V12h1.41c.26 0 .47-.23.47-.5s-.21-.5-.47-.5h-1.41V9.5c0-.27-.22-.5-.48-.5Z" fill="currentColor"/></svg>';
+
+  assets.forEach((asset) => {
+    const card = document.createElement("article");
+    card.className = `editor-library-asset is-${asset.kind || "illustration"}`;
+    const image = document.createElement("img");
+    image.src = asset.src;
+    image.alt = asset.title;
+    const overlay = document.createElement("div");
+    overlay.className = "editor-library-asset-overlay";
+    const name = document.createElement("span");
+    name.className = "editor-library-asset-name";
+    name.textContent = asset.title;
+    const actions = document.createElement("div");
+    actions.className = "editor-library-asset-actions";
+    actions.append(
+      createEditorLibraryAction({label: "Add to canvas", action: "add", asset, icon: addIcon}),
+      createEditorLibraryAction({label: "Add as reference", action: "reference", asset, icon: referenceIcon}),
+    );
+    overlay.append(name, actions);
+    card.append(image, overlay);
+    grid.appendChild(card);
+  });
+
+  results.appendChild(grid);
+}
+
 function renderEditorLibraryDetail(results, category, query) {
   const heading = document.createElement("div");
   heading.className = "editor-library-detail-heading";
@@ -3077,42 +3143,17 @@ function renderEditorLibraryDetail(results, category, query) {
   title.textContent = category.name;
   heading.append(back, root, title);
 
-  const grid = document.createElement("div");
-  grid.className = "editor-library-asset-grid";
   const assets = editorLibraryAssetsFor(category).filter((asset) => asset.title.toLowerCase().includes(query));
-  const addIcon = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="1.25" y="1.25" width="13.5" height="13.5" rx="3" stroke="currentColor" stroke-width="1.5"/></svg>';
-  const referenceIcon = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.3.75c0 .42-.32.75-.71.75-.65 0-1.18.56-1.18 1.25a.71.71 0 0 1-1.41 0C0 1.23 1.16 0 2.59 0c.39 0 .71.33.71.75ZM0 5.75A.71.71 0 0 1 1.41 5v3.25a.71.71 0 0 1-1.41 0v-2.5Zm.71 4.75c.39 0 .7.33.7.75 0 .69.53 1.25 1.18 1.25h3.61c.08.53.23 1.03.43 1.5H2.59C1.16 14 0 12.77 0 11.25c0-.42.32-.75.71-.75ZM13.18 5.69a5.3 5.3 0 0 0-1.42-.19V2.75c0-.69-.52-1.25-1.17-1.25a.71.71 0 0 1 0-1.5c1.43 0 2.59 1.23 2.59 2.75v2.94ZM7.53 11.5A4.37 4.37 0 0 1 11.76 7 4.37 4.37 0 0 1 16 11.5a4.37 4.37 0 0 1-4.24 4.5 4.37 4.37 0 0 1-4.23-4.5Zm4.23-2.5c-.26 0-.47.23-.47.5V11H9.88c-.26 0-.47.23-.47.5s.21.5.47.5h1.41v1.5c0 .27.21.5.47.5s.48-.23.48-.5V12h1.41c.26 0 .47-.23.47-.5s-.21-.5-.47-.5h-1.41V9.5c0-.27-.22-.5-.48-.5Z" fill="currentColor"/></svg>';
-
-  assets.forEach((asset) => {
-    const card = document.createElement("article");
-    card.className = "editor-library-asset";
-    const image = document.createElement("img");
-    image.src = asset.src;
-    image.alt = asset.title;
-    const overlay = document.createElement("div");
-    overlay.className = "editor-library-asset-overlay";
-    const name = document.createElement("span");
-    name.className = "editor-library-asset-name";
-    name.textContent = asset.title;
-    const actions = document.createElement("div");
-    actions.className = "editor-library-asset-actions";
-    actions.append(
-      createEditorLibraryAction({label: "Add to canvas", action: "add", asset, icon: addIcon}),
-      createEditorLibraryAction({label: "Add as reference", action: "reference", asset, icon: referenceIcon}),
-    );
-    overlay.append(name, actions);
-    card.append(image, overlay);
-    grid.appendChild(card);
-  });
-
   results.append(heading);
-  if (assets.length) results.appendChild(grid);
-  else {
-    const empty = document.createElement("div");
-    empty.className = "editor-library-empty";
-    empty.textContent = `No ${category.name} illustrations match your search.`;
-    results.appendChild(empty);
-  }
+  renderEditorLibraryAssetGrid(results, assets, `No ${category.name} illustrations match your search.`);
+}
+
+function renderEditorLibraryCollection(results, type, query) {
+  const source = type === "icons"
+    ? editorLibraryIconAssets.map((asset) => ({...asset, kind: "icon", category: "Icons"}))
+    : editorLibraryTemplateAssets;
+  const assets = source.filter((asset) => asset.title.toLowerCase().includes(query));
+  renderEditorLibraryAssetGrid(results, assets, `No ${type} match your search.`);
 }
 
 function renderEditorLibrary() {
@@ -3120,12 +3161,23 @@ function renderEditorLibrary() {
   const search = document.getElementById("editorLibrarySearch");
   if (!results || !search) return;
   const query = state.editorLibraryQuery.trim().toLowerCase();
+  const type = state.editorLibraryType || "illustrations";
   results.innerHTML = "";
-  search.placeholder = state.editorLibraryCategoryId ? "Search illustrations" : "Search gallery";
+  document.querySelectorAll("[data-editor-library-type]").forEach((button) => {
+    const selected = button.dataset.editorLibraryType === type;
+    button.classList.toggle("selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  search.placeholder = state.editorLibraryCategoryId && type === "illustrations" ? "Search illustrations" : `Search ${type}`;
+  search.setAttribute("aria-label", `Search gallery ${type}`);
   if (search.value !== state.editorLibraryQuery) search.value = state.editorLibraryQuery;
   const category = editorLibraryCategories.find((item) => item.id === state.editorLibraryCategoryId);
-  if (category) renderEditorLibraryDetail(results, category, query);
-  else renderEditorLibraryCategories(results, query);
+  if (type === "illustrations") {
+    if (category) renderEditorLibraryDetail(results, category, query);
+    else renderEditorLibraryCategories(results, query);
+    return;
+  }
+  renderEditorLibraryCollection(results, type, query);
 }
 
 function bindEditorLibrary() {
@@ -3135,6 +3187,15 @@ function bindEditorLibrary() {
     state.editorLibraryQuery = search.value;
     renderEditorLibrary();
     search.focus();
+  });
+  document.querySelectorAll("[data-editor-library-type]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.editorLibraryType = button.dataset.editorLibraryType;
+      state.editorLibraryCategoryId = null;
+      state.editorLibraryQuery = "";
+      search.value = "";
+      renderEditorLibrary();
+    });
   });
 }
 
