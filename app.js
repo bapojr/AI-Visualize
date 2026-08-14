@@ -3062,7 +3062,7 @@ function renderEditorLibraryDetail(results, category, query) {
   const back = document.createElement("button");
   back.className = "editor-library-back";
   back.type = "button";
-  back.setAttribute("aria-label", "Back to library categories");
+  back.setAttribute("aria-label", "Back to gallery categories");
   back.innerHTML = '<svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M12.25 7H1.75M6 2.75 1.75 7 6 11.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   back.addEventListener("click", () => {
     state.editorLibraryCategoryId = null;
@@ -3072,7 +3072,7 @@ function renderEditorLibraryDetail(results, category, query) {
     renderEditorLibrary();
   });
   const root = document.createElement("span");
-  root.textContent = "Library /";
+  root.textContent = "Gallery /";
   const title = document.createElement("strong");
   title.textContent = category.name;
   heading.append(back, root, title);
@@ -3121,7 +3121,7 @@ function renderEditorLibrary() {
   if (!results || !search) return;
   const query = state.editorLibraryQuery.trim().toLowerCase();
   results.innerHTML = "";
-  search.placeholder = state.editorLibraryCategoryId ? "Search illustrations" : "Search library";
+  search.placeholder = state.editorLibraryCategoryId ? "Search illustrations" : "Search gallery";
   if (search.value !== state.editorLibraryQuery) search.value = state.editorLibraryQuery;
   const category = editorLibraryCategories.find((item) => item.id === state.editorLibraryCategoryId);
   if (category) renderEditorLibraryDetail(results, category, query);
