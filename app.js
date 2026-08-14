@@ -1640,6 +1640,7 @@ function bindEditorImageMoreMenu() {
   const addImageCopy = (snapshot) => {
     const stageContent = document.getElementById("editorCanvasStageContent");
     if (!stageContent || !snapshot?.src) return;
+    clearEditorImageSelectionForCanvasObject();
     drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
     const image = document.createElement("img");
     image.className = "canvas-object canvas-imported-image is-selected";
@@ -2320,6 +2321,20 @@ function clearCanvasObjectSelection() {
   state.selectedTableCell = null;
 }
 
+function clearEditorImageSelectionForCanvasObject() {
+  state.isEditorFrameSelected = false;
+  state.selectedEditorSegmentId = null;
+  state.selectedEditorSegmentType = null;
+  document.getElementById("editorCanvasStageContent")?.classList.remove("is-frame-selected");
+  document.querySelectorAll("#editorImageSegmentation .editor-segment").forEach((segment) => {
+    segment.classList.remove("active", "is-multi-selected", "inspector-hover");
+  });
+  document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
+  document.getElementById("editorImageActionStack")?.classList.add("hidden");
+  document.getElementById("editorTextActionStack")?.classList.add("hidden");
+  setEditorSegmentDetailVisible(false);
+}
+
 function tableDashStyle(value) {
   return Number(value) > 0 ? "dashed" : "solid";
 }
@@ -2929,6 +2944,7 @@ function addUploadedAssetToCanvas(asset) {
   const stageContent = document.getElementById("editorCanvasStageContent");
   if (!drawingLayer || !stageContent || !asset?.src) return;
 
+  clearEditorImageSelectionForCanvasObject();
   drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
   const image = document.createElement("img");
   image.className = "canvas-object canvas-imported-image is-selected";
@@ -3487,19 +3503,7 @@ function bindCanvasToolbar() {
       item.classList.remove("is-selected");
     });
     object?.classList.add("is-selected");
-    if (object?.classList.contains("canvas-table-object")) {
-      state.isEditorFrameSelected = false;
-      state.selectedEditorSegmentId = null;
-      state.selectedEditorSegmentType = null;
-      stageContent.classList.remove("is-frame-selected");
-      document.querySelectorAll("#editorImageSegmentation .editor-segment").forEach((segment) => {
-        segment.classList.remove("active", "is-multi-selected", "inspector-hover");
-      });
-      document.querySelectorAll(".editor-object-item").forEach((item) => item.classList.remove("selected"));
-      document.getElementById("editorImageActionStack")?.classList.add("hidden");
-      document.getElementById("editorTextActionStack")?.classList.add("hidden");
-      setEditorSegmentDetailVisible(false);
-    }
+    if (object) clearEditorImageSelectionForCanvasObject();
     if (!object?.classList.contains("canvas-table-object") || previousTable !== object) {
       document.querySelectorAll(".canvas-table-object th.is-selected, .canvas-table-object td.is-selected").forEach((cell) => {
         cell.classList.remove("is-selected");
@@ -3840,6 +3844,37 @@ function bindCanvasToolbar() {
   });
 
   setCanvasTool(state.canvasTool);
+}
+
+function bindCanvasDeleteShortcut() {
+  document.addEventListener("keydown", (event) => {
+    if (!["Backspace", "Delete"].includes(event.key) || event.defaultPrevented || event.isComposing) return;
+    if (state.desktop.activeScreen !== "editor-desktop") return;
+
+    const target = event.target instanceof Element ? event.target : null;
+    if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+
+    const selectedObjects = Array.from(document.querySelectorAll(".canvas-object.is-selected"));
+    const generatedImageSelected = state.isEditorFrameSelected && !state.isBlankEditor;
+    if (!selectedObjects.length && !generatedImageSelected) return;
+
+    event.preventDefault();
+    selectedObjects.forEach((object) => object.remove());
+    clearCanvasObjectSelection();
+
+    if (generatedImageSelected) {
+      state.isBlankEditor = true;
+      state.isEditorFrameSelected = false;
+      state.selectedEditorSegmentId = null;
+      state.selectedEditorSegmentType = null;
+      renderEditorCanvas();
+    } else {
+      clearEditorImageSelectionForCanvasObject();
+      renderEditorInspector();
+    }
+
+    setCanvasTool("select");
+  });
 }
 
 function bindSelectGroups() {
@@ -4881,6 +4916,7 @@ function init() {
   bindEditorCrop();
   bindEditorRegionEditing();
   bindCanvasToolbar();
+  bindCanvasDeleteShortcut();
   bindEditorLibrary();
   setEditorPanelView("left", state.editorLeftPanelView);
   setEditorPanelView("right", state.editorRightPanelView);
