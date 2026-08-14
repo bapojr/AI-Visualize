@@ -931,6 +931,26 @@
                     </section>
                   </div>
                 </div>
+                <div class="editor-chart-settings" id="editorChartSettings" hidden>
+                  <div class="editor-canvas-settings-heading editor-chart-settings-heading">
+                    <span class="editor-chart-heading-icon" aria-hidden="true">
+                      <svg viewBox="0 0 16 16"><path d="M9.492 1.547V5.64h4.093a5.7 5.7 0 0 0-4.093-4.093ZM5.22 7.776V2.64A5.697 5.697 0 1 0 9.18 13.326L5.713 9.137a2.13 2.13 0 0 1-.492-1.361ZM15.125 6.118a.895.895 0 0 1-.887.946H9.017a.949.949 0 0 1-.949-.95V.895a.895.895 0 0 1 .946-.887 7.12 7.12 0 0 1 6.111 6.11Z" fill="currentColor"/></svg>
+                    </span>
+                    <span>Chart</span>
+                  </div>
+                  <section class="editor-chart-settings-section">
+                    <div class="editor-chart-selected-summary">
+                      <span id="editorChartSelectedIcon" aria-hidden="true"></span>
+                      <div><strong id="editorChartSelectedType">Column chart</strong><span>Editable chart</span></div>
+                    </div>
+                    <button class="editor-chart-edit-button" id="editorChartEditButton" type="button">Edit chart data</button>
+                  </section>
+                  <section class="editor-chart-settings-section">
+                    <h2>Transform</h2>
+                    <label class="editor-chart-control-row"><span>Rotation</span><input id="editorChartRotation" type="number" min="-180" max="180" step="1" value="0" /><output>0°</output></label>
+                    <label class="editor-chart-control-row"><span>Opacity</span><input id="editorChartOpacity" type="range" min="10" max="100" value="100" /><output>100%</output></label>
+                  </section>
+                </div>
                 <div class="editor-image-settings" id="editorImageSettings" hidden>
                   <div class="editor-canvas-settings-heading">Image</div>
                   <section class="editor-image-settings-section editor-image-prompt-section" aria-labelledby="editorImagePromptHeading">
@@ -1128,6 +1148,11 @@
                     <path d="M13.7143 0C14.975 0 16 1.025 16 2.28571V13.7143C16 14.975 14.975 16 13.7143 16H2.28571L2.05357 15.9893C0.9 15.8714 0 14.8964 0 13.7143V2.28571C0 1.025 1.025 0 2.28571 0H13.7143ZM1.71429 10V13.7143C1.71429 14.0286 1.97143 14.2857 2.28571 14.2857H7.14286V10H1.71429ZM8.85714 10V14.2857H13.7143C14.0286 14.2857 14.2857 14.0286 14.2857 13.7143V10H8.85714ZM1.71429 8.28571H7.14286V4.57143H1.71429V8.28571ZM8.85714 8.28571H14.2857V4.57143H8.85714V8.28571Z" fill="currentColor"/>
                   </svg>
                 </button>
+                <button class="canvas-tool-button" id="canvasChartToolButton" type="button" data-canvas-tool="chart" data-tooltip="Charts" aria-label="Charts" aria-expanded="false" aria-controls="canvasChartMenu">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M9.49204 1.54663V5.64007H13.5855C13.0694 3.64081 11.4943 2.06276 9.49204 1.54663ZM5.22062 7.77578V2.64118C3.00779 3.42428 1.42381 5.53329 1.42381 8.01308C1.42381 11.1573 3.97479 13.7083 7.11903 13.7083C7.84873 13.7083 8.54284 13.5719 9.18058 13.3257L5.71302 9.1373C5.39563 8.75465 5.22062 8.27115 5.22062 7.77578ZM15.125 6.11764C15.1932 6.63674 14.7631 7.06388 14.2381 7.06388H9.01744C8.49241 7.06388 8.06824 6.6397 8.06824 6.11468V0.894053C8.06824 0.369024 8.49538 -0.0610838 9.01447 0.00714024C12.1884 0.42835 14.7038 2.94374 15.125 6.11764ZM6.64443 1.92335V7.77578C6.64443 7.94189 6.70375 8.10207 6.80757 8.22962L10.726 12.9578C11.0731 13.3761 10.9989 14.0079 10.5213 14.266C9.50984 14.8177 8.35003 15.1321 7.11903 15.1321C3.18873 15.1321 0 11.9434 0 8.01308C0 4.58705 2.4175 1.72757 5.64183 1.0483C6.17873 0.935581 6.64443 1.37459 6.64443 1.92335ZM15.1072 8.48769C15.6559 8.48769 16.0949 8.95339 15.9822 9.49028C15.6797 10.926 14.944 12.2014 13.9177 13.1744C13.5529 13.5214 12.9804 13.4473 12.66 13.0587L10.1595 10.042C9.64629 9.42206 10.0883 8.48769 10.8892 8.48769H15.1072Z" fill="currentColor"/>
+                  </svg>
+                </button>
                 <span class="canvas-toolbar-divider" aria-hidden="true"></span>
                 <button class="canvas-tool-button" id="canvasImportButton" type="button" data-canvas-tool="import" data-tooltip="Import" aria-label="Import">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -1178,6 +1203,7 @@
                   <div class="canvas-table-size-grid" id="canvasTableSizeGrid" role="grid" aria-label="Table size grid"></div>
                   <div class="canvas-table-size-label" id="canvasTableSizeLabel">Select table size</div>
                 </div>
+                <div class="canvas-chart-menu" id="canvasChartMenu" aria-label="Choose a chart type" hidden></div>
               </div>
               <input class="canvas-import-input" id="canvasImportInput" type="file" accept="image/*" hidden />
               <div class="canvas-stage" id="editorCanvasStage">
@@ -2183,7 +2209,37 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
+    <div class="editor-chart-modal" id="editorChartModal" hidden>
+      <section class="editor-chart-dialog" role="dialog" aria-modal="true" aria-labelledby="editorChartDialogTitle" tabindex="-1">
+        <header class="editor-chart-dialog-header">
+          <div class="editor-chart-dialog-title">
+            <span class="editor-chart-dialog-mark" aria-hidden="true"></span>
+            <div><h2 id="editorChartDialogTitle">Create chart</h2><p id="editorChartDialogSubtitle">Build a publication-ready data visual.</p></div>
+          </div>
+          <button class="editor-chart-dialog-close" id="editorChartModalClose" type="button" aria-label="Close chart editor">×</button>
+        </header>
+        <div class="editor-chart-dialog-body">
+          <aside class="editor-chart-builder">
+            <div class="editor-chart-builder-tabs" role="tablist" aria-label="Chart settings">
+              <button class="active" type="button" role="tab" aria-selected="true" data-chart-editor-tab="content">Content</button>
+              <button type="button" role="tab" aria-selected="false" data-chart-editor-tab="appearance">Appearance</button>
+            </div>
+            <div class="editor-chart-builder-panel" id="editorChartContentPanel" data-chart-editor-panel="content"></div>
+            <div class="editor-chart-builder-panel" id="editorChartAppearancePanel" data-chart-editor-panel="appearance" hidden></div>
+          </aside>
+          <section class="editor-chart-preview-panel" aria-label="Live chart preview">
+            <div class="editor-chart-preview-heading"><span>Live preview</span><strong id="editorChartPreviewType">Column chart</strong></div>
+            <div class="editor-chart-preview" id="editorChartPreview"></div>
+          </section>
+        </div>
+        <footer class="editor-chart-dialog-footer">
+          <button class="editor-chart-cancel" id="editorChartModalCancel" type="button">Cancel</button>
+          <button class="editor-chart-insert" id="editorChartModalInsert" type="button">Insert chart</button>
+        </footer>
+      </section>
+    </div>
+
     <script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.24/dist/dotlottie-wc.js"></script>
-    <script src="app.js?v=55"></script>
+    <script src="app.js?v=68"></script>
   </body>
 </html>

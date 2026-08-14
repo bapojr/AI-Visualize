@@ -465,6 +465,9 @@ const state = {
   tableUnderline: false,
   tableTransparency: 0,
   selectedTableCell: null,
+  chartDraft: null,
+  chartEditingObject: null,
+  chartEditorTab: "content",
   canvasPanX: 0,
   canvasPanY: 0,
   editorLeftPanelCollapsed: false,
@@ -2466,6 +2469,469 @@ function selectedCanvasTable() {
   return document.querySelector(".canvas-table-object.is-selected");
 }
 
+const chartTypeDefinitions = [
+  {id: "column", label: "Column"},
+  {id: "bar", label: "Bar"},
+  {id: "stacked-column", label: "Stacked column"},
+  {id: "stacked-bar", label: "Stacked bar"},
+  {id: "area", label: "Area"},
+  {id: "doughnut", label: "Doughnut"},
+  {id: "semi-doughnut", label: "Semi-doughnut"},
+  {id: "pie", label: "Pie"},
+  {id: "radar", label: "Radar"},
+  {id: "line", label: "Line"},
+];
+
+function chartTypeLabel(type) {
+  return chartTypeDefinitions.find((item) => item.id === type)?.label || "Chart";
+}
+
+function createDefaultChartConfig(type = "column") {
+  const circular = ["doughnut", "semi-doughnut", "pie"].includes(type);
+  return {
+    type,
+    title: circular ? "Study composition" : "Research outcomes",
+    subtitle: circular ? "Participants by cohort" : "Comparison across timepoints",
+    categories: circular ? ["Treatment"] : ["Baseline", "Week 4", "Week 8"],
+    series: [
+      {id: `series-${Date.now()}-1`, name: "Treatment", color: "#0062FF", values: circular ? [62] : [12, 18, 25]},
+      {id: `series-${Date.now()}-2`, name: "Control", color: "#21A7A2", values: circular ? [38] : [10, 14, 17]},
+    ],
+    legend: "bottom",
+    showValues: true,
+    fontColor: "#13161B",
+    background: "#FFFFFF",
+    gridColor: "#D8E0EE",
+  };
+}
+
+function cloneChartConfig(config) {
+  return JSON.parse(JSON.stringify(config));
+}
+
+function chartEscape(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"})[character]);
+}
+
+function chartPolar(cx, cy, radius, angle) {
+  const radians = (angle - 90) * Math.PI / 180;
+  return {x: cx + radius * Math.cos(radians), y: cy + radius * Math.sin(radians)};
+}
+
+function chartArcPath(cx, cy, radius, startAngle, endAngle, innerRadius = 0) {
+  const start = chartPolar(cx, cy, radius, endAngle);
+  const end = chartPolar(cx, cy, radius, startAngle);
+  const largeArc = endAngle - startAngle <= 180 ? 0 : 1;
+  if (!innerRadius) return `M ${cx} ${cy} L ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArc} 0 ${end.x} ${end.y} Z`;
+  const innerStart = chartPolar(cx, cy, innerRadius, endAngle);
+  const innerEnd = chartPolar(cx, cy, innerRadius, startAngle);
+  return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArc} 0 ${end.x} ${end.y} L ${innerEnd.x} ${innerEnd.y} A ${innerRadius} ${innerRadius} 0 ${largeArc} 1 ${innerStart.x} ${innerStart.y} Z`;
+}
+
+function chartLegendMarkup(config, width, y, compact) {
+  if (compact || config.legend === "none") return "";
+  const items = config.series.map((series) => `<g><circle cx="0" cy="0" r="5" fill="${series.color}"/><text x="10" y="4" fill="${config.fontColor}" font-size="11" font-weight="500">${chartEscape(series.name)}</text></g>`);
+  const itemWidth = Math.max(78, (width - 40) / Math.max(1, items.length));
+  return `<g transform="translate(${Math.max(20, width / 2 - itemWidth * items.length / 2)} ${y})">${items.map((item, index) => `<g transform="translate(${index * itemWidth} 0)">${item}</g>`).join("")}</g>`;
+}
+
+function renderChartSvg(config, width = 640, height = 400, compact = false) {
+  const safeWidth = Math.max(120, width);
+  const safeHeight = Math.max(80, height);
+  const categories = config.categories.length ? config.categories : ["Category"];
+  const series = config.series.length ? config.series : [{name: "Series", color: "#0062FF", values: [0]}];
+  const headerHeight = compact ? 4 : 64;
+  const legendTop = config.legend === "top" && !compact ? 69 : null;
+  const plotTop = compact ? 8 : legendTop ? 88 : 78;
+  const plotBottom = compact ? safeHeight - 8 : config.legend === "bottom" ? safeHeight - 48 : safeHeight - 28;
+  const plotLeft = compact ? 10 : 54;
+  const plotRight = safeWidth - (compact ? 10 : 24);
+  const plotWidth = Math.max(10, plotRight - plotLeft);
+  const plotHeight = Math.max(10, plotBottom - plotTop);
+  const allValues = series.flatMap((item) => item.values.map((value) => Math.max(0, Number(value) || 0)));
+  const stackedMax = Math.max(...categories.map((_, categoryIndex) => series.reduce((total, item) => total + (Number(item.values[categoryIndex]) || 0), 0)), 1);
+  const maxValue = Math.max(...allValues, 1);
+  const scaleMax = ["stacked-column", "stacked-bar"].includes(config.type) ? stackedMax : maxValue;
+  const title = compact ? "" : `<text x="${safeWidth / 2}" y="27" text-anchor="middle" fill="${config.fontColor}" font-size="18" font-weight="600">${chartEscape(config.title)}</text><text x="${safeWidth / 2}" y="47" text-anchor="middle" fill="#717F99" font-size="11" font-weight="500">${chartEscape(config.subtitle)}</text>`;
+  const topLegend = legendTop ? chartLegendMarkup(config, safeWidth, legendTop, compact) : "";
+  const bottomLegend = config.legend === "bottom" ? chartLegendMarkup(config, safeWidth, safeHeight - 20, compact) : "";
+  let body = "";
+
+  if (["pie", "doughnut", "semi-doughnut"].includes(config.type)) {
+    const values = series.map((item) => Math.max(0, Number(item.values[0]) || 0));
+    const total = values.reduce((sum, value) => sum + value, 0) || 1;
+    const semi = config.type === "semi-doughnut";
+    const startBase = semi ? -90 : 0;
+    const sweep = semi ? 180 : 360;
+    const radius = Math.max(18, Math.min(plotWidth, plotHeight) * (semi ? 0.42 : 0.38));
+    const cx = safeWidth / 2;
+    const cy = semi ? plotBottom - 8 : plotTop + plotHeight / 2;
+    let angle = startBase;
+    body = values.map((value, index) => {
+      const next = angle + value / total * sweep;
+      const inner = config.type === "pie" ? 0 : radius * 0.56;
+      const path = chartArcPath(cx, cy, radius, angle, next, inner);
+      const mid = (angle + next) / 2;
+      const labelPoint = chartPolar(cx, cy, radius * 0.76, mid);
+      const label = config.showValues && !compact ? `<text x="${labelPoint.x}" y="${labelPoint.y + 4}" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">${Math.round(value / total * 100)}%</text>` : "";
+      angle = next;
+      return `<path d="${path}" fill="${series[index].color}" stroke="${config.background}" stroke-width="2"/>${label}`;
+    }).join("");
+  } else if (config.type === "radar") {
+    const count = Math.max(3, categories.length);
+    const radius = Math.min(plotWidth, plotHeight) * 0.38;
+    const cx = safeWidth / 2;
+    const cy = plotTop + plotHeight / 2;
+    const rings = [0.33, 0.66, 1].map((ratio) => `<polygon points="${Array.from({length: count}, (_, index) => { const point = chartPolar(cx, cy, radius * ratio, index * 360 / count); return `${point.x},${point.y}`; }).join(" ")}" fill="none" stroke="${config.gridColor}" stroke-width="1"/>`).join("");
+    const axes = Array.from({length: count}, (_, index) => { const point = chartPolar(cx, cy, radius, index * 360 / count); return `<line x1="${cx}" y1="${cy}" x2="${point.x}" y2="${point.y}" stroke="${config.gridColor}"/>${compact ? "" : `<text x="${point.x}" y="${point.y + (point.y < cy ? -6 : 14)}" text-anchor="middle" fill="${config.fontColor}" font-size="10">${chartEscape(categories[index] || `Point ${index + 1}`)}</text>`}`; }).join("");
+    const shapes = series.map((item) => `<polygon points="${Array.from({length: count}, (_, index) => { const value = Number(item.values[index]) || 0; const point = chartPolar(cx, cy, radius * value / scaleMax, index * 360 / count); return `${point.x},${point.y}`; }).join(" ")}" fill="${item.color}" fill-opacity="0.15" stroke="${item.color}" stroke-width="2"/>`).join("");
+    body = rings + axes + shapes;
+  } else {
+    const horizontal = ["bar", "stacked-bar"].includes(config.type);
+    const stacked = ["stacked-column", "stacked-bar"].includes(config.type);
+    const lineLike = ["line", "area"].includes(config.type);
+    const grid = compact ? "" : Array.from({length: 5}, (_, index) => {
+      if (horizontal) {
+        const x = plotLeft + index * plotWidth / 4;
+        return `<line x1="${x}" y1="${plotTop}" x2="${x}" y2="${plotBottom}" stroke="${config.gridColor}" stroke-width="1"/><text x="${x}" y="${plotBottom + 16}" text-anchor="middle" fill="#717F99" font-size="9">${Math.round(scaleMax * index / 4)}</text>`;
+      }
+      const y = plotBottom - index * plotHeight / 4;
+      return `<line x1="${plotLeft}" y1="${y}" x2="${plotRight}" y2="${y}" stroke="${config.gridColor}" stroke-width="1"/><text x="${plotLeft - 8}" y="${y + 3}" text-anchor="end" fill="#717F99" font-size="9">${Math.round(scaleMax * index / 4)}</text>`;
+    }).join("");
+    const axis = `<line x1="${plotLeft}" y1="${plotBottom}" x2="${plotRight}" y2="${plotBottom}" stroke="#9AA7BC" stroke-width="1"/>`;
+    let marks = "";
+    if (lineLike) {
+      marks = series.map((item) => {
+        const points = categories.map((_, index) => {
+          const x = plotLeft + (categories.length === 1 ? plotWidth / 2 : index * plotWidth / (categories.length - 1));
+          const value = Number(item.values[index]) || 0;
+          const y = plotBottom - value / scaleMax * plotHeight;
+          return {x, y, value};
+        });
+        const pointString = points.map((point) => `${point.x},${point.y}`).join(" ");
+        const fill = config.type === "area" ? `<polygon points="${plotLeft},${plotBottom} ${pointString} ${plotRight},${plotBottom}" fill="${item.color}" fill-opacity="0.16"/>` : "";
+        const dots = points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="3.5" fill="${item.color}"/>${config.showValues && !compact ? `<text x="${point.x}" y="${point.y - 8}" text-anchor="middle" fill="${config.fontColor}" font-size="9" font-weight="600">${point.value}</text>` : ""}`).join("");
+        return `${fill}<polyline points="${pointString}" fill="none" stroke="${item.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${dots}`;
+      }).join("");
+    } else if (horizontal) {
+      const categoryHeight = plotHeight / categories.length;
+      const barHeight = stacked ? categoryHeight * 0.48 : categoryHeight * 0.62 / series.length;
+      marks = categories.map((category, categoryIndex) => {
+        let offset = 0;
+        const label = compact ? "" : `<text x="${plotLeft - 8}" y="${plotTop + categoryHeight * (categoryIndex + .5) + 3}" text-anchor="end" fill="${config.fontColor}" font-size="9">${chartEscape(category)}</text>`;
+        const bars = series.map((item, seriesIndex) => {
+          const value = Number(item.values[categoryIndex]) || 0;
+          const length = value / scaleMax * plotWidth;
+          const x = plotLeft + (stacked ? offset : 0);
+          const y = plotTop + categoryIndex * categoryHeight + (stacked ? categoryHeight * .26 : categoryHeight * .19 + seriesIndex * barHeight);
+          offset += length;
+          return `<rect x="${x}" y="${y}" width="${Math.max(0, length)}" height="${barHeight}" rx="2" fill="${item.color}"/>${config.showValues && !compact ? `<text x="${x + length + 5}" y="${y + barHeight / 2 + 3}" fill="${config.fontColor}" font-size="9" font-weight="600">${value}</text>` : ""}`;
+        }).join("");
+        return label + bars;
+      }).join("");
+    } else {
+      const categoryWidth = plotWidth / categories.length;
+      const barWidth = stacked ? categoryWidth * 0.5 : categoryWidth * 0.68 / series.length;
+      marks = categories.map((category, categoryIndex) => {
+        let offset = 0;
+        const label = compact ? "" : `<text x="${plotLeft + categoryWidth * (categoryIndex + .5)}" y="${plotBottom + 15}" text-anchor="middle" fill="${config.fontColor}" font-size="9">${chartEscape(category)}</text>`;
+        const bars = series.map((item, seriesIndex) => {
+          const value = Number(item.values[categoryIndex]) || 0;
+          const barHeight = value / scaleMax * plotHeight;
+          const x = plotLeft + categoryIndex * categoryWidth + (stacked ? categoryWidth * .25 : categoryWidth * .16 + seriesIndex * barWidth);
+          const y = plotBottom - barHeight - (stacked ? offset : 0);
+          offset += barHeight;
+          return `<rect x="${x}" y="${y}" width="${barWidth}" height="${Math.max(0, barHeight)}" rx="2" fill="${item.color}"/>${config.showValues && !compact ? `<text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" fill="${config.fontColor}" font-size="9" font-weight="600">${value}</text>` : ""}`;
+        }).join("");
+        return label + bars;
+      }).join("");
+    }
+    body = grid + axis + marks;
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${safeWidth} ${safeHeight}" role="img" aria-label="${chartEscape(config.title || chartTypeLabel(config.type))}" preserveAspectRatio="none"><rect width="${safeWidth}" height="${safeHeight}" fill="${config.background}"/>${title}${topLegend}${body}${bottomLegend}</svg>`;
+}
+
+function chartDeleteIcon() {
+  return `<svg viewBox="0 0 14 16" aria-hidden="true"><path d="M5.04 0c-.4 0-.77.25-.91.63l-.49 1.31H.73a.73.73 0 0 0 0 1.45h12.12a.73.73 0 0 0 0-1.45H9.94L9.45.63A.97.97 0 0 0 8.54 0h-3.5ZM.97 4.85v9.21A1.94 1.94 0 0 0 2.91 16h7.76a1.94 1.94 0 0 0 1.94-1.94V4.85h-1.46v9.21a.49.49 0 0 1-.48.49H2.91a.49.49 0 0 1-.49-.49V4.85H.97Zm4.85 2.18a.73.73 0 0 0-1.46 0v5.33a.73.73 0 0 0 1.46 0V7.03Zm3.39 0a.73.73 0 0 0-1.45 0v5.33a.73.73 0 0 0 1.45 0V7.03Z" fill="currentColor"/></svg>`;
+}
+
+function renderChartEditorPanels() {
+  const config = state.chartDraft;
+  const content = document.getElementById("editorChartContentPanel");
+  const appearance = document.getElementById("editorChartAppearancePanel");
+  if (!config || !content || !appearance) return;
+  const seriesCount = config.series.length;
+  content.innerHTML = `
+    <label class="editor-chart-field"><span>Chart title</span><input data-chart-field="title" value="${chartEscape(config.title)}" /></label>
+    <label class="editor-chart-field"><span>Subtitle</span><input data-chart-field="subtitle" value="${chartEscape(config.subtitle)}" /></label>
+    <div class="editor-chart-section-title"><h3>Series</h3><button type="button" data-chart-action="add-series">+ Add series</button></div>
+    <div>${config.series.map((series, index) => `<div class="editor-chart-series" data-series-index="${index}"><input type="color" data-series-field="color" value="${series.color}" aria-label="${chartEscape(series.name)} color"/><input data-series-field="name" value="${chartEscape(series.name)}" aria-label="Series name"/><button class="editor-chart-icon-button" type="button" data-chart-action="delete-series" aria-label="Delete ${chartEscape(series.name)}" ${seriesCount <= 1 ? "disabled" : ""}>${chartDeleteIcon()}</button></div>`).join("")}</div>
+    <div class="editor-chart-section-title"><h3>Data</h3><button type="button" data-chart-action="add-row">+ Add row</button></div>
+    <div>${config.categories.map((category, rowIndex) => `<div class="editor-chart-row" style="--chart-series-count:${seriesCount}" data-row-index="${rowIndex}"><input data-row-field="category" value="${chartEscape(category)}" aria-label="Category name"/>${config.series.map((series, seriesIndex) => `<input type="number" min="0" step="1" data-value-series="${seriesIndex}" value="${Number(series.values[rowIndex]) || 0}" aria-label="${chartEscape(series.name)} value"/>`).join("")}<button class="editor-chart-icon-button" type="button" data-chart-action="delete-row" aria-label="Delete ${chartEscape(category)}" ${config.categories.length <= 1 ? "disabled" : ""}>${chartDeleteIcon()}</button></div>`).join("")}</div>
+  `;
+  appearance.innerHTML = `
+    <div class="editor-chart-section-title"><h3>Labels</h3></div>
+    <label class="editor-chart-toggle-row"><span>Show values</span><input type="checkbox" data-chart-field="showValues" ${config.showValues ? "checked" : ""}/></label>
+    <div class="editor-chart-legend-field"><span>Legend position</span><div class="editor-chart-legend-options">${["bottom", "top", "none"].map((value) => `<button class="${config.legend === value ? "active" : ""}" type="button" data-chart-legend="${value}">${value[0].toUpperCase() + value.slice(1)}</button>`).join("")}</div></div>
+    <div class="editor-chart-section-title"><h3>Colors</h3></div>
+    <div class="editor-chart-appearance-colors">
+      <label class="editor-chart-appearance-color"><input type="color" data-chart-field="fontColor" value="${config.fontColor}"/><span>Text</span></label>
+      <label class="editor-chart-appearance-color"><input type="color" data-chart-field="background" value="${config.background}"/><span>Background</span></label>
+      <label class="editor-chart-appearance-color"><input type="color" data-chart-field="gridColor" value="${config.gridColor}"/><span>Grid</span></label>
+    </div>
+  `;
+  updateChartPreview();
+}
+
+function updateChartPreview() {
+  const config = state.chartDraft;
+  const preview = document.getElementById("editorChartPreview");
+  if (!config || !preview) return;
+  preview.innerHTML = renderChartSvg(config, 640, 420);
+  const type = `${chartTypeLabel(config.type)} chart`;
+  const typeLabel = document.getElementById("editorChartPreviewType");
+  if (typeLabel) typeLabel.textContent = type;
+}
+
+function createCanvasChart(config) {
+  const object = document.createElement("div");
+  object.className = "canvas-object canvas-chart-object is-selected";
+  object.chartConfig = cloneChartConfig(config);
+  object.dataset.chartType = config.type;
+  object.dataset.chartRotation = "0";
+  object.dataset.chartOpacity = "100";
+  const render = document.createElement("div");
+  render.className = "canvas-chart-render";
+  render.innerHTML = renderChartSvg(object.chartConfig, 640, 420);
+  object.appendChild(render);
+  ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach((position) => {
+    const handle = document.createElement("button");
+    handle.type = "button";
+    handle.className = "canvas-chart-handle";
+    handle.dataset.chartResize = position;
+    handle.setAttribute("aria-label", `Resize chart ${position}`);
+    object.appendChild(handle);
+  });
+  const rotate = document.createElement("button");
+  rotate.type = "button";
+  rotate.className = "canvas-chart-rotate-control";
+  rotate.dataset.chartRotate = "true";
+  rotate.setAttribute("aria-label", "Rotate chart");
+  object.appendChild(rotate);
+  return object;
+}
+
+function selectedCanvasChart() {
+  return document.querySelector(".canvas-chart-object.is-selected");
+}
+
+function updateCanvasChart(object) {
+  if (!object?.chartConfig) return;
+  object.dataset.chartType = object.chartConfig.type;
+  const render = object.querySelector(".canvas-chart-render");
+  if (render) render.innerHTML = renderChartSvg(object.chartConfig, 640, 420);
+}
+
+function syncChartSettingsPanel() {
+  const chart = selectedCanvasChart();
+  if (!chart) return;
+  const type = document.getElementById("editorChartSelectedType");
+  const icon = document.getElementById("editorChartSelectedIcon");
+  const rotation = document.getElementById("editorChartRotation");
+  const opacity = document.getElementById("editorChartOpacity");
+  if (type) type.textContent = `${chartTypeLabel(chart.chartConfig?.type)} chart`;
+  if (icon && chart.chartConfig) icon.innerHTML = renderChartSvg({...chart.chartConfig, title: "", subtitle: "", legend: "none", showValues: false}, 60, 42, true);
+  if (rotation) {
+    rotation.value = chart.dataset.chartRotation || "0";
+    rotation.nextElementSibling.textContent = `${rotation.value}°`;
+  }
+  if (opacity) {
+    opacity.value = chart.dataset.chartOpacity || "100";
+    opacity.nextElementSibling.textContent = `${opacity.value}%`;
+  }
+}
+
+function setChartEditorTab(tab) {
+  state.chartEditorTab = tab;
+  document.querySelectorAll("[data-chart-editor-tab]").forEach((button) => {
+    const selected = button.dataset.chartEditorTab === tab;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-selected", String(selected));
+  });
+  document.querySelectorAll("[data-chart-editor-panel]").forEach((panel) => {
+    panel.hidden = panel.dataset.chartEditorPanel !== tab;
+  });
+}
+
+function openChartEditor(type = "column", chartObject = null) {
+  const modal = document.getElementById("editorChartModal");
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.classList.add("editor-chart-modal-open");
+  state.chartEditingObject = chartObject;
+  state.chartDraft = cloneChartConfig(chartObject?.chartConfig || createDefaultChartConfig(type));
+  state.chartDraft.type = type || state.chartDraft.type;
+  renderChartEditorPanels();
+  setChartEditorTab("content");
+  const title = document.getElementById("editorChartDialogTitle");
+  const subtitle = document.getElementById("editorChartDialogSubtitle");
+  const insert = document.getElementById("editorChartModalInsert");
+  if (title) title.textContent = chartObject ? `Edit ${chartTypeLabel(state.chartDraft.type)} chart` : `Create ${chartTypeLabel(state.chartDraft.type)} chart`;
+  if (subtitle) subtitle.textContent = "Edit data and styling while the preview updates in real time.";
+  if (insert) insert.textContent = chartObject ? "Apply changes" : "Insert chart";
+  modal.querySelector(".editor-chart-dialog")?.focus();
+}
+
+function closeChartEditor() {
+  const modal = document.getElementById("editorChartModal");
+  if (modal) modal.hidden = true;
+  document.body.classList.remove("editor-chart-modal-open");
+  state.chartDraft = null;
+  state.chartEditingObject = null;
+}
+
+function bindEditorChart() {
+  const modal = document.getElementById("editorChartModal");
+  if (!modal) return;
+
+  document.querySelectorAll("[data-chart-editor-tab]").forEach((button) => {
+    button.addEventListener("click", () => setChartEditorTab(button.dataset.chartEditorTab));
+  });
+
+  const refreshStructure = () => {
+    renderChartEditorPanels();
+    setChartEditorTab(state.chartEditorTab);
+  };
+
+  modal.addEventListener("input", (event) => {
+    const config = state.chartDraft;
+    if (!config) return;
+    const field = event.target.dataset.chartField;
+    if (field) {
+      config[field] = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+      updateChartPreview();
+      return;
+    }
+    const seriesElement = event.target.closest("[data-series-index]");
+    if (seriesElement && event.target.dataset.seriesField) {
+      const series = config.series[Number(seriesElement.dataset.seriesIndex)];
+      if (series) series[event.target.dataset.seriesField] = event.target.value;
+      updateChartPreview();
+      return;
+    }
+    const rowElement = event.target.closest("[data-row-index]");
+    if (!rowElement) return;
+    const rowIndex = Number(rowElement.dataset.rowIndex);
+    if (event.target.dataset.rowField === "category") config.categories[rowIndex] = event.target.value;
+    if (event.target.dataset.valueSeries !== undefined) {
+      const series = config.series[Number(event.target.dataset.valueSeries)];
+      if (series) series.values[rowIndex] = Math.max(0, Number(event.target.value) || 0);
+    }
+    updateChartPreview();
+  });
+
+  modal.addEventListener("click", (event) => {
+    const config = state.chartDraft;
+    if (!config) return;
+    const legend = event.target.closest("[data-chart-legend]");
+    if (legend) {
+      config.legend = legend.dataset.chartLegend;
+      refreshStructure();
+      return;
+    }
+    const actionButton = event.target.closest("[data-chart-action]");
+    if (!actionButton) return;
+    const action = actionButton.dataset.chartAction;
+    if (action === "add-series" && config.series.length < 5) {
+      const colors = ["#F28C5E", "#58A65C", "#E3B341"];
+      config.series.push({
+        id: `series-${Date.now()}`,
+        name: `Series ${config.series.length + 1}`,
+        color: colors[(config.series.length - 2) % colors.length],
+        values: config.categories.map(() => 0),
+      });
+    }
+    if (action === "delete-series" && config.series.length > 1) {
+      const index = Number(actionButton.closest("[data-series-index]")?.dataset.seriesIndex);
+      config.series.splice(index, 1);
+    }
+    if (action === "add-row" && config.categories.length < 10) {
+      config.categories.push(`Category ${config.categories.length + 1}`);
+      config.series.forEach((series) => series.values.push(0));
+    }
+    if (action === "delete-row" && config.categories.length > 1) {
+      const index = Number(actionButton.closest("[data-row-index]")?.dataset.rowIndex);
+      config.categories.splice(index, 1);
+      config.series.forEach((series) => series.values.splice(index, 1));
+    }
+    refreshStructure();
+  });
+
+  const finish = () => closeChartEditor();
+  document.getElementById("editorChartModalClose")?.addEventListener("click", finish);
+  document.getElementById("editorChartModalCancel")?.addEventListener("click", finish);
+  modal.addEventListener("pointerdown", (event) => {
+    if (event.target === modal) finish();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) finish();
+  });
+
+  document.getElementById("editorChartModalInsert")?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!state.chartDraft) return;
+    const editingObject = state.chartEditingObject;
+    if (editingObject) {
+      editingObject.chartConfig = cloneChartConfig(state.chartDraft);
+      updateCanvasChart(editingObject);
+      closeChartEditor();
+      showEditorLeftEditPanel();
+      requestAnimationFrame(() => {
+        editingObject.classList.add("is-selected");
+        setCanvasTool("select");
+      });
+      return;
+    }
+    const layer = document.getElementById("canvasWorkspaceLayer");
+    if (!layer) return;
+    clearCanvasObjectSelection();
+    clearEditorImageSelectionForCanvasObject();
+    const chart = createCanvasChart(state.chartDraft);
+    layer.appendChild(chart);
+    const left = Math.max(12, (layer.offsetWidth - chart.offsetWidth) / 2);
+    const top = Math.max(12, (layer.offsetHeight - chart.offsetHeight) / 2);
+    chart.style.left = `${left}px`;
+    chart.style.top = `${top}px`;
+    closeChartEditor();
+    showEditorLeftEditPanel();
+    requestAnimationFrame(() => {
+      chart.classList.add("is-selected");
+      setCanvasTool("select");
+    });
+  });
+
+  document.getElementById("editorChartEditButton")?.addEventListener("click", () => {
+    const chart = selectedCanvasChart();
+    if (chart) openChartEditor(chart.chartConfig?.type || "column", chart);
+  });
+  document.getElementById("editorChartRotation")?.addEventListener("input", (event) => {
+    const chart = selectedCanvasChart();
+    if (!chart) return;
+    const value = Math.max(-180, Math.min(180, Number(event.target.value) || 0));
+    chart.dataset.chartRotation = `${value}`;
+    chart.style.setProperty("--chart-rotation", `${value}deg`);
+    syncChartSettingsPanel();
+  });
+  document.getElementById("editorChartOpacity")?.addEventListener("input", (event) => {
+    const chart = selectedCanvasChart();
+    if (!chart) return;
+    chart.dataset.chartOpacity = event.target.value;
+    chart.style.opacity = `${Number(event.target.value) / 100}`;
+    syncChartSettingsPanel();
+  });
+}
+
 function selectedCanvasTableCell() {
   return selectedCanvasTable()?.querySelector("td.is-selected, th.is-selected") || null;
 }
@@ -2499,6 +2965,7 @@ function showEditorLeftEditPanel() {
 function selectedCanvasObjectSettingsTool() {
   const selectedObject = document.querySelector(".canvas-object.is-selected");
   if (!selectedObject) return null;
+  if (selectedObject.classList.contains("canvas-chart-object")) return "chart";
   if (selectedObject.classList.contains("canvas-table-object")) return "table";
   if (selectedObject.classList.contains("canvas-shape-object")) return "shape";
   if (selectedObject.classList.contains("canvas-line-object")) return "line";
@@ -3006,12 +3473,13 @@ function setCanvasTool(tool) {
   const segmentSelected = Boolean(state.selectedEditorSegmentId) && !imageSelected;
   const textSegmentSelected = segmentSelected && state.selectedEditorSegmentType === "text";
   const tableSelected = Boolean(selectedCanvasTable());
+  const chartSelected = Boolean(selectedCanvasChart());
   const selectedObjectTool = selectedCanvasObjectSettingsTool();
   const settingsTool = tool === "select" && selectedObjectTool ? selectedObjectTool : tool;
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
   const canvasSettings = document.getElementById("editorCanvasSettings");
-  if (canvasSettings) canvasSettings.hidden = imageSelected || tableSelected || !["select", "hand"].includes(settingsTool);
+  if (canvasSettings) canvasSettings.hidden = imageSelected || tableSelected || chartSelected || !["select", "hand"].includes(settingsTool);
   const shapeSettings = document.getElementById("editorShapeSettings");
   if (shapeSettings) shapeSettings.hidden = imageSelected || settingsTool !== "shape";
   if (!imageSelected && settingsTool === "shape") syncShapeSettingsPanel();
@@ -3030,6 +3498,9 @@ function setCanvasTool(tool) {
   const tableSettings = document.getElementById("editorTableSettings");
   if (tableSettings) tableSettings.hidden = imageSelected || !tableSelected || settingsTool !== "table";
   if (!imageSelected && tableSelected && settingsTool === "table") syncTableSettingsPanel();
+  const chartSettings = document.getElementById("editorChartSettings");
+  if (chartSettings) chartSettings.hidden = imageSelected || !chartSelected || settingsTool !== "chart";
+  if (!imageSelected && chartSelected && settingsTool === "chart") syncChartSettingsPanel();
   const imageSettings = document.getElementById("editorImageSettings");
   if (imageSettings) imageSettings.hidden = !imageSelected;
   if (imageSelected) syncImageSettingsPanel();
@@ -3574,6 +4045,8 @@ function bindCanvasToolbar() {
   const tableMenu = document.getElementById("canvasTableMenu");
   const tableGrid = document.getElementById("canvasTableSizeGrid");
   const tableLabel = document.getElementById("canvasTableSizeLabel");
+  const chartToolButton = document.getElementById("canvasChartToolButton");
+  const chartMenu = document.getElementById("canvasChartMenu");
   if (!stage || !mediaShell || !stageContent || !drawingLayer || !workspaceLayer) return;
 
   document.getElementById("editorUploadsAdd")?.addEventListener("click", () => importInput?.click());
@@ -3587,6 +4060,8 @@ function bindCanvasToolbar() {
     });
     if (tableMenu) tableMenu.hidden = true;
     tableToolButton?.setAttribute("aria-expanded", "false");
+    if (chartMenu) chartMenu.hidden = true;
+    chartToolButton?.setAttribute("aria-expanded", "false");
   };
 
   if (tableGrid && !tableGrid.children.length) {
@@ -3619,6 +4094,30 @@ function bindCanvasToolbar() {
     tableGrid.addEventListener("mouseleave", () => {
       tableGrid.querySelectorAll("button").forEach((item) => item.classList.remove("preview"));
       if (tableLabel) tableLabel.textContent = "Select table size";
+    });
+  }
+
+  if (chartMenu && !chartMenu.children.length) {
+    chartTypeDefinitions.forEach((definition) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "canvas-chart-option";
+      button.dataset.chartType = definition.id;
+      button.innerHTML = `<span class="canvas-chart-option-preview">${renderChartSvg({...createDefaultChartConfig(definition.id), title: "", subtitle: "", legend: "none", showValues: false}, 120, 78, true)}</span><strong>${definition.label}</strong>`;
+      button.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeToolMenus();
+        openChartEditor(definition.id);
+      });
+      button.addEventListener("keydown", (event) => {
+        if (!['Enter', ' '].includes(event.key)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        closeToolMenus();
+        openChartEditor(definition.id);
+      });
+      chartMenu.appendChild(button);
     });
   }
 
@@ -3775,6 +4274,16 @@ function bindCanvasToolbar() {
         }
         return;
       }
+      if (tool === "chart") {
+        setCanvasTool("select");
+        const willOpen = chartMenu?.hidden ?? false;
+        closeToolMenus();
+        if (chartMenu && willOpen) {
+          chartMenu.hidden = false;
+          chartToolButton?.setAttribute("aria-expanded", "true");
+        }
+        return;
+      }
       closeToolMenus();
       setCanvasTool(tool);
       if (tool === "import") {
@@ -3816,7 +4325,9 @@ function bindCanvasToolbar() {
   stage.addEventListener("pointercancel", endPan);
 
   let drawSession = null;
-  let tableDragSession = null;
+  let objectDragSession = null;
+  let chartResizeSession = null;
+  let chartRotateSession = null;
   let suppressTableClick = false;
   mediaShell.addEventListener("click", (event) => {
     if (!suppressTableClick) return;
@@ -3928,44 +4439,139 @@ function bindCanvasToolbar() {
 
   workspaceLayer.addEventListener("pointerdown", (event) => {
     if (event.button !== 0 || state.canvasTool !== "select") return;
-    const table = event.target.closest(".canvas-table-object");
-    if (!table) return;
+    const object = event.target.closest(".canvas-table-object, .canvas-chart-object");
+    if (!object) return;
     event.preventDefault();
     event.stopPropagation();
-    selectObject(table);
-    tableDragSession = {
+    selectObject(object);
+
+    const resizeHandle = event.target.closest("[data-chart-resize]");
+    if (resizeHandle && object.classList.contains("canvas-chart-object")) {
+      chartResizeSession = {
+        pointerId: event.pointerId,
+        object,
+        direction: resizeHandle.dataset.chartResize,
+        startX: event.clientX,
+        startY: event.clientY,
+        left: parseFloat(object.style.left || "0"),
+        top: parseFloat(object.style.top || "0"),
+        width: object.offsetWidth,
+        height: object.offsetHeight,
+      };
+      object.classList.add("is-resizing");
+      object.setPointerCapture?.(event.pointerId);
+      return;
+    }
+
+    if (event.target.closest("[data-chart-rotate]") && object.classList.contains("canvas-chart-object")) {
+      const rect = object.getBoundingClientRect();
+      chartRotateSession = {
+        pointerId: event.pointerId,
+        object,
+        centerX: rect.left + rect.width / 2,
+        centerY: rect.top + rect.height / 2,
+        startAngle: Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)),
+        rotation: Number(object.dataset.chartRotation) || 0,
+      };
+      object.classList.add("is-rotating");
+      object.setPointerCapture?.(event.pointerId);
+      return;
+    }
+
+    objectDragSession = {
       pointerId: event.pointerId,
-      table,
+      object,
       startX: event.clientX,
       startY: event.clientY,
-      left: parseFloat(table.style.left || "0"),
-      top: parseFloat(table.style.top || "0"),
+      left: parseFloat(object.style.left || "0"),
+      top: parseFloat(object.style.top || "0"),
       moved: false,
     };
-    table.setPointerCapture?.(event.pointerId);
+    object.setPointerCapture?.(event.pointerId);
   });
+
+  const updateChartTransform = (event) => {
+    const scale = state.zoom / 100;
+    if (chartResizeSession) {
+      event.preventDefault();
+      const session = chartResizeSession;
+      const deltaX = (event.clientX - session.startX) / scale;
+      const deltaY = (event.clientY - session.startY) / scale;
+      const west = session.direction.includes("w");
+      const east = session.direction.includes("e");
+      const north = session.direction.includes("n");
+      const south = session.direction.includes("s");
+      const width = Math.max(220, session.width + (east ? deltaX : west ? -deltaX : 0));
+      const height = Math.max(160, session.height + (south ? deltaY : north ? -deltaY : 0));
+      session.object.style.width = `${width}px`;
+      session.object.style.height = `${height}px`;
+      if (west) session.object.style.left = `${Math.max(0, session.left + session.width - width)}px`;
+      if (north) session.object.style.top = `${Math.max(0, session.top + session.height - height)}px`;
+      return true;
+    }
+    if (chartRotateSession) {
+      event.preventDefault();
+      const session = chartRotateSession;
+      const angle = Math.atan2(event.clientY - session.centerY, event.clientX - session.centerX);
+      let rotation = session.rotation + (angle - session.startAngle) * 180 / Math.PI;
+      if (event.shiftKey) rotation = Math.round(rotation / 15) * 15;
+      rotation = Math.round(rotation * 10) / 10;
+      session.object.dataset.chartRotation = `${rotation}`;
+      session.object.style.setProperty("--chart-rotation", `${rotation}deg`);
+      syncChartSettingsPanel();
+      return true;
+    }
+    return false;
+  };
+
+  window.addEventListener("pointermove", (event) => {
+    if (chartResizeSession || chartRotateSession) updateChartTransform(event);
+  }, true);
 
   workspaceLayer.addEventListener("pointermove", (event) => {
-    if (!tableDragSession || event.pointerId !== tableDragSession.pointerId) return;
+    if (chartResizeSession || chartRotateSession) return;
     const scale = state.zoom / 100;
-    const deltaX = (event.clientX - tableDragSession.startX) / scale;
-    const deltaY = (event.clientY - tableDragSession.startY) / scale;
-    if (!tableDragSession.moved && Math.hypot(deltaX, deltaY) < 4) return;
+    if (!objectDragSession || event.pointerId !== objectDragSession.pointerId) return;
+    const deltaX = (event.clientX - objectDragSession.startX) / scale;
+    const deltaY = (event.clientY - objectDragSession.startY) / scale;
+    if (!objectDragSession.moved && Math.hypot(deltaX, deltaY) < 4) return;
     event.preventDefault();
-    tableDragSession.moved = true;
-    tableDragSession.table.classList.add("is-dragging");
-    const maxLeft = Math.max(0, workspaceLayer.offsetWidth - tableDragSession.table.offsetWidth);
-    const maxTop = Math.max(0, workspaceLayer.offsetHeight - tableDragSession.table.offsetHeight);
-    tableDragSession.table.style.left = `${Math.max(0, Math.min(maxLeft, tableDragSession.left + deltaX))}px`;
-    tableDragSession.table.style.top = `${Math.max(0, Math.min(maxTop, tableDragSession.top + deltaY))}px`;
+    objectDragSession.moved = true;
+    objectDragSession.object.classList.add("is-dragging");
+    const maxLeft = Math.max(0, workspaceLayer.offsetWidth - objectDragSession.object.offsetWidth);
+    const maxTop = Math.max(0, workspaceLayer.offsetHeight - objectDragSession.object.offsetHeight);
+    objectDragSession.object.style.left = `${Math.max(0, Math.min(maxLeft, objectDragSession.left + deltaX))}px`;
+    objectDragSession.object.style.top = `${Math.max(0, Math.min(maxTop, objectDragSession.top + deltaY))}px`;
   });
 
+  const endChartTransform = () => {
+    if (chartResizeSession) {
+      const pointerId = chartResizeSession.pointerId;
+      if (chartResizeSession.object.hasPointerCapture?.(pointerId)) chartResizeSession.object.releasePointerCapture(pointerId);
+      chartResizeSession.object.classList.remove("is-resizing");
+      chartResizeSession = null;
+      suppressTableClick = true;
+      window.setTimeout(() => { suppressTableClick = false; }, 0);
+      return;
+    }
+    if (chartRotateSession) {
+      const pointerId = chartRotateSession.pointerId;
+      if (chartRotateSession.object.hasPointerCapture?.(pointerId)) chartRotateSession.object.releasePointerCapture(pointerId);
+      chartRotateSession.object.classList.remove("is-rotating");
+      chartRotateSession = null;
+      suppressTableClick = true;
+      window.setTimeout(() => { suppressTableClick = false; }, 0);
+    }
+  };
+  window.addEventListener("pointerup", endChartTransform, true);
+  window.addEventListener("pointercancel", endChartTransform, true);
+
   const endTableDrag = (event) => {
-    if (!tableDragSession || event.pointerId !== tableDragSession.pointerId) return;
-    tableDragSession.table.releasePointerCapture?.(event.pointerId);
-    tableDragSession.table.classList.remove("is-dragging");
-    suppressTableClick = tableDragSession.moved;
-    tableDragSession = null;
+    if (!objectDragSession || event.pointerId !== objectDragSession.pointerId) return;
+    objectDragSession.object.releasePointerCapture?.(event.pointerId);
+    objectDragSession.object.classList.remove("is-dragging");
+    suppressTableClick = objectDragSession.moved;
+    objectDragSession = null;
     if (suppressTableClick) window.setTimeout(() => { suppressTableClick = false; }, 0);
   };
   workspaceLayer.addEventListener("pointerup", endTableDrag);
@@ -5116,6 +5722,7 @@ function init() {
   bindEditorTextSettings();
   bindEditorFrameSettings();
   bindEditorTableSettings();
+  bindEditorChart();
   bindEditorImageSettings();
   bindEditorSegmentSettings();
   bindEditorInspector();

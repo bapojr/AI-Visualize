@@ -5248,6 +5248,7 @@ a {
 .editor-pen-settings,
 .editor-text-settings,
 .editor-frame-settings,
+.editor-chart-settings,
 .editor-image-settings,
 .editor-segment-graphic-settings,
 .editor-segment-text-settings {
@@ -5261,6 +5262,7 @@ a {
 .editor-pen-settings[hidden],
 .editor-text-settings[hidden],
 .editor-frame-settings[hidden],
+.editor-chart-settings[hidden],
 .editor-image-settings[hidden],
 .editor-segment-graphic-settings[hidden],
 .editor-segment-text-settings[hidden],
@@ -6396,7 +6398,7 @@ a {
   left: 50%;
   z-index: 20;
   display: flex;
-  width: 417px;
+  width: 456px;
   height: 40px;
   padding: 4px 12px;
   align-items: center;
@@ -6405,6 +6407,643 @@ a {
   border-radius: 25px;
   background: var(--Gray-1, #fff);
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+.canvas-chart-menu {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  z-index: 42;
+  display: flex;
+  width: clamp(360px, calc(100vw - 704px), 780px);
+  padding: 10px;
+  gap: 8px;
+  overflow-x: auto;
+  transform: translateX(-50%);
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 12px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.08), 16px 8px 32px 16px rgba(0, 0, 0, 0.02);
+  scrollbar-width: thin;
+}
+
+.canvas-chart-menu[hidden] {
+  display: none;
+}
+
+.canvas-chart-option {
+  display: flex;
+  width: 116px;
+  min-width: 116px;
+  height: 96px;
+  padding: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+  font: 500 12px/16px "IBM Plex Sans", sans-serif;
+  text-align: left;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.canvas-chart-option:hover,
+.canvas-chart-option:focus-visible {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.canvas-chart-option-preview {
+  display: grid;
+  min-height: 58px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 5px;
+  background: linear-gradient(145deg, #f8f9fd 0%, #fff 100%);
+}
+
+.canvas-chart-option-preview svg {
+  display: block;
+  width: 102px;
+  height: 58px;
+}
+
+.canvas-chart-object {
+  width: 460px;
+  height: 320px;
+  min-width: 220px;
+  min-height: 160px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 8px 24px rgba(5, 30, 87, 0.1);
+  cursor: move !important;
+  touch-action: none;
+  transform: rotate(var(--chart-rotation, 0deg));
+  transform-origin: center;
+}
+
+.canvas-chart-object.is-dragging,
+.canvas-chart-object.is-resizing,
+.canvas-chart-object.is-rotating {
+  cursor: grabbing !important;
+}
+
+.canvas-chart-render {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.canvas-chart-render svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-chart-handle {
+  position: absolute;
+  z-index: 4;
+  display: none;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+}
+
+.canvas-chart-handle::after {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--Blue-9, #0062ff);
+  border-radius: 3px;
+  background: var(--Gray-1, #fff);
+  content: "";
+}
+
+.canvas-chart-object.is-selected .canvas-chart-handle,
+.canvas-chart-object.is-selected .canvas-chart-rotate-control {
+  display: block;
+}
+
+.canvas-chart-handle[data-chart-resize="nw"] { left: 0; top: 0; cursor: nwse-resize; }
+.canvas-chart-handle[data-chart-resize="n"] { left: 50%; top: 0; cursor: ns-resize; }
+.canvas-chart-handle[data-chart-resize="ne"] { left: 100%; top: 0; cursor: nesw-resize; }
+.canvas-chart-handle[data-chart-resize="e"] { left: 100%; top: 50%; cursor: ew-resize; }
+.canvas-chart-handle[data-chart-resize="se"] { left: 100%; top: 100%; cursor: nwse-resize; }
+.canvas-chart-handle[data-chart-resize="s"] { left: 50%; top: 100%; cursor: ns-resize; }
+.canvas-chart-handle[data-chart-resize="sw"] { left: 0; top: 100%; cursor: nesw-resize; }
+.canvas-chart-handle[data-chart-resize="w"] { left: 0; top: 50%; cursor: ew-resize; }
+
+.canvas-chart-rotate-control {
+  position: absolute;
+  bottom: calc(100% + 24px);
+  left: 50%;
+  z-index: 4;
+  display: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  transform: translateX(-50%);
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.canvas-chart-rotate-control::after {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 1.5px;
+  height: 20px;
+  transform: translateX(-50%);
+  background: var(--Blue-9, #0062ff);
+  content: "";
+}
+
+.canvas-chart-rotate-control::before {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--Blue-9, #0062ff);
+  border-radius: 50%;
+  background: var(--Gray-1, #fff);
+  content: "";
+}
+
+.editor-chart-settings-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-chart-heading-icon,
+.editor-chart-dialog-mark {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-chart-heading-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.editor-chart-settings-section {
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+}
+
+.editor-chart-settings-section h2 {
+  margin: 0 0 14px;
+  color: var(--Gray-12, #13161b);
+  font: 500 16px/22px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-selected-summary {
+  display: flex;
+  padding: 12px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 8px;
+  background: var(--Gray-2, #f8f9fd);
+}
+
+.editor-chart-selected-summary > span {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--Gray-1, #fff);
+}
+
+.editor-chart-selected-summary svg {
+  width: 34px;
+  height: 28px;
+}
+
+.editor-chart-selected-summary div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.editor-chart-selected-summary strong,
+.editor-chart-selected-summary span {
+  color: var(--Gray-12, #13161b);
+  font: 500 14px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-selected-summary div span {
+  color: var(--Gray-10, #717f99);
+  font-size: 12px;
+}
+
+.editor-chart-edit-button {
+  width: 100%;
+  height: 36px;
+  margin-top: 12px;
+  border: 1px solid var(--Blue-9, #0062ff);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+  color: var(--Blue-10, #0054f1);
+  font: 500 14px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-control-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 44px;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  color: var(--Gray-11, #5d6a81);
+  font: 500 13px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-control-row input[type="number"] {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.editor-chart-control-row output {
+  color: var(--Gray-12, #13161b);
+  text-align: right;
+}
+
+.editor-chart-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  padding: 28px;
+  place-items: center;
+  background: rgba(5, 15, 36, 0.7);
+}
+
+.editor-chart-modal[hidden] {
+  display: none;
+}
+
+.editor-chart-dialog {
+  display: grid;
+  width: min(1120px, calc(100vw - 56px));
+  max-height: min(760px, calc(100vh - 56px));
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.12), 16px 8px 32px 16px rgba(0, 0, 0, 0.08);
+  outline: none;
+}
+
+.editor-chart-dialog-header,
+.editor-chart-dialog-footer {
+  display: flex;
+  padding: 16px 20px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+}
+
+.editor-chart-dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.editor-chart-dialog-title h2,
+.editor-chart-dialog-title p {
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-dialog-title h2 {
+  color: var(--Gray-12, #13161b);
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.editor-chart-dialog-title p {
+  color: var(--Gray-10, #717f99);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.editor-chart-dialog-close {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.editor-chart-dialog-close:hover {
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-chart-dialog-body {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: 430px minmax(0, 1fr);
+}
+
+.editor-chart-builder {
+  min-height: 0;
+  overflow: auto;
+  border-right: 1px solid var(--Gray-5, #e4eaf7);
+  background: var(--Gray-2, #f8f9fd);
+}
+
+.editor-chart-builder-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+  background: var(--Gray-1, #fff);
+}
+
+.editor-chart-builder-tabs button {
+  position: relative;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  font: 500 14px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-builder-tabs button.active {
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-chart-builder-tabs button.active::after {
+  position: absolute;
+  right: 18px;
+  bottom: -1px;
+  left: 18px;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: var(--Blue-9, #0062ff);
+  content: "";
+}
+
+.editor-chart-builder-panel {
+  padding: 16px;
+}
+
+.editor-chart-field,
+.editor-chart-toggle-row,
+.editor-chart-legend-field {
+  display: flex;
+  margin-bottom: 14px;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--Gray-11, #5d6a81);
+  font: 500 12px/16px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-field input,
+.editor-chart-field select,
+.editor-chart-series input,
+.editor-chart-row input {
+  height: 36px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-12, #13161b);
+  font: 500 13px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-section-title {
+  display: flex;
+  margin: 18px 0 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editor-chart-section-title h3 {
+  margin: 0;
+  color: var(--Gray-12, #13161b);
+  font: 600 14px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-section-title button,
+.editor-chart-add-button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--Blue-9, #0062ff);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+  color: var(--Blue-10, #0054f1);
+  font: 500 12px/16px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-series,
+.editor-chart-row {
+  display: grid;
+  margin-bottom: 8px;
+  padding: 8px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+}
+
+.editor-chart-series {
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+}
+
+.editor-chart-row {
+  grid-template-columns: minmax(90px, 1fr) repeat(var(--chart-series-count, 2), minmax(54px, .62fr)) 32px;
+}
+
+.editor-chart-series input[type="color"],
+.editor-chart-appearance-color input[type="color"] {
+  width: 32px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+}
+
+.editor-chart-icon-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--Gray-10, #717f99);
+}
+
+.editor-chart-icon-button:hover {
+  background: #fff0f2;
+  color: #d82038;
+}
+
+.editor-chart-icon-button svg {
+  width: 14px;
+  height: 16px;
+}
+
+.editor-chart-preview-panel {
+  display: flex;
+  min-width: 0;
+  padding: 22px;
+  flex-direction: column;
+  background: linear-gradient(150deg, #fff 0%, #f8fbff 100%);
+}
+
+.editor-chart-preview-heading {
+  display: flex;
+  margin-bottom: 12px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--Gray-10, #717f99);
+  font: 500 12px/16px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-preview-heading strong {
+  color: var(--Blue-10, #0054f1);
+  font-weight: 600;
+}
+
+.editor-chart-preview {
+  display: grid;
+  min-height: 360px;
+  flex: 1;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 12px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 0 12px 36px rgba(5, 30, 87, 0.07);
+}
+
+.editor-chart-preview svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.editor-chart-appearance-colors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.editor-chart-appearance-color {
+  display: grid;
+  padding: 9px;
+  grid-template-columns: 32px 1fr;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 8px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+  font: 500 12px/16px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-toggle-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editor-chart-toggle-row input {
+  width: 36px;
+  height: 20px;
+  accent-color: var(--Blue-9, #0062ff);
+}
+
+.editor-chart-legend-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.editor-chart-legend-options button {
+  height: 34px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+  font: 500 12px/16px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-legend-options button.active {
+  border-color: var(--Blue-9, #0062ff);
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-chart-dialog-footer {
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--Gray-5, #e4eaf7);
+  border-bottom: 0;
+}
+
+.editor-chart-dialog-footer button {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 6px;
+  font: 500 14px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-chart-cancel {
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+}
+
+.editor-chart-insert {
+  min-width: 118px;
+  border: 1px solid var(--Blue-9, #0062ff);
+  background: var(--Blue-9, #0062ff);
+  color: var(--Gray-1, #fff);
+}
+
+@media (max-width: 900px) {
+  .editor-chart-dialog-body { grid-template-columns: minmax(300px, 42%) minmax(0, 1fr); }
+  .editor-chart-preview-panel { padding: 14px; }
 }
 
 .canvas-tool-button,
