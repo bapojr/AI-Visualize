@@ -866,6 +866,7 @@ function getGalleryItems(category) {
 }
 
 function setScreen(name) {
+  if (name !== "editor-desktop") hideEditorLibraryPreview();
   const isMobile = name.includes("mobile");
   const targetScreens = isMobile ? mobileScreens : desktopScreens;
 
@@ -3535,6 +3536,7 @@ function updateCanvasTransform() {
 }
 
 function setEditorPanelView(panel, view) {
+  if (panel === "left" && view !== "library") hideEditorLibraryPreview();
   if (panel === "left") state.editorLeftPanelView = view;
   if (panel === "right") state.editorRightPanelView = view;
 
@@ -3670,6 +3672,92 @@ function editorLibraryAssetsFor(category) {
 }
 
 let editorLibraryStatusTimer = null;
+let editorLibraryPreviewState = null;
+
+function ensureEditorLibraryPreview() {
+  let preview = document.getElementById("editorLibraryHoverPreview");
+  if (preview) return preview;
+
+  preview = document.createElement("aside");
+  preview.id = "editorLibraryHoverPreview";
+  preview.className = "editor-library-hover-preview";
+  preview.setAttribute("role", "tooltip");
+  preview.setAttribute("aria-hidden", "true");
+  preview.innerHTML = `
+    <div class="editor-library-hover-preview-header">
+      <div class="editor-library-hover-preview-title"></div>
+      <span class="editor-library-hover-preview-kind"></span>
+    </div>
+    <div class="editor-library-hover-preview-media">
+      <img alt="" />
+    </div>
+  `;
+  document.body.appendChild(preview);
+  preview.querySelector("img")?.addEventListener("load", () => positionEditorLibraryPreview());
+  return preview;
+}
+
+function editorLibraryPreviewKind(asset) {
+  if (asset.kind === "icon") return "Icon";
+  if (asset.kind === "template") return "Template";
+  return "Illustration";
+}
+
+function positionEditorLibraryPreview() {
+  const preview = document.getElementById("editorLibraryHoverPreview");
+  const card = editorLibraryPreviewState?.card;
+  const leftPanel = document.getElementById("editorLeftPanel");
+  const rightPanel = document.getElementById("historyPanel");
+  if (!preview || !card?.isConnected || !leftPanel || state.editorLeftPanelCollapsed) {
+    hideEditorLibraryPreview();
+    return;
+  }
+
+  const cardRect = card.getBoundingClientRect();
+  const leftPanelRect = leftPanel.getBoundingClientRect();
+  const rightBoundary = rightPanel?.getBoundingClientRect().left || window.innerWidth;
+  const gap = 16;
+  const viewportPadding = 16;
+  const availableWidth = rightBoundary - leftPanelRect.right - gap - viewportPadding;
+  if (availableWidth < 240) {
+    hideEditorLibraryPreview();
+    return;
+  }
+
+  preview.style.width = `${Math.min(420, availableWidth)}px`;
+  preview.style.left = `${leftPanelRect.right + gap}px`;
+  const previewRect = preview.getBoundingClientRect();
+  const minTop = 52 + viewportPadding;
+  const maxTop = Math.max(minTop, window.innerHeight - previewRect.height - viewportPadding);
+  const centeredTop = cardRect.top + cardRect.height / 2 - previewRect.height / 2;
+  preview.style.top = `${Math.min(maxTop, Math.max(minTop, centeredTop))}px`;
+}
+
+function showEditorLibraryPreview(card, asset) {
+  const editor = document.getElementById("editorDesktopScreen");
+  if (!editor?.classList.contains("active") || state.editorLeftPanelCollapsed || state.editorLeftPanelView !== "library") return;
+
+  const preview = ensureEditorLibraryPreview();
+  const kind = editorLibraryPreviewKind(asset);
+  editorLibraryPreviewState = {card, asset};
+  preview.dataset.kind = kind.toLowerCase();
+  preview.querySelector(".editor-library-hover-preview-title").textContent = asset.title;
+  preview.querySelector(".editor-library-hover-preview-kind").textContent = kind;
+  const image = preview.querySelector("img");
+  image.src = asset.src;
+  image.alt = `${asset.title} ${kind.toLowerCase()} preview`;
+  preview.setAttribute("aria-hidden", "false");
+  preview.classList.add("visible");
+  positionEditorLibraryPreview();
+}
+
+function hideEditorLibraryPreview() {
+  editorLibraryPreviewState = null;
+  const preview = document.getElementById("editorLibraryHoverPreview");
+  if (!preview) return;
+  preview.classList.remove("visible");
+  preview.setAttribute("aria-hidden", "true");
+}
 
 function showEditorLibraryStatus(message) {
   const status = document.getElementById("editorLibraryStatus");
@@ -3763,6 +3851,7 @@ function renderEditorLibraryAssetGrid(results, assets, emptyMessage) {
   assets.forEach((asset) => {
     const card = document.createElement("article");
     card.className = `editor-library-asset is-${asset.kind || "illustration"}`;
+    card.setAttribute("aria-label", `${asset.title}. Hover or focus to preview.`);
     const image = document.createElement("img");
     image.src = asset.src;
     image.alt = asset.title;
@@ -3779,6 +3868,14 @@ function renderEditorLibraryAssetGrid(results, assets, emptyMessage) {
     );
     overlay.append(name, actions);
     card.append(image, overlay);
+    card.addEventListener("pointerenter", () => showEditorLibraryPreview(card, asset));
+    card.addEventListener("pointerleave", () => {
+      if (!card.contains(document.activeElement)) hideEditorLibraryPreview();
+    });
+    card.addEventListener("focusin", () => showEditorLibraryPreview(card, asset));
+    card.addEventListener("focusout", (event) => {
+      if (!card.contains(event.relatedTarget)) hideEditorLibraryPreview();
+    });
     grid.appendChild(card);
   });
 
@@ -3823,6 +3920,7 @@ function renderEditorLibrary() {
   const results = document.getElementById("editorLibraryResults");
   const search = document.getElementById("editorLibrarySearch");
   if (!results || !search) return;
+  hideEditorLibraryPreview();
   const query = state.editorLibraryQuery.trim().toLowerCase();
   const type = state.editorLibraryType || "illustrations";
   results.innerHTML = "";
@@ -3859,6 +3957,15 @@ function bindEditorLibrary() {
       search.value = "";
       renderEditorLibrary();
     });
+  });
+  document.getElementById("editorLibraryResults")?.addEventListener("scroll", () => {
+    if (editorLibraryPreviewState) positionEditorLibraryPreview();
+  }, {passive: true});
+  window.addEventListener("resize", () => {
+    if (editorLibraryPreviewState) positionEditorLibraryPreview();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") hideEditorLibraryPreview();
   });
 }
 
@@ -4019,6 +4126,7 @@ function bindEditorSlides() {
 }
 
 function setEditorLeftPanelCollapsed(collapsed) {
+  if (collapsed) hideEditorLibraryPreview();
   state.editorLeftPanelCollapsed = collapsed;
   document.getElementById("editorDesktopScreen")?.classList.toggle("editor-left-panel-collapsed", collapsed);
   const leftPanel = document.getElementById("editorLeftPanel");

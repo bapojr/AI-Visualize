@@ -4644,6 +4644,97 @@ a {
   transform: translate(-50%, 0);
 }
 
+.editor-library-hover-preview {
+  position: fixed;
+  top: 68px;
+  left: calc(var(--editor-left-panel-width) + 16px);
+  z-index: 45;
+  width: 380px;
+  max-width: calc(100vw - var(--editor-left-panel-width) - var(--editor-right-panel-width) - 32px);
+  overflow: hidden;
+  border: 1px solid var(--Gray-5, #e4eaf7);
+  border-radius: 12px;
+  background: var(--Gray-1, #fff);
+  box-shadow: 4px 4px 16px 0 rgba(0, 0, 0, 0.08), 16px 8px 32px 16px rgba(0, 0, 0, 0.02);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-8px) scale(0.985);
+  transform-origin: left center;
+  transition: opacity 140ms ease, transform 180ms ease;
+  visibility: hidden;
+}
+
+.editor-library-hover-preview.visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  visibility: visible;
+}
+
+.editor-library-hover-preview-header {
+  display: flex;
+  min-height: 56px;
+  padding: 10px 12px 10px 16px;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+  background: var(--Gray-1, #fff);
+}
+
+.editor-library-hover-preview-title {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  color: var(--Gray-12, #13161b);
+  font: 600 16px/22px "IBM Plex Sans", sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-library-hover-preview-kind {
+  display: inline-flex;
+  height: 24px;
+  padding: 0 8px;
+  flex: 0 0 auto;
+  align-items: center;
+  border: 1px solid var(--Blue-5, #c7d9ff);
+  border-radius: 999px;
+  background: var(--Blue-3, #edf3ff);
+  color: var(--Blue-11, #1c4dc1);
+  font: 600 11px/14px "IBM Plex Sans", sans-serif;
+}
+
+.editor-library-hover-preview-media {
+  display: grid;
+  height: clamp(260px, 46vh, 420px);
+  padding: 20px;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(0, 98, 255, 0.07), transparent 44%),
+    var(--Gray-2, #f8f9fd);
+}
+
+.editor-library-hover-preview-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.editor-library-hover-preview[data-kind="icon"] .editor-library-hover-preview-media img {
+  width: min(68%, 240px);
+  height: min(68%, 240px);
+}
+
+.editor-library-hover-preview[data-kind="template"] .editor-library-hover-preview-media {
+  padding: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editor-library-hover-preview {
+    transition: none;
+  }
+}
+
 .editor-library-empty {
   display: grid;
   min-height: 160px;
