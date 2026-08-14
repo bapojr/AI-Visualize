@@ -30,6 +30,8 @@
   --radius-md: 16px;
   --radius-sm: 12px;
   --radius-pill: 999px;
+  --editor-left-panel-width: 400px;
+  --editor-right-panel-width: 280px;
 }
 
 /* Landing sidebar: signed-in desktop specification. */
@@ -3597,7 +3599,7 @@ a {
 
 .editor-main {
   display: grid;
-  grid-template-columns: 400px minmax(0, 1fr) 280px;
+  grid-template-columns: var(--editor-left-panel-width) minmax(0, 1fr) var(--editor-right-panel-width);
   height: calc(100vh - 52px);
   min-height: calc(100vh - 52px);
   background: #ffffff;
@@ -4779,7 +4781,7 @@ a {
 }
 
 #editorDesktopScreen.editor-left-panel-collapsed .editor-main {
-  grid-template-columns: 0 minmax(0, 1fr) 280px;
+  grid-template-columns: 0 minmax(0, 1fr) var(--editor-right-panel-width);
   height: 100vh;
   min-height: 100vh;
 }
@@ -8104,7 +8106,9 @@ a {
 
 .editor-chat-panel {
   display: flex;
-  min-width: 0;
+  width: var(--editor-right-panel-width);
+  min-width: var(--editor-right-panel-width);
+  max-width: var(--editor-right-panel-width);
   padding: 0;
   align-items: stretch;
   flex-direction: column;
@@ -8113,12 +8117,26 @@ a {
 }
 
 .editor-right-panel-header {
+  min-width: 0;
+  padding: 0 12px;
   justify-content: flex-start;
+}
+
+.editor-right-panel-header .editor-panel-tabs {
+  width: 100%;
+  gap: 8px;
+}
+
+.editor-right-panel-header .editor-panel-tab {
+  min-width: 0;
+  padding: 0 2px;
+  flex: 1 1 0;
 }
 
 .editor-right-panel-view {
   display: none;
   width: 100%;
+  min-width: 0;
   min-height: 0;
   padding: 12px;
   flex: 1 1 auto;
@@ -8196,7 +8214,7 @@ a {
 .editor-slides-list {
   display: flex;
   min-height: 0;
-  padding: 16px;
+  padding: 12px;
   flex: 1 1 auto;
   flex-direction: column;
   gap: 18px;
@@ -8388,6 +8406,7 @@ a {
 
 .editor-inspector-scroll {
   width: 100%;
+  min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
   overflow-x: hidden;
@@ -8398,6 +8417,8 @@ a {
 
 .editor-segment-detail {
   display: flex;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
@@ -8687,7 +8708,8 @@ a {
   width: 100%;
   height: 160px;
   min-height: 160px;
-  padding: 16px;
+  max-width: 100%;
+  padding: 14px 12px;
   flex: 0 0 auto;
   flex-direction: column;
   border: 1px solid var(--Gray-5, #e4eaf7);
@@ -8728,13 +8750,13 @@ a {
   width: 100%;
   flex: 0 0 32px;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
 }
 
 .editor-chat-actions {
   min-width: 0;
   justify-content: flex-end;
-  gap: 5px;
+  gap: 4px;
 }
 
 .editor-chat-plus {
@@ -9855,7 +9877,7 @@ a {
   }
 
   .editor-main {
-    grid-template-columns: 400px minmax(0, 1fr) 280px;
+    grid-template-columns: var(--editor-left-panel-width) minmax(0, 1fr) var(--editor-right-panel-width);
   }
 }
 
