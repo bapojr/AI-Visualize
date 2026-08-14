@@ -628,7 +628,8 @@ body.how-tour-open {
 
 .how-tour-media > img,
 .how-tour-media > svg,
-.how-tour-media > canvas {
+.how-tour-media > canvas,
+.how-tour-media > dotlottie-wc {
   display: block;
   width: 100%;
   height: 100%;

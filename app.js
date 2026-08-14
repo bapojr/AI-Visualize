@@ -551,18 +551,22 @@ const landingTourSteps = [
   {
     title: "Describe your visual",
     description: "Tell Paperpal what you want to create, then choose your ratio, style, and image model.",
+    animation: "assets/tour/describe-visual.lottie",
   },
   {
     title: "Guide it with scientific illustrations",
     description: "Browse 25,000+ expert-designed scientific illustrations and use them as references for a more accurate visual.",
+    animation: "assets/tour/scientific-illustrations.lottie",
   },
   {
     title: "Refine with simple prompts",
     description: "Ask Paperpal to change, add, remove, or restyle elements until the illustration looks right.",
+    animation: "assets/tour/refine-prompts.lottie",
   },
   {
     title: "Export, edit, and present anywhere",
     description: "Export high-resolution PNG, SVG, or PPTX, then continue editing vector elements, labels, colours, and layouts directly in PowerPoint.",
+    animation: "assets/tour/export-powerpoint.lottie",
   },
 ];
 
@@ -599,7 +603,13 @@ function bindLandingTour() {
     title.textContent = step.title;
     description.textContent = step.description;
     media.dataset.tourStep = String(state.landingTourStep + 1);
-    media.setAttribute("aria-label", `Animation placeholder for step ${state.landingTourStep + 1}: ${step.title}`);
+    media.setAttribute("aria-label", `Animation for step ${state.landingTourStep + 1}: ${step.title}`);
+    const player = document.createElement("dotlottie-wc");
+    player.setAttribute("src", step.animation);
+    player.setAttribute("autoplay", "true");
+    player.setAttribute("loop", "true");
+    player.setAttribute("aria-hidden", "true");
+    media.replaceChildren(player);
     previous.disabled = isFirst;
     forward.disabled = isLast;
     primary.textContent = isLast ? "Start Creating" : "Next";
@@ -624,6 +634,7 @@ function bindLandingTour() {
 
   const dismiss = () => {
     backdrop.hidden = true;
+    media.replaceChildren();
     document.body.classList.remove("how-tour-open");
     trigger.setAttribute("aria-expanded", "false");
     const focusTarget = returnFocus && document.contains(returnFocus) ? returnFocus : trigger;
@@ -683,7 +694,6 @@ function bindLandingTour() {
     }
   });
 
-  open();
 }
 
 function shuffle(items) {
