@@ -407,6 +407,7 @@ const state = {
     ratio: "1:1",
   },
   prompt: "",
+  landingTourStep: 0,
   selectedVariant: 1,
   activeOverlay: null,
   editorState: "text",
@@ -545,6 +546,145 @@ const overlayIds = [
   "download-toast",
   "mobile-select-note",
 ];
+
+const landingTourSteps = [
+  {
+    title: "Describe your visual",
+    description: "Tell Paperpal what you want to create, then choose your ratio, style, and image model.",
+  },
+  {
+    title: "Guide it with scientific illustrations",
+    description: "Browse 25,000+ expert-designed scientific illustrations and use them as references for a more accurate visual.",
+  },
+  {
+    title: "Refine with simple prompts",
+    description: "Ask Paperpal to change, add, remove, or restyle elements until the illustration looks right.",
+  },
+  {
+    title: "Export, edit, and present anywhere",
+    description: "Export high-resolution PNG, SVG, or PPTX, then continue editing vector elements, labels, colours, and layouts directly in PowerPoint.",
+  },
+];
+
+function bindLandingTour() {
+  const backdrop = document.getElementById("landingHowTour");
+  const dialog = backdrop?.querySelector(".how-tour-dialog");
+  const trigger = document.getElementById("landingHowItWorksTrigger");
+  const close = document.getElementById("landingHowTourClose");
+  const skip = document.getElementById("landingHowTourSkip");
+  const previous = document.getElementById("landingHowTourPrevious");
+  const forward = document.getElementById("landingHowTourForward");
+  const primary = document.getElementById("landingHowTourPrimary");
+  const title = document.getElementById("landingHowTourTitle");
+  const description = document.getElementById("landingHowTourDescription");
+  const media = document.getElementById("landingHowTourMedia");
+  const progress = document.getElementById("landingHowTourProgress");
+  if (!backdrop || !dialog || !trigger || !close || !skip || !previous || !forward || !primary || !title || !description || !media || !progress) return;
+
+  let returnFocus = null;
+
+  landingTourSteps.forEach((step, index) => {
+    const indicator = document.createElement("button");
+    indicator.className = "how-tour-progress-button";
+    indicator.type = "button";
+    indicator.dataset.tourStep = String(index);
+    indicator.setAttribute("aria-label", `Go to step ${index + 1}: ${step.title}`);
+    progress.appendChild(indicator);
+  });
+
+  const render = () => {
+    const step = landingTourSteps[state.landingTourStep];
+    const isFirst = state.landingTourStep === 0;
+    const isLast = state.landingTourStep === landingTourSteps.length - 1;
+    title.textContent = step.title;
+    description.textContent = step.description;
+    media.dataset.tourStep = String(state.landingTourStep + 1);
+    media.setAttribute("aria-label", `Animation placeholder for step ${state.landingTourStep + 1}: ${step.title}`);
+    previous.disabled = isFirst;
+    forward.disabled = isLast;
+    primary.textContent = isLast ? "Start Creating" : "Next";
+    progress.querySelectorAll(".how-tour-progress-button").forEach((indicator, index) => {
+      const isActive = index === state.landingTourStep;
+      indicator.classList.toggle("active", isActive);
+      indicator.setAttribute("aria-current", isActive ? "step" : "false");
+    });
+  };
+
+  const open = () => {
+    returnFocus = document.activeElement instanceof HTMLElement && document.activeElement !== document.body
+      ? document.activeElement
+      : trigger;
+    state.landingTourStep = 0;
+    render();
+    backdrop.hidden = false;
+    document.body.classList.add("how-tour-open");
+    trigger.setAttribute("aria-expanded", "true");
+    window.requestAnimationFrame(() => dialog.focus());
+  };
+
+  const dismiss = () => {
+    backdrop.hidden = true;
+    document.body.classList.remove("how-tour-open");
+    trigger.setAttribute("aria-expanded", "false");
+    const focusTarget = returnFocus && document.contains(returnFocus) ? returnFocus : trigger;
+    focusTarget.focus({preventScroll: true});
+  };
+
+  const goToStep = (step) => {
+    state.landingTourStep = Math.max(0, Math.min(landingTourSteps.length - 1, step));
+    render();
+  };
+
+  trigger.addEventListener("click", open);
+  close.addEventListener("click", dismiss);
+  skip.addEventListener("click", dismiss);
+  previous.addEventListener("click", () => goToStep(state.landingTourStep - 1));
+  forward.addEventListener("click", () => goToStep(state.landingTourStep + 1));
+  primary.addEventListener("click", () => {
+    if (state.landingTourStep === landingTourSteps.length - 1) {
+      dismiss();
+      return;
+    }
+    goToStep(state.landingTourStep + 1);
+  });
+  progress.addEventListener("click", (event) => {
+    const indicator = event.target.closest("[data-tour-step]");
+    if (indicator) goToStep(Number(indicator.dataset.tourStep));
+  });
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) dismiss();
+  });
+  backdrop.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      dismiss();
+      return;
+    }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goToStep(state.landingTourStep - 1);
+      return;
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goToStep(state.landingTourStep + 1);
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(dialog.querySelectorAll("button:not(:disabled)"));
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === dialog || document.activeElement === first)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  open();
+}
 
 function shuffle(items) {
   const copy = [...items];
@@ -4946,6 +5086,7 @@ function init() {
   toggleSubmitStates();
   initLandingPromptTyping();
   initLandingHeadingTyping();
+  bindLandingTour();
   updateEditorToolbar("text");
   bindCanvasSelection();
   bindEditorImageMoreMenu();

@@ -225,7 +225,14 @@
                           Turn complex Life Sciences and medical research into editable visuals. Generate from your<br />
                           Paperpal document, refine with chat, and export as an editable SVG for full control.
                         </p>
-                        <button class="how-it-works-button" type="button">
+                        <button
+                          class="how-it-works-button"
+                          id="landingHowItWorksTrigger"
+                          type="button"
+                          aria-haspopup="dialog"
+                          aria-controls="landingHowTour"
+                          aria-expanded="false"
+                        >
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                             <path d="M8 16C10.1217 16 12.1566 15.1571 13.6569 13.6569C15.1571 12.1566 16 10.1217 16 8C16 5.87827 15.1571 3.84344 13.6569 2.34315C12.1566 0.842855 10.1217 0 8 0C5.87827 0 3.84344 0.842855 2.34315 2.34315C0.842855 3.84344 0 5.87827 0 8C0 10.1217 0.842855 12.1566 2.34315 13.6569C3.84344 15.1571 5.87827 16 8 16ZM8 5.5C7.44687 5.5 7 5.94687 7 6.5C7 6.91563 6.66563 7.25 6.25 7.25C5.83437 7.25 5.5 6.91563 5.5 6.5C5.5 5.11875 6.61875 4 8 4C9.38125 4 10.5 5.11875 10.5 6.5C10.5 7.975 9.375 8.6 8.75 8.82812V8.94687C8.75 9.3625 8.41563 9.69687 8 9.69687C7.58437 9.69687 7.25 9.3625 7.25 8.94687V8.69375C7.25 8.05313 7.7125 7.59375 8.19063 7.4375C8.39063 7.37188 8.60312 7.26562 8.75937 7.11562C8.89375 6.98437 9 6.80313 9 6.50313C9 5.95 8.55313 5.50313 8 5.50313V5.5ZM7 11.5C7 11.2348 7.10536 10.9804 7.29289 10.7929C7.48043 10.6054 7.73478 10.5 8 10.5C8.26522 10.5 8.51957 10.6054 8.70711 10.7929C8.89464 10.9804 9 11.2348 9 11.5C9 11.7652 8.89464 12.0196 8.70711 12.2071C8.51957 12.3946 8.26522 12.5 8 12.5C7.73478 12.5 7.48043 12.3946 7.29289 12.2071C7.10536 12.0196 7 11.7652 7 11.5Z" fill="#0054F1"/>
                           </svg>
@@ -1816,6 +1823,51 @@
 
     <div class="overlay-backdrop hidden" id="overlayBackdrop"></div>
 
+    <div class="how-tour-backdrop" id="landingHowTour" hidden>
+      <section
+        class="how-tour-dialog"
+        role="dialog"
+        aria-modal="true"
+        tabindex="-1"
+        aria-labelledby="landingHowTourTitle"
+        aria-describedby="landingHowTourDescription"
+      >
+        <button class="how-tour-close" id="landingHowTourClose" type="button" aria-label="Close tour">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <button class="how-tour-side-button how-tour-previous" id="landingHowTourPrevious" type="button" aria-label="Previous step">
+          <svg xmlns="http://www.w3.org/2000/svg" width="8" height="14" viewBox="0 0 8 14" fill="none" aria-hidden="true">
+            <path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button class="how-tour-side-button how-tour-next" id="landingHowTourForward" type="button" aria-label="Next step">
+          <svg xmlns="http://www.w3.org/2000/svg" width="8" height="14" viewBox="0 0 8 14" fill="none" aria-hidden="true">
+            <path d="M1 1L7 7L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="how-tour-visual">
+          <div class="how-tour-media" id="landingHowTourMedia" role="img" aria-label="Tour animation placeholder"></div>
+          <div class="how-tour-progress" id="landingHowTourProgress" aria-label="Tour progress"></div>
+        </div>
+
+        <div class="how-tour-copy" aria-live="polite">
+          <h2 id="landingHowTourTitle">Describe your visual</h2>
+          <p id="landingHowTourDescription">
+            Tell Paperpal what you want to create, then choose your ratio, style, and image model.
+          </p>
+          <div class="how-tour-actions">
+            <button class="how-tour-skip" id="landingHowTourSkip" type="button">Skip tour</button>
+            <button class="how-tour-primary" id="landingHowTourPrimary" type="button">Next</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <aside class="overlay panel preview-split-panel hidden" id="preview-panel">
       <div class="preview-image-pane">
         <div class="preview-image-topbar">
@@ -2131,6 +2183,6 @@
       <button class="btn btn-primary wide" data-close-overlay>Continue</button>
     </div>
 
-    <script src="app.js?v=53"></script>
+    <script src="app.js?v=54"></script>
   </body>
 </html>
