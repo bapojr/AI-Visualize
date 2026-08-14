@@ -1437,6 +1437,7 @@ function bindCanvasSelection() {
   };
 
   const selectWholeImage = () => {
+    showEditorLeftEditPanel();
     clearCanvasObjectSelection();
     state.selectedEditorSegmentId = null;
     state.selectedEditorSegmentType = "frame";
@@ -1477,6 +1478,9 @@ function bindCanvasSelection() {
     event.stopPropagation();
     selectWholeImage();
   });
+
+  imageToolbar?.addEventListener("click", () => showEditorLeftEditPanel());
+  textToolbar?.addEventListener("click", () => showEditorLeftEditPanel());
 
   editRegion?.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -1533,6 +1537,7 @@ function bindCanvasSelection() {
   imageActionToolbar?.addEventListener("click", (event) => {
     const action = event.target.closest(".editor-image-tool");
     if (!action) return;
+    showEditorLeftEditPanel();
     const wasPressed = action.getAttribute("aria-pressed") === "true";
     resetImageToolbarState();
     const pressed = action === useReference ? !wasPressed : true;
@@ -1568,6 +1573,7 @@ function bindCanvasSelection() {
     const segment = event.target.closest(".editor-segment");
     if (!segment) return;
     event.stopPropagation();
+    showEditorLeftEditPanel();
     clearCanvasObjectSelection();
     state.selectedEditorSegmentId = segment.dataset.segmentId;
     state.selectedEditorSegmentType = segment.dataset.segmentType;
@@ -1640,6 +1646,7 @@ function bindEditorImageMoreMenu() {
   const addImageCopy = (snapshot) => {
     const stageContent = document.getElementById("editorCanvasStageContent");
     if (!stageContent || !snapshot?.src) return;
+    showEditorLeftEditPanel();
     clearEditorImageSelectionForCanvasObject();
     drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
     const image = document.createElement("img");
@@ -2335,6 +2342,22 @@ function clearEditorImageSelectionForCanvasObject() {
   setEditorSegmentDetailVisible(false);
 }
 
+function showEditorLeftEditPanel() {
+  if (state.editorLeftPanelView !== "edit") setEditorPanelView("left", "edit");
+}
+
+function selectedCanvasObjectSettingsTool() {
+  const selectedObject = document.querySelector(".canvas-object.is-selected");
+  if (!selectedObject) return null;
+  if (selectedObject.classList.contains("canvas-table-object")) return "table";
+  if (selectedObject.classList.contains("canvas-shape-object")) return "shape";
+  if (selectedObject.classList.contains("canvas-line-object")) return "line";
+  if (selectedObject.classList.contains("canvas-pen-object")) return "pen";
+  if (selectedObject.classList.contains("canvas-text-object")) return "text";
+  if (selectedObject.classList.contains("canvas-frame-object")) return "frame";
+  return null;
+}
+
 function tableDashStyle(value) {
   return Number(value) > 0 ? "dashed" : "solid";
 }
@@ -2833,28 +2856,30 @@ function setCanvasTool(tool) {
   const segmentSelected = Boolean(state.selectedEditorSegmentId) && !imageSelected;
   const textSegmentSelected = segmentSelected && state.selectedEditorSegmentType === "text";
   const tableSelected = Boolean(selectedCanvasTable());
+  const selectedObjectTool = selectedCanvasObjectSettingsTool();
+  const settingsTool = tool === "select" && selectedObjectTool ? selectedObjectTool : tool;
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
   const canvasSettings = document.getElementById("editorCanvasSettings");
-  if (canvasSettings) canvasSettings.hidden = imageSelected || tableSelected || !["select", "hand"].includes(tool);
+  if (canvasSettings) canvasSettings.hidden = imageSelected || tableSelected || !["select", "hand"].includes(settingsTool);
   const shapeSettings = document.getElementById("editorShapeSettings");
-  if (shapeSettings) shapeSettings.hidden = imageSelected || tool !== "shape";
-  if (!imageSelected && tool === "shape") syncShapeSettingsPanel();
+  if (shapeSettings) shapeSettings.hidden = imageSelected || settingsTool !== "shape";
+  if (!imageSelected && settingsTool === "shape") syncShapeSettingsPanel();
   const lineSettings = document.getElementById("editorLineSettings");
-  if (lineSettings) lineSettings.hidden = imageSelected || tool !== "line";
-  if (!imageSelected && tool === "line") syncLineSettingsPanel();
+  if (lineSettings) lineSettings.hidden = imageSelected || settingsTool !== "line";
+  if (!imageSelected && settingsTool === "line") syncLineSettingsPanel();
   const penSettings = document.getElementById("editorPenSettings");
-  if (penSettings) penSettings.hidden = imageSelected || tool !== "pen";
-  if (!imageSelected && tool === "pen") syncPenSettingsPanel();
+  if (penSettings) penSettings.hidden = imageSelected || settingsTool !== "pen";
+  if (!imageSelected && settingsTool === "pen") syncPenSettingsPanel();
   const textSettings = document.getElementById("editorTextSettings");
-  if (textSettings) textSettings.hidden = imageSelected || tool !== "text";
-  if (!imageSelected && tool === "text") syncTextSettingsPanel();
+  if (textSettings) textSettings.hidden = imageSelected || settingsTool !== "text";
+  if (!imageSelected && settingsTool === "text") syncTextSettingsPanel();
   const frameSettings = document.getElementById("editorFrameSettings");
-  if (frameSettings) frameSettings.hidden = imageSelected || tool !== "frame";
-  if (!imageSelected && tool === "frame") syncFrameSettingsPanel();
+  if (frameSettings) frameSettings.hidden = imageSelected || settingsTool !== "frame";
+  if (!imageSelected && settingsTool === "frame") syncFrameSettingsPanel();
   const tableSettings = document.getElementById("editorTableSettings");
-  if (tableSettings) tableSettings.hidden = imageSelected || !tableSelected || tool !== "select";
-  if (!imageSelected && tableSelected && tool === "select") syncTableSettingsPanel();
+  if (tableSettings) tableSettings.hidden = imageSelected || !tableSelected || settingsTool !== "table";
+  if (!imageSelected && tableSelected && settingsTool === "table") syncTableSettingsPanel();
   const imageSettings = document.getElementById("editorImageSettings");
   if (imageSettings) imageSettings.hidden = !imageSelected;
   if (imageSelected) syncImageSettingsPanel();
@@ -2944,6 +2969,7 @@ function addUploadedAssetToCanvas(asset) {
   const stageContent = document.getElementById("editorCanvasStageContent");
   if (!drawingLayer || !stageContent || !asset?.src) return;
 
+  showEditorLeftEditPanel();
   clearEditorImageSelectionForCanvasObject();
   drawingLayer.querySelectorAll(".canvas-object.is-selected").forEach((object) => object.classList.remove("is-selected"));
   const image = document.createElement("img");
@@ -3447,6 +3473,9 @@ function bindCanvasToolbar() {
   }
 
   const updateToolChoice = (type, option) => {
+    showEditorLeftEditPanel();
+    clearCanvasObjectSelection();
+    clearEditorImageSelectionForCanvasObject();
     const isShape = type === "shape";
     const toolButton = isShape ? shapeToolButton : lineToolButton;
     const optionSelector = isShape ? "[data-canvas-shape-option]" : "[data-canvas-line-option]";
@@ -3474,6 +3503,7 @@ function bindCanvasToolbar() {
   document.querySelectorAll("[data-canvas-menu-toggle]").forEach((toggle) => {
     toggle.addEventListener("click", (event) => {
       event.stopPropagation();
+      showEditorLeftEditPanel();
       const menu = document.getElementById(toggle.getAttribute("aria-controls"));
       const willOpen = menu?.hidden ?? false;
       closeToolMenus();
@@ -3498,6 +3528,7 @@ function bindCanvasToolbar() {
   });
 
   const selectObject = (object) => {
+    showEditorLeftEditPanel();
     const previousTable = selectedCanvasTable();
     document.querySelectorAll(".canvas-object.is-selected").forEach((item) => {
       item.classList.remove("is-selected");
@@ -3514,6 +3545,7 @@ function bindCanvasToolbar() {
   };
 
   const clearObjectSelection = () => {
+    showEditorLeftEditPanel();
     clearCanvasObjectSelection();
     setCanvasTool("select");
   };
@@ -3579,7 +3611,11 @@ function bindCanvasToolbar() {
   document.querySelectorAll("[data-canvas-tool]").forEach((button) => {
     button.addEventListener("click", () => {
       const tool = button.dataset.canvasTool;
+      showEditorLeftEditPanel();
+      clearCanvasObjectSelection();
+      clearEditorImageSelectionForCanvasObject();
       if (tool === "table") {
+        setCanvasTool("select");
         const willOpen = tableMenu?.hidden ?? false;
         closeToolMenus();
         if (tableMenu && willOpen) {
