@@ -30,8 +30,8 @@
   --radius-md: 16px;
   --radius-sm: 12px;
   --radius-pill: 999px;
-  --editor-left-panel-width: 400px;
-  --editor-right-panel-width: 280px;
+  --editor-left-panel-width: 304px;
+  --editor-right-panel-width: 304px;
 }
 
 /* Landing sidebar: signed-in desktop specification. */
