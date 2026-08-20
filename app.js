@@ -1505,20 +1505,26 @@ function blankCanvasDisplaySize(width, height) {
   };
 }
 
-function syncBlankCanvasDimensionLabel() {
+function syncBlankCanvasDimensionLabel(canvas = state) {
   const label = document.getElementById("editorBlankCanvasDimensionLabel");
   if (!label) return;
-  label.textContent = `${formatBlankCanvasDimension(state.blankCanvasWidth)} x ${formatBlankCanvasDimension(state.blankCanvasHeight)} ${state.blankCanvasUnit}`;
+  const width = canvas.width ?? canvas.blankCanvasWidth;
+  const height = canvas.height ?? canvas.blankCanvasHeight;
+  const unit = canvas.unit ?? canvas.blankCanvasUnit;
+  label.textContent = `${formatBlankCanvasDimension(width)} x ${formatBlankCanvasDimension(height)} ${unit}`;
 }
 
-function applyBlankCanvasAppearance() {
+function applyBlankCanvasAppearance(canvas = state) {
   const stageContent = document.getElementById("editorCanvasStageContent");
   if (!stageContent || !state.isBlankEditor) return;
-  const size = blankCanvasDisplaySize(state.blankCanvasWidth, state.blankCanvasHeight);
+  const width = canvas.width ?? canvas.blankCanvasWidth;
+  const height = canvas.height ?? canvas.blankCanvasHeight;
+  const color = canvas.color ?? canvas.blankCanvasColor;
+  const size = blankCanvasDisplaySize(width, height);
   stageContent.style.width = `${size.width}px`;
   stageContent.style.height = `${size.height}px`;
-  stageContent.style.setProperty("--blank-canvas-color", state.blankCanvasColor);
-  syncBlankCanvasDimensionLabel();
+  stageContent.style.setProperty("--blank-canvas-color", color);
+  syncBlankCanvasDimensionLabel(canvas);
 }
 
 function renderEditorCanvas() {
@@ -5341,11 +5347,13 @@ function syncBlankCanvasSizeControls() {
   if (color) color.value = draft.color;
   if (colorValue) colorValue.textContent = draft.color.toUpperCase();
   colorControl?.style.setProperty("--blank-canvas-picker-color", draft.color);
+  if (state.isEditingBlankCanvasSize) applyBlankCanvasAppearance(draft);
 }
 
 function closeBlankCanvasSizeEditor() {
   state.isEditingBlankCanvasSize = false;
   state.blankCanvasDraft = null;
+  applyBlankCanvasAppearance();
   setCanvasTool("select");
 }
 
@@ -5476,7 +5484,7 @@ function bindBlankCanvasDimensions() {
 
   window.addEventListener("resize", () => {
     if (state.isBlankEditor && document.getElementById("editorDesktopScreen")?.classList.contains("active")) {
-      applyBlankCanvasAppearance();
+      applyBlankCanvasAppearance(state.isEditingBlankCanvasSize ? currentBlankCanvasDraft() : state);
     }
   });
 }
