@@ -11965,7 +11965,8 @@ a {
 .prompt-flow-thread {
   position: absolute;
   top: 32px;
-  right: clamp(32px, 5vw, 84px);
+  left: 50%;
+  right: auto;
   bottom: 28px;
   display: flex;
   width: var(--prompt-flow-thread-width);
@@ -11974,6 +11975,7 @@ a {
   justify-content: flex-end;
   align-items: stretch;
   gap: 16px;
+  transform: translateX(-50%);
 }
 
 .prompt-flow-user-message {
@@ -12305,9 +12307,11 @@ a {
 @media (max-width: 960px) {
   .prompt-flow-thread {
     top: 24px;
-    right: 24px;
+    left: 50%;
+    right: auto;
     bottom: 24px;
     width: calc(100% - 48px);
+    transform: translateX(-50%);
   }
 
   .prompt-flow-refine {
