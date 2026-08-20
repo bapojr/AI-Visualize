@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=68" />
+    <link rel="stylesheet" href="styles.css?v=69" />
   </head>
   <body>
     <div id="app">
@@ -635,6 +635,63 @@
                     </div>
                   </section>
                 </div>
+                <div class="editor-canvas-size-settings" id="editorCanvasSizeSettings" hidden>
+                  <div class="editor-canvas-settings-heading">Canvas size</div>
+                  <section class="editor-canvas-size-section" aria-labelledby="editorCanvasDimensionsHeading">
+                    <h2 id="editorCanvasDimensionsHeading">Dimensions</h2>
+                    <label class="editor-canvas-size-field is-full">
+                      <span>Preset</span>
+                      <select id="editorCanvasPreset" aria-label="Canvas size preset">
+                        <option value="custom">Custom</option>
+                        <option value="16:9">16:9</option>
+                        <option value="10:7" selected>10:7</option>
+                        <option value="4:3">4:3</option>
+                        <option value="1:1">1:1</option>
+                        <option value="2:3">2:3</option>
+                      </select>
+                    </label>
+                    <div class="editor-canvas-size-grid">
+                      <label class="editor-canvas-size-field">
+                        <span>Width</span>
+                        <input id="editorCanvasWidth" type="number" min="0.1" step="0.01" value="10" inputmode="decimal" />
+                      </label>
+                      <button class="editor-canvas-ratio-lock active" id="editorCanvasAspectLock" type="button" aria-label="Unlock canvas aspect ratio" aria-pressed="true">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.25 7V5a3.75 3.75 0 0 1 7.5 0v2M3 7h10v8H3V7Zm2.75 3.25v1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </button>
+                      <label class="editor-canvas-size-field">
+                        <span>Height</span>
+                        <input id="editorCanvasHeight" type="number" min="0.1" step="0.01" value="7" inputmode="decimal" />
+                      </label>
+                    </div>
+                    <div class="editor-canvas-size-grid is-units-row">
+                      <label class="editor-canvas-size-field is-unit">
+                        <span>Units</span>
+                        <select id="editorCanvasUnit" aria-label="Canvas size unit">
+                          <option value="px">px</option>
+                          <option value="in" selected>in</option>
+                          <option value="cm">cm</option>
+                        </select>
+                      </label>
+                      <button class="editor-canvas-reset-size" id="editorCanvasSizeReset" type="button">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.1 5.2A5.7 5.7 0 1 1 2.4 9M3 2.8v2.8h2.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Reset</span>
+                      </button>
+                    </div>
+                  </section>
+                  <section class="editor-canvas-size-section" aria-labelledby="editorBlankCanvasColorHeading">
+                    <h2 id="editorBlankCanvasColorHeading">Canvas color</h2>
+                    <label class="editor-canvas-color-control">
+                      <input id="editorBlankCanvasColor" type="color" value="#FFFFFF" aria-label="Blank canvas color" />
+                      <span class="editor-canvas-color-preview" aria-hidden="true"></span>
+                      <span id="editorBlankCanvasColorValue">#FFFFFF</span>
+                    </label>
+                  </section>
+                  <section class="editor-canvas-size-actions" aria-label="Canvas size actions">
+                    <button class="editor-canvas-size-primary" id="editorCanvasSizeApply" type="button">Apply</button>
+                    <button class="editor-canvas-size-secondary" id="editorCanvasSizeApplyAll" type="button">Apply to all</button>
+                    <button class="editor-canvas-size-tertiary" id="editorCanvasSizeCancel" type="button">Cancel</button>
+                  </section>
+                </div>
                 <div class="editor-shape-settings" id="editorShapeSettings" hidden>
                   <div class="editor-canvas-settings-heading" id="editorShapeSettingsHeading">Rectangle</div>
                   <section class="editor-shape-settings-section" aria-labelledby="editorShapeFillHeading">
@@ -1223,6 +1280,14 @@
                   <div class="editor-canvas-media-shell" id="editorCanvasMediaShell">
                     <div class="canvas-workspace-layer" id="canvasWorkspaceLayer" aria-label="Canvas objects"></div>
                     <div class="editor-canvas-stage-content" id="editorCanvasStageContent">
+                      <button class="editor-blank-canvas-dimensions" id="editorBlankCanvasDimensions" type="button" aria-label="Edit canvas dimensions">
+                        <span id="editorBlankCanvasDimensionLabel">10 x 7 in</span>
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m2.2 11.1-.7 3.4 3.4-.7L13.8 5a1.4 1.4 0 0 0 0-2l-.8-.8a1.4 1.4 0 0 0-2 0l-8.8 8.9Zm7.7-7.8 2.8 2.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </button>
+                      <div class="editor-blank-canvas-watermark" id="editorBlankCanvasWatermark" aria-label="Created in paperpal.com">
+                        <span>Created in <strong>paperpal.com</strong></span>
+                        <span class="editor-blank-canvas-watermark-logo"><img src="assets/sidebar/pp.svg" alt="Paperpal" /></span>
+                      </div>
                       <img id="editorCanvasImage" alt="Selected generated visual" class="editor-canvas-image" />
                       <div class="editor-image-segmentation" id="editorImageSegmentation"></div>
                       <div class="canvas-drawing-layer" id="canvasDrawingLayer"></div>
@@ -2252,6 +2317,6 @@
     </div>
 
     <script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.24/dist/dotlottie-wc.js"></script>
-    <script src="app.js?v=68"></script>
+    <script src="app.js?v=69"></script>
   </body>
 </html>

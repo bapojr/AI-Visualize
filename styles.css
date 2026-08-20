@@ -5357,6 +5357,7 @@ a {
 }
 
 .editor-canvas-settings,
+.editor-canvas-size-settings,
 .editor-shape-settings,
 .editor-line-settings,
 .editor-pen-settings,
@@ -5371,6 +5372,7 @@ a {
 }
 
 .editor-canvas-settings[hidden],
+.editor-canvas-size-settings[hidden],
 .editor-shape-settings[hidden],
 .editor-line-settings[hidden],
 .editor-pen-settings[hidden],
@@ -5407,6 +5409,190 @@ a {
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
+}
+
+.editor-canvas-size-section {
+  padding: 20px 16px 22px;
+  border-bottom: 1px solid var(--Gray-5, #e4eaf7);
+}
+
+.editor-canvas-size-section h2 {
+  margin: 0 0 18px;
+  color: var(--Gray-12, #13161b);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.editor-canvas-size-field {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  color: var(--Gray-10, #717f99);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.editor-canvas-size-field.is-full {
+  margin-bottom: 16px;
+}
+
+.editor-canvas-size-field input,
+.editor-canvas-size-field select {
+  width: 100%;
+  height: 38px;
+  padding: 0 11px;
+  box-sizing: border-box;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  outline: 0;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-12, #13161b);
+  font: 500 14px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-canvas-size-field input:focus,
+.editor-canvas-size-field select:focus {
+  border-color: var(--Blue-9, #0062ff);
+  box-shadow: 0 0 0 2px rgba(0, 98, 255, 0.1);
+}
+
+.editor-canvas-size-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px minmax(0, 1fr);
+  align-items: end;
+  gap: 8px;
+}
+
+.editor-canvas-ratio-lock {
+  display: grid;
+  width: 30px;
+  height: 38px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-10, #717f99);
+}
+
+.editor-canvas-ratio-lock svg {
+  width: 16px;
+  height: 16px;
+}
+
+.editor-canvas-ratio-lock:hover,
+.editor-canvas-ratio-lock.active {
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-canvas-size-grid.is-units-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-top: 16px;
+}
+
+.editor-canvas-size-field.is-unit {
+  grid-column: 1;
+}
+
+.editor-canvas-reset-size {
+  display: flex;
+  height: 38px;
+  padding: 0 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+  font: 500 13px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-canvas-reset-size svg {
+  width: 14px;
+  height: 14px;
+}
+
+.editor-canvas-reset-size:hover {
+  border-color: var(--Blue-9, #0062ff);
+  color: var(--Blue-10, #0054f1);
+  background: var(--Blue-3, #edf3ff);
+}
+
+.editor-canvas-color-control {
+  display: flex;
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 6px;
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.editor-canvas-color-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.editor-canvas-color-preview {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  border-radius: 5px;
+  background: var(--blank-canvas-picker-color, #fff);
+  box-shadow: inset 0 0 0 1px rgba(19, 22, 27, 0.04);
+}
+
+.editor-canvas-color-control:hover {
+  border-color: var(--Blue-9, #0062ff);
+}
+
+.editor-canvas-size-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 20px 16px;
+  border-top: 1px solid var(--Gray-5, #e4eaf7);
+  background: var(--Gray-1, #fff);
+}
+
+.editor-canvas-size-actions button {
+  height: 36px;
+  border-radius: 6px;
+  font: 500 13px/18px "IBM Plex Sans", sans-serif;
+}
+
+.editor-canvas-size-primary {
+  border: 1px solid var(--Blue-9, #0062ff);
+  background: var(--Blue-9, #0062ff);
+  color: var(--Gray-1, #fff);
+}
+
+.editor-canvas-size-secondary {
+  border: 1px solid var(--Blue-9, #0062ff);
+  background: var(--Gray-1, #fff);
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-canvas-size-tertiary {
+  grid-column: 1 / -1;
+  border: 1px solid var(--Gray-6, #d8e0ee);
+  background: var(--Gray-1, #fff);
+  color: var(--Gray-11, #5d6a81);
+}
+
+.editor-canvas-size-actions button:hover {
+  box-shadow: 0 0 0 2px rgba(0, 98, 255, 0.1);
 }
 
 .editor-background-swatches {
@@ -7459,8 +7645,87 @@ a {
 }
 
 .editor-canvas-stage-content.is-blank-canvas {
-  width: 520px;
-  height: 560px;
+  width: 700px;
+  height: 490px;
+  box-sizing: border-box;
+  border: 1px solid var(--Gray-7, #cad5e7);
+  background: var(--blank-canvas-color, #fff);
+  box-shadow: 0 16px 40px rgba(5, 30, 87, 0.08);
+}
+
+.editor-blank-canvas-dimensions,
+.editor-blank-canvas-watermark {
+  display: none;
+}
+
+.editor-canvas-stage-content.is-blank-canvas .editor-blank-canvas-dimensions {
+  position: absolute;
+  top: -31px;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  height: 24px;
+  padding: 0;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--Gray-11, #5d6a81);
+  font: 600 13px/18px "IBM Plex Sans", sans-serif;
+  white-space: nowrap;
+}
+
+.editor-blank-canvas-dimensions svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  transform: translateX(-3px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.editor-blank-canvas-dimensions:hover,
+.editor-blank-canvas-dimensions:focus-visible {
+  color: var(--Blue-10, #0054f1);
+}
+
+.editor-blank-canvas-dimensions:hover svg,
+.editor-blank-canvas-dimensions:focus-visible svg {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.editor-canvas-stage-content.is-blank-canvas .editor-blank-canvas-watermark {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 20;
+  display: flex;
+  height: 28px;
+  align-items: center;
+  border-radius: 5px;
+  overflow: hidden;
+  background: rgba(19, 22, 27, 0.78);
+  color: #fff;
+  font: 400 11px/16px "IBM Plex Sans", sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.editor-blank-canvas-watermark > span:first-child {
+  padding: 0 9px;
+}
+
+.editor-blank-canvas-watermark-logo {
+  display: grid;
+  width: 30px;
+  height: 28px;
+  place-items: center;
+  background: var(--Blue-9, #0062ff);
+}
+
+.editor-blank-canvas-watermark-logo img {
+  width: 12px;
+  height: 18px;
+  object-fit: contain;
 }
 
 .editor-canvas-image {

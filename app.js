@@ -514,6 +514,14 @@ const state = {
   editorInspectorPromptExpanded: false,
   editorInspectorTemplateId: null,
   editorSegmentStyles: {},
+  blankCanvasPreset: "10:7",
+  blankCanvasWidth: 10,
+  blankCanvasHeight: 7,
+  blankCanvasUnit: "in",
+  blankCanvasAspectLocked: true,
+  blankCanvasColor: "#FFFFFF",
+  blankCanvasDraft: null,
+  isEditingBlankCanvasSize: false,
   hasHistory: false,
   mixedOrder: shuffle([...templateCatalog]),
   generatedResultTemplate: templateCatalog[0],
@@ -1454,6 +1462,65 @@ function updateEditorToolbar(kind) {
   toolbar.innerHTML = '<div class="toolbar-group"><span class="toolbar-chip">Select any element to edit its properties</span></div>';
 }
 
+const blankCanvasPresetDimensions = {
+  "16:9": {width: 16, height: 9},
+  "10:7": {width: 10, height: 7},
+  "4:3": {width: 4, height: 3},
+  "1:1": {width: 8, height: 8},
+  "2:3": {width: 6, height: 9},
+};
+
+function resetBlankCanvasState() {
+  state.blankCanvasPreset = "10:7";
+  state.blankCanvasWidth = 10;
+  state.blankCanvasHeight = 7;
+  state.blankCanvasUnit = "in";
+  state.blankCanvasAspectLocked = true;
+  state.blankCanvasColor = "#FFFFFF";
+  state.blankCanvasDraft = null;
+  state.isEditingBlankCanvasSize = false;
+}
+
+function formatBlankCanvasDimension(value) {
+  const rounded = Math.round(Number(value) * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function blankCanvasDisplaySize(width, height) {
+  const shell = document.getElementById("editorCanvasMediaShell");
+  const ratio = Math.max(0.05, Number(width) / Math.max(0.05, Number(height)));
+  const shellWidth = shell?.clientWidth || 900;
+  const shellHeight = shell?.clientHeight || 760;
+  const maxWidth = Math.max(280, shellWidth - 112);
+  const maxHeight = Math.max(280, shellHeight - 178);
+  let displayWidth = maxWidth;
+  let displayHeight = displayWidth / ratio;
+  if (displayHeight > maxHeight) {
+    displayHeight = maxHeight;
+    displayWidth = displayHeight * ratio;
+  }
+  return {
+    width: Math.round(Math.max(220, displayWidth)),
+    height: Math.round(Math.max(180, displayHeight)),
+  };
+}
+
+function syncBlankCanvasDimensionLabel() {
+  const label = document.getElementById("editorBlankCanvasDimensionLabel");
+  if (!label) return;
+  label.textContent = `${formatBlankCanvasDimension(state.blankCanvasWidth)} x ${formatBlankCanvasDimension(state.blankCanvasHeight)} ${state.blankCanvasUnit}`;
+}
+
+function applyBlankCanvasAppearance() {
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  if (!stageContent || !state.isBlankEditor) return;
+  const size = blankCanvasDisplaySize(state.blankCanvasWidth, state.blankCanvasHeight);
+  stageContent.style.width = `${size.width}px`;
+  stageContent.style.height = `${size.height}px`;
+  stageContent.style.setProperty("--blank-canvas-color", state.blankCanvasColor);
+  syncBlankCanvasDimensionLabel();
+}
+
 function renderEditorCanvas() {
   const activeTemplate = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
 
@@ -1499,6 +1566,7 @@ function renderEditorCanvas() {
     image.className = "editor-canvas-image hidden";
     stageContent?.classList.remove("is-frame-selected");
     stageContent?.classList.add("is-blank-canvas");
+    applyBlankCanvasAppearance();
     if (segmentation) segmentation.innerHTML = "";
     actionStack?.classList.add("hidden");
     textActionStack?.classList.add("hidden");
@@ -1512,6 +1580,11 @@ function renderEditorCanvas() {
   }
   state.currentEditorTemplate = activeTemplate;
   stageContent?.classList.remove("is-blank-canvas");
+  stageContent?.style.removeProperty("--blank-canvas-color");
+  if (stageContent && !state.imageWidth && !state.imageHeight) {
+    stageContent.style.width = "";
+    stageContent.style.height = "";
+  }
   const croppedImage = state.editorCroppedImages[activeTemplate.id];
   image.src = croppedImage?.src || activeTemplate.image;
   image.alt = activeTemplate.title;
@@ -3527,10 +3600,22 @@ function setCanvasTool(tool) {
   const chartSelected = Boolean(selectedCanvasChart());
   const selectedObjectTool = selectedCanvasObjectSettingsTool();
   const settingsTool = tool === "select" && selectedObjectTool ? selectedObjectTool : tool;
+  if (!["select", "hand"].includes(settingsTool) && state.isEditingBlankCanvasSize) {
+    state.isEditingBlankCanvasSize = false;
+    state.blankCanvasDraft = null;
+  }
   const stage = document.getElementById("editorCanvasStage");
   if (stage) stage.dataset.canvasTool = tool;
   const canvasSettings = document.getElementById("editorCanvasSettings");
-  if (canvasSettings) canvasSettings.hidden = imageSelected || tableSelected || chartSelected || !["select", "hand"].includes(settingsTool);
+  const canvasSizeSettings = document.getElementById("editorCanvasSizeSettings");
+  const canvasSizeActive = state.isBlankEditor
+    && state.isEditingBlankCanvasSize
+    && !imageSelected
+    && !tableSelected
+    && !chartSelected
+    && ["select", "hand"].includes(settingsTool);
+  if (canvasSettings) canvasSettings.hidden = canvasSizeActive || imageSelected || tableSelected || chartSelected || !["select", "hand"].includes(settingsTool);
+  if (canvasSizeSettings) canvasSizeSettings.hidden = !canvasSizeActive;
   const shapeSettings = document.getElementById("editorShapeSettings");
   if (shapeSettings) shapeSettings.hidden = imageSelected || settingsTool !== "shape";
   if (!imageSelected && settingsTool === "shape") syncShapeSettingsPanel();
@@ -4040,11 +4125,27 @@ function selectEditorSlide(slideId) {
   state.selectedEditorSegmentId = null;
   state.selectedEditorSegmentType = null;
   state.isBlankEditor = slide.isBlank;
+  if (slide.isBlank) {
+    const canvasSize = slide.canvasSize;
+    if (canvasSize) {
+      state.blankCanvasPreset = canvasSize.preset || "custom";
+      state.blankCanvasWidth = canvasSize.width || 10;
+      state.blankCanvasHeight = canvasSize.height || 7;
+      state.blankCanvasUnit = canvasSize.unit || "in";
+      state.blankCanvasColor = canvasSize.color || "#FFFFFF";
+      state.blankCanvasAspectLocked = canvasSize.locked ?? true;
+      state.blankCanvasDraft = null;
+      state.isEditingBlankCanvasSize = false;
+    } else {
+      resetBlankCanvasState();
+    }
+  }
   if (slide.template) {
     state.generatedResultTemplate = slide.template;
     state.currentEditorTemplate = slide.template;
   }
   renderEditorCanvas();
+  setCanvasTool(state.canvasTool);
   renderEditorSlides();
 }
 
@@ -5013,15 +5114,36 @@ function initActions() {
   });
 
   document.getElementById("startFromScratchButton")?.addEventListener("click", () => {
+    resetBlankCanvasState();
+    ensureEditorSlides();
+    const blankSlide = state.editorSlides.find((slide) => slide.isBlank);
+    if (blankSlide) {
+      state.activeEditorSlideId = blankSlide.id;
+      blankSlide.canvasSize = {
+        preset: state.blankCanvasPreset,
+        width: state.blankCanvasWidth,
+        height: state.blankCanvasHeight,
+        unit: state.blankCanvasUnit,
+        color: state.blankCanvasColor,
+        locked: state.blankCanvasAspectLocked,
+      };
+    }
     state.isBlankEditor = true;
+    state.zoom = 100;
+    state.canvasPanX = 0;
+    state.canvasPanY = 0;
     state.selectedEditorSegmentId = null;
     state.selectedEditorSegmentType = null;
     state.isEditorFrameSelected = false;
     state.imageRotation = 0;
     state.imageOffsetX = 0;
     state.imageOffsetY = 0;
+    document.getElementById("canvasWorkspaceLayer")?.replaceChildren();
+    document.getElementById("canvasDrawingLayer")?.replaceChildren();
     renderHistory();
     setScreen("editor-desktop");
+    showEditorLeftEditPanel();
+    setCanvasTool("select");
   });
 
   document.getElementById("landingSubmitMobile")?.addEventListener("click", () => {
@@ -5177,6 +5299,185 @@ function bindEditorBackgroundSwatches() {
 
   colorPicker?.addEventListener("input", () => {
     setBackground(colorPicker.value, colorPicker.parentElement);
+  });
+}
+
+const blankCanvasUnitFactors = {px: 1, in: 96, cm: 96 / 2.54};
+
+function currentBlankCanvasDraft() {
+  if (!state.blankCanvasDraft) {
+    state.blankCanvasDraft = {
+      preset: state.blankCanvasPreset,
+      width: state.blankCanvasWidth,
+      height: state.blankCanvasHeight,
+      unit: state.blankCanvasUnit,
+      locked: state.blankCanvasAspectLocked,
+      ratio: state.blankCanvasWidth / state.blankCanvasHeight,
+      color: state.blankCanvasColor,
+    };
+  }
+  return state.blankCanvasDraft;
+}
+
+function syncBlankCanvasSizeControls() {
+  const draft = currentBlankCanvasDraft();
+  const preset = document.getElementById("editorCanvasPreset");
+  const width = document.getElementById("editorCanvasWidth");
+  const height = document.getElementById("editorCanvasHeight");
+  const unit = document.getElementById("editorCanvasUnit");
+  const lock = document.getElementById("editorCanvasAspectLock");
+  const color = document.getElementById("editorBlankCanvasColor");
+  const colorValue = document.getElementById("editorBlankCanvasColorValue");
+  const colorControl = color?.closest(".editor-canvas-color-control");
+  if (preset) preset.value = draft.preset;
+  if (width) width.value = formatBlankCanvasDimension(draft.width);
+  if (height) height.value = formatBlankCanvasDimension(draft.height);
+  if (unit) unit.value = draft.unit;
+  if (lock) {
+    lock.classList.toggle("active", draft.locked);
+    lock.setAttribute("aria-pressed", String(draft.locked));
+    lock.setAttribute("aria-label", draft.locked ? "Unlock canvas aspect ratio" : "Lock canvas aspect ratio");
+  }
+  if (color) color.value = draft.color;
+  if (colorValue) colorValue.textContent = draft.color.toUpperCase();
+  colorControl?.style.setProperty("--blank-canvas-picker-color", draft.color);
+}
+
+function closeBlankCanvasSizeEditor() {
+  state.isEditingBlankCanvasSize = false;
+  state.blankCanvasDraft = null;
+  setCanvasTool("select");
+}
+
+function applyBlankCanvasDraft({applyToAll = false} = {}) {
+  const draft = currentBlankCanvasDraft();
+  state.blankCanvasPreset = draft.preset;
+  state.blankCanvasWidth = Math.max(0.1, Number(draft.width) || 10);
+  state.blankCanvasHeight = Math.max(0.1, Number(draft.height) || 7);
+  state.blankCanvasUnit = draft.unit;
+  state.blankCanvasAspectLocked = draft.locked;
+  state.blankCanvasColor = draft.color;
+  const activeSlide = state.editorSlides.find((slide) => slide.id === state.activeEditorSlideId);
+  if (activeSlide?.isBlank) {
+    activeSlide.canvasSize = {
+      preset: state.blankCanvasPreset,
+      width: state.blankCanvasWidth,
+      height: state.blankCanvasHeight,
+      unit: state.blankCanvasUnit,
+      color: state.blankCanvasColor,
+      locked: state.blankCanvasAspectLocked,
+    };
+  }
+  if (applyToAll) {
+    state.editorSlides.forEach((slide) => {
+      slide.canvasSize = {
+        preset: state.blankCanvasPreset,
+        width: state.blankCanvasWidth,
+        height: state.blankCanvasHeight,
+        unit: state.blankCanvasUnit,
+        color: state.blankCanvasColor,
+        locked: state.blankCanvasAspectLocked,
+      };
+    });
+  }
+  closeBlankCanvasSizeEditor();
+  renderEditorCanvas();
+}
+
+function bindBlankCanvasDimensions() {
+  const dimensionButton = document.getElementById("editorBlankCanvasDimensions");
+  const preset = document.getElementById("editorCanvasPreset");
+  const width = document.getElementById("editorCanvasWidth");
+  const height = document.getElementById("editorCanvasHeight");
+  const unit = document.getElementById("editorCanvasUnit");
+  const lock = document.getElementById("editorCanvasAspectLock");
+  const color = document.getElementById("editorBlankCanvasColor");
+
+  dimensionButton?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!state.isBlankEditor) return;
+    clearCanvasObjectSelection();
+    clearEditorImageSelectionForCanvasObject();
+    state.isEditingBlankCanvasSize = true;
+    state.blankCanvasDraft = null;
+    showEditorLeftEditPanel();
+    setCanvasTool("select");
+    syncBlankCanvasSizeControls();
+  });
+
+  preset?.addEventListener("change", () => {
+    const draft = currentBlankCanvasDraft();
+    draft.preset = preset.value;
+    const dimensions = blankCanvasPresetDimensions[preset.value];
+    if (dimensions) {
+      draft.width = dimensions.width;
+      draft.height = dimensions.height;
+      draft.ratio = dimensions.width / dimensions.height;
+    }
+    syncBlankCanvasSizeControls();
+  });
+
+  const updateDimension = (source) => {
+    const draft = currentBlankCanvasDraft();
+    const nextValue = Math.max(0.1, Number(source === "width" ? width?.value : height?.value) || 0.1);
+    if (source === "width") {
+      draft.width = nextValue;
+      if (draft.locked) draft.height = nextValue / draft.ratio;
+    } else {
+      draft.height = nextValue;
+      if (draft.locked) draft.width = nextValue * draft.ratio;
+    }
+    draft.preset = "custom";
+    if (!draft.locked) draft.ratio = draft.width / draft.height;
+    syncBlankCanvasSizeControls();
+  };
+  width?.addEventListener("input", () => updateDimension("width"));
+  height?.addEventListener("input", () => updateDimension("height"));
+
+  unit?.addEventListener("change", () => {
+    const draft = currentBlankCanvasDraft();
+    const fromFactor = blankCanvasUnitFactors[draft.unit] || 1;
+    const toFactor = blankCanvasUnitFactors[unit.value] || 1;
+    draft.width = draft.width * fromFactor / toFactor;
+    draft.height = draft.height * fromFactor / toFactor;
+    draft.unit = unit.value;
+    draft.preset = "custom";
+    syncBlankCanvasSizeControls();
+  });
+
+  lock?.addEventListener("click", () => {
+    const draft = currentBlankCanvasDraft();
+    draft.locked = !draft.locked;
+    draft.ratio = draft.width / draft.height;
+    syncBlankCanvasSizeControls();
+  });
+
+  color?.addEventListener("input", () => {
+    const draft = currentBlankCanvasDraft();
+    draft.color = color.value.toUpperCase();
+    syncBlankCanvasSizeControls();
+  });
+
+  document.getElementById("editorCanvasSizeReset")?.addEventListener("click", () => {
+    state.blankCanvasDraft = {
+      preset: "10:7",
+      width: 10,
+      height: 7,
+      unit: "in",
+      locked: true,
+      ratio: 10 / 7,
+      color: "#FFFFFF",
+    };
+    syncBlankCanvasSizeControls();
+  });
+  document.getElementById("editorCanvasSizeApply")?.addEventListener("click", () => applyBlankCanvasDraft());
+  document.getElementById("editorCanvasSizeApplyAll")?.addEventListener("click", () => applyBlankCanvasDraft({applyToAll: true}));
+  document.getElementById("editorCanvasSizeCancel")?.addEventListener("click", closeBlankCanvasSizeEditor);
+
+  window.addEventListener("resize", () => {
+    if (state.isBlankEditor && document.getElementById("editorDesktopScreen")?.classList.contains("active")) {
+      applyBlankCanvasAppearance();
+    }
   });
 }
 
@@ -5881,6 +6182,7 @@ function init() {
   setEditorLeftPanelCollapsed(state.editorLeftPanelCollapsed);
   bindSelectGroups();
   bindEditorBackgroundSwatches();
+  bindBlankCanvasDimensions();
   bindEditorShapeSettings();
   bindEditorLineSettings();
   bindEditorPenSettings();
