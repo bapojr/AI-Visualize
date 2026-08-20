@@ -11930,7 +11930,7 @@ a {
   justify-content: flex-end;
   padding: 0 16px;
   border-bottom: 1px solid var(--Gray-5, #e4eaf7);
-  background: #fff;
+  background: var(--Gray-2, #f8f9fd);
 }
 
 .prompt-flow-prime {
