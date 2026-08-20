@@ -531,6 +531,7 @@ const state = {
   generationRequestId: 0,
   generationController: null,
   generationNotice: "",
+  editorChatSessionPrompt: "",
   isBlankEditor: false,
 };
 
@@ -761,6 +762,14 @@ function generatedImageOrientation(ratio = "1:1") {
   return "landscape";
 }
 
+function activeGeneratedTemplate() {
+  return (
+    state.isGeneratingImage
+      ? state.pendingGeneratedResultTemplate || state.generatedResultTemplate
+      : state.generatedResultTemplate
+  ) || state.currentEditorTemplate || templateCatalog[0];
+}
+
 function generatedTemplateFromResponse(result, settings) {
   const format = generationFormat();
   const title = state.prompt.length > 72
@@ -840,6 +849,7 @@ async function startImageGeneration() {
       state.isGeneratingImage = false;
       renderVariants();
       updatePreviewVisuals();
+      if (state.desktop.activeScreen === "editor-desktop") renderEditorCanvas();
       state.generationTimer = null;
     }, 1200);
     return;
@@ -865,6 +875,7 @@ async function startImageGeneration() {
     state.generationController = null;
     renderVariants();
     updatePreviewVisuals();
+    if (state.desktop.activeScreen === "editor-desktop") renderEditorCanvas();
   }
 }
 
@@ -1229,12 +1240,133 @@ function renderSubjectList(filter = "") {
   });
 }
 
+function editorChatResponseText(template = activeGeneratedTemplate()) {
+  const visualTypeByCategory = {
+    Infographics: "infographic",
+    Posters: "poster",
+    "Graphical Abstracts": "graphical abstract",
+    Diagram: "diagram",
+    Diagrams: "diagram",
+  };
+  const visualType =
+    visualTypeByCategory[template.category] ||
+    String(template.category || "visual")
+      .replace(/s$/i, "")
+      .toLowerCase();
+
+  if (state.isGeneratingImage) {
+    return `I’m creating a ${visualType} for you. I’ll turn your prompt into a clean, publication-ready visual design.`;
+  }
+  if (state.generationNotice) return state.generationNotice;
+  return `Here is your generated ${visualType}. You can refine the design with a suggestion below or describe another change.`;
+}
+
+function syncEditorChatHistory(template = activeGeneratedTemplate()) {
+  const session = document.querySelector("[data-editor-generation-session]");
+  if (!session) return;
+
+  const response = session.querySelector("[data-editor-generation-response]");
+  const image = session.querySelector("[data-editor-generation-image]");
+  const status = session.querySelector("[data-editor-generation-status]");
+
+  if (response) response.textContent = editorChatResponseText(template);
+  if (image) {
+    image.src = template.image;
+    image.alt = template.title;
+  }
+  if (status) status.textContent = state.isGeneratingImage ? "Generating visual" : "Generated visual";
+  session.classList.toggle("is-generating", state.isGeneratingImage);
+}
+
+function renderEditorChatHistory({reset = false} = {}) {
+  const thread = document.getElementById("editorChatThread");
+  const prompt = state.editorChatSessionPrompt.trim();
+  if (!thread || !prompt) return;
+
+  if (reset) thread.replaceChildren();
+  let session = thread.querySelector("[data-editor-generation-session]");
+  if (!session) {
+    session = document.createElement("section");
+    session.className = "editor-chat-generation-session";
+    session.dataset.editorGenerationSession = "";
+
+    const userMessage = document.createElement("div");
+    userMessage.className = "editor-chat-message editor-chat-message-user";
+    userMessage.textContent = prompt;
+
+    const assistant = document.createElement("div");
+    assistant.className = "editor-chat-assistant";
+
+    const response = document.createElement("p");
+    response.className = "editor-chat-assistant-copy";
+    response.dataset.editorGenerationResponse = "";
+
+    const resultCard = document.createElement("figure");
+    resultCard.className = "editor-chat-result-card";
+    const status = document.createElement("figcaption");
+    status.className = "editor-chat-result-status";
+    status.dataset.editorGenerationStatus = "";
+    const image = document.createElement("img");
+    image.dataset.editorGenerationImage = "";
+    resultCard.append(image, status);
+
+    const suggestions = document.createElement("div");
+    suggestions.className = "editor-chat-suggestions";
+    suggestions.setAttribute("aria-label", "Suggested refinements");
+    ["More designs", "Make colors more natural", "Simplify the labels"].forEach((label) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.addEventListener("click", () => {
+        const composer = document.getElementById("editorChatPrompt");
+        if (!composer) return;
+        composer.value = label;
+        toggleSubmitStates();
+        composer.focus();
+      });
+      suggestions.appendChild(button);
+    });
+
+    const feedback = document.createElement("div");
+    feedback.className = "editor-chat-feedback";
+    [
+      ["Copy response", "copy", '<path d="M5 5h7v9H5zM2 2h7v3H5v6H2z"/>'],
+      ["Helpful", "helpful", '<path d="M6 14H3V7h3m0 7h5.5a1.5 1.5 0 0 0 1.45-1.12l1-4A1.5 1.5 0 0 0 12.5 7H9l.5-3A1.7 1.7 0 0 0 8 2L6 7"/>'],
+      ["Not helpful", "unhelpful", '<path d="M6 2H3v7h3m0-7h5.5a1.5 1.5 0 0 1 1.45 1.12l1 4A1.5 1.5 0 0 1 12.5 9H9l.5 3A1.7 1.7 0 0 1 8 14L6 9"/>'],
+    ].forEach(([label, action, icon]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.chatFeedback = action;
+      button.setAttribute("aria-label", label);
+      button.title = label;
+      button.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true">${icon}</svg>`;
+      button.addEventListener("click", async () => {
+        if (action === "copy") {
+          await navigator.clipboard?.writeText(response.textContent || "");
+          button.classList.add("selected");
+          window.setTimeout(() => button.classList.remove("selected"), 900);
+          return;
+        }
+        feedback.querySelectorAll("[data-chat-feedback='helpful'], [data-chat-feedback='unhelpful']").forEach((item) => {
+          item.classList.toggle("selected", item === button && !button.classList.contains("selected"));
+        });
+      });
+      feedback.appendChild(button);
+    });
+
+    assistant.append(response, resultCard, suggestions, feedback);
+    session.append(userMessage, assistant);
+    thread.appendChild(session);
+  }
+
+  syncEditorChatHistory();
+  requestAnimationFrame(() => {
+    thread.scrollTop = thread.scrollHeight;
+  });
+}
+
 function updatePreviewVisuals() {
-  const activeVariant = (
-    state.isGeneratingImage
-      ? state.pendingGeneratedResultTemplate || state.generatedResultTemplate
-      : state.generatedResultTemplate
-  ) || templateCatalog[0];
+  const activeVariant = activeGeneratedTemplate();
   const preview = document.getElementById("previewPanelImage");
   const mobilePreview = document.getElementById("mobilePreviewImage");
   const conversationAiOutput = document.getElementById("conversationAiOutput");
@@ -1242,6 +1374,8 @@ function updatePreviewVisuals() {
   const previewConversationAiOutput = document.getElementById("previewConversationAiOutput");
   const previewConversationImage = document.getElementById("previewConversationImage");
   const previewConversationPills = document.getElementById("previewConversationPills");
+
+  syncEditorChatHistory(activeVariant);
 
   if (conversationAiOutput) {
     conversationAiOutput.textContent = state.isGeneratingImage
@@ -1528,7 +1662,7 @@ function applyBlankCanvasAppearance(canvas = state) {
 }
 
 function renderEditorCanvas() {
-  const activeTemplate = state.generatedResultTemplate || state.currentEditorTemplate || templateCatalog[0];
+  const activeTemplate = activeGeneratedTemplate();
 
   const canvas = document.getElementById("editorCanvas");
   const image = document.getElementById("editorCanvasImage");
@@ -4952,9 +5086,32 @@ function handlePromptSubmit(destination) {
   state.isBlankEditor = false;
   state.hasHistory = true;
   renderLandingHistoryVisibility();
-  setScreen(destination);
   syncConversationPrompt();
   syncMobileConversationPrompt();
+
+  if (destination === "editor-desktop") {
+    state.editorChatSessionPrompt = state.prompt;
+    state.editorRightPanelView = "chat";
+    state.isEditorFrameSelected = false;
+    state.selectedEditorSegmentId = null;
+    state.selectedEditorSegmentType = null;
+    state.imageRotation = 0;
+    state.imageOffsetX = 0;
+    state.imageOffsetY = 0;
+    state.canvasPanX = 0;
+    state.canvasPanY = 0;
+    state.zoom = 100;
+    renderHistory();
+    startImageGeneration();
+    setScreen(destination);
+    setEditorPanelView("right", "chat");
+    showEditorLeftEditPanel();
+    setCanvasTool("select");
+    renderEditorChatHistory({reset: true});
+    return;
+  }
+
+  setScreen(destination);
   startImageGeneration();
 }
 
@@ -5116,7 +5273,7 @@ function initActions() {
 
   document.getElementById("landingSubmitDesktop")?.addEventListener("click", () => {
     if (!document.getElementById("landingPromptDesktop").value.trim()) return;
-    handlePromptSubmit("conversation-desktop");
+    handlePromptSubmit("editor-desktop");
   });
 
   document.getElementById("startFromScratchButton")?.addEventListener("click", () => {
