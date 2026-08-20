@@ -11743,6 +11743,10 @@ a {
   gap: 0;
 }
 
+:is(.first-user-shell, .desktop-prompt-flow).sidebar-collapsed .sidebar-nav-label {
+  display: none;
+}
+
 :is(.first-user-shell, .desktop-prompt-flow).sidebar-collapsed .sidebar-compact-search {
   display: flex;
 }
@@ -11951,6 +11955,7 @@ a {
 
 .prompt-flow-workspace {
   position: relative;
+  --prompt-flow-thread-width: min(720px, calc(100% - 64px));
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -11963,7 +11968,7 @@ a {
   right: clamp(32px, 5vw, 84px);
   bottom: 28px;
   display: flex;
-  width: min(720px, calc(100% - 64px));
+  width: var(--prompt-flow-thread-width);
   min-width: 0;
   flex-direction: column;
   justify-content: flex-end;
@@ -11986,6 +11991,7 @@ a {
 .prompt-flow-understanding {
   position: static;
   display: flex;
+  width: 100%;
   min-height: 0;
   flex-direction: column;
   gap: 12px;
@@ -12007,9 +12013,14 @@ a {
 
 .prompt-flow-loader-row dotlottie-wc {
   display: block;
-  width: 17px;
-  height: 23px;
+  width: 17px !important;
+  min-width: 17px;
+  max-width: 17px;
+  height: 23px !important;
+  min-height: 23px;
+  max-height: 23px;
   flex: 0 0 17px;
+  overflow: hidden;
 }
 
 .prompt-flow-composer {

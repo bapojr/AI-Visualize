@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=74" />
+    <link rel="stylesheet" href="styles.css?v=75" />
   </head>
   <body>
     <div id="app">
@@ -346,23 +346,29 @@
                 <div class="prompt-flow-thread">
                   <div class="prompt-flow-user-message" id="conversationFlowPrompt"></div>
 
-                <section class="prompt-flow-understanding" id="desktopPromptUnderstanding" aria-live="polite">
-                  <div class="prompt-flow-loader-row">
-                    <dotlottie-wc src="assets/loaders/ai-chat-loader.lottie" autoplay loop aria-hidden="true"></dotlottie-wc>
-                    <span>Understanding your prompt...</span>
-                  </div>
-                  <div class="prompt-flow-composer" aria-hidden="true">
-                    <span>Describe what you want to visualize....</span>
-                    <div class="prompt-flow-composer-actions">
-                      <button type="button" tabindex="-1">+</button>
-                      <span>Gallery</span><span>Ratio</span><span>Styles</span><span>Image model</span>
-                      <button class="prompt-flow-send" type="button" tabindex="-1">↵</button>
+                  <section class="prompt-flow-understanding" id="desktopPromptUnderstanding" aria-live="polite">
+                    <div class="prompt-flow-loader-row">
+                      <dotlottie-wc
+                        src="assets/loaders/ai-chat-loader.lottie"
+                        autoplay
+                        loop
+                        style="width: 17px; height: 23px"
+                        aria-hidden="true"
+                      ></dotlottie-wc>
+                      <span>Understanding your prompt...</span>
                     </div>
-                  </div>
-                  <p class="prompt-flow-disclaimer">AI content should always be reviewed. We do not use your data to improve or train our system.</p>
-                </section>
+                    <div class="prompt-flow-composer" aria-hidden="true">
+                      <span>Describe what you want to visualize....</span>
+                      <div class="prompt-flow-composer-actions">
+                        <button type="button" tabindex="-1">+</button>
+                        <span>Gallery</span><span>Ratio</span><span>Styles</span><span>Image model</span>
+                        <button class="prompt-flow-send" type="button" tabindex="-1">↵</button>
+                      </div>
+                    </div>
+                    <p class="prompt-flow-disclaimer">AI content should always be reviewed. We do not use your data to improve or train our system.</p>
+                  </section>
 
-                <section class="prompt-flow-refine" id="desktopRefinePanel" hidden aria-labelledby="desktopRefineTitle">
+                  <section class="prompt-flow-refine" id="desktopRefinePanel" hidden aria-labelledby="desktopRefineTitle">
                   <header class="prompt-flow-refine-header">
                     <h1 id="desktopRefineTitle">Refine Details</h1>
                     <button type="button" id="desktopRefineClose" aria-label="Close refine details">×</button>
@@ -2403,6 +2409,6 @@
     </div>
 
     <script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.24/dist/dotlottie-wc.js"></script>
-    <script src="app.js?v=74"></script>
+    <script src="app.js?v=75"></script>
   </body>
 </html>
