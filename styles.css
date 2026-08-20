@@ -847,6 +847,10 @@ body.how-tour-open {
   outline-offset: 2px;
 }
 
+.landing-stage .start-scratch-card + .landing-chat {
+  margin-top: 16px;
+}
+
 .landing-stage .landing-chat {
   position: relative;
   height: 234px;
