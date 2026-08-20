@@ -826,10 +826,29 @@ body.how-tour-open {
   }
 }
 
+.landing-stage .start-scratch-card,
 .landing-stage .landing-chat {
-  position: relative;
   width: min(860px, 100%);
   max-width: 860px;
+}
+
+.landing-stage .start-scratch-card {
+  margin: 16px 0 0;
+}
+
+.landing-stage .start-scratch-card:hover {
+  border-color: var(--Blue-9, #0062ff);
+  box-shadow: 0 12px 32px rgba(49, 85, 153, 0.12);
+}
+
+.landing-stage .start-scratch-card:focus-visible {
+  border-color: var(--Blue-9, #0062ff);
+  outline: 2px solid var(--Blue-3, #edf3ff);
+  outline-offset: 2px;
+}
+
+.landing-stage .landing-chat {
+  position: relative;
   height: 234px;
   min-height: 234px;
   margin: 32px 0 0;
