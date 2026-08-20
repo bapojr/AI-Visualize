@@ -896,6 +896,9 @@ function getGalleryItems(category) {
 }
 
 function setScreen(name) {
+  if (name !== "conversation-desktop") {
+    restoreLandingSidebar({ expanded: name === "landing-desktop" });
+  }
   if (name !== "editor-desktop") hideEditorLibraryPreview();
   const isMobile = name.includes("mobile");
   const targetScreens = isMobile ? mobileScreens : desktopScreens;
@@ -1473,6 +1476,35 @@ function syncConversationPrompt() {
   if (flowPrompt) flowPrompt.textContent = value;
 }
 
+function mountLandingSidebarInPromptFlow() {
+  const sidebar = document.querySelector(".landing-sidebar");
+  const flow = document.getElementById("desktopPromptFlow");
+  const main = flow?.querySelector(".prompt-flow-main");
+  if (!sidebar || !flow || !main) return;
+  if (sidebar.parentElement !== flow) flow.insertBefore(sidebar, main);
+  flow.classList.add("sidebar-collapsed");
+}
+
+function restoreLandingSidebar({ expanded = true } = {}) {
+  const sidebar = document.querySelector(".landing-sidebar");
+  const shell = document.querySelector(".first-user-shell");
+  const flow = document.getElementById("desktopPromptFlow");
+  if (!sidebar || !shell) return;
+  if (sidebar.parentElement !== shell) shell.prepend(sidebar);
+  flow?.classList.remove("sidebar-collapsed");
+  if (expanded) shell.classList.remove("sidebar-collapsed");
+}
+
+function returnToLandingFromPromptFlow() {
+  if (state.desktopPromptStageTimer) {
+    clearTimeout(state.desktopPromptStageTimer);
+    state.desktopPromptStageTimer = null;
+  }
+  setDesktopPromptStage("idle");
+  setScreen("landing-desktop");
+  requestAnimationFrame(() => document.getElementById("landingPromptDesktop")?.focus());
+}
+
 function setDesktopPromptStage(stage) {
   state.desktopPromptStage = stage;
   const flow = document.getElementById("desktopPromptFlow");
@@ -1506,6 +1538,7 @@ function beginDesktopPromptFlow() {
   state.editorChatSessionPrompt = state.prompt;
   renderLandingHistoryVisibility();
   populateDesktopRefineDetails();
+  mountLandingSidebarInPromptFlow();
   setScreen("conversation-desktop");
   setDesktopPromptStage("understanding");
 
@@ -5366,7 +5399,12 @@ function initActions() {
   document.querySelector(".sidebar-auth-cta")?.addEventListener("click", () => {
     document.querySelector(".landing-sidebar")?.classList.add("is-signed-in");
   });
-  document.getElementById("sidebarLogoToggle")?.addEventListener("click", () => {
+  document.getElementById("sidebarLogoToggle")?.addEventListener("click", (event) => {
+    const promptFlow = event.currentTarget.closest(".desktop-prompt-flow");
+    if (promptFlow) {
+      promptFlow.classList.toggle("sidebar-collapsed");
+      return;
+    }
     document.querySelector(".first-user-shell")?.classList.toggle("sidebar-collapsed");
   });
   document.getElementById("subjectSearch")?.addEventListener("input", (event) => {
@@ -5474,7 +5512,11 @@ function initActions() {
     input.value = "";
   });
 
-  document.querySelector("[data-scroll-chat]")?.addEventListener("click", () => {
+  document.querySelector("[data-scroll-chat]")?.addEventListener("click", (event) => {
+    if (event.currentTarget.closest(".desktop-prompt-flow")) {
+      returnToLandingFromPromptFlow();
+      return;
+    }
     document.querySelector(".landing-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
