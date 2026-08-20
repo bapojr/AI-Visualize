@@ -407,6 +407,9 @@ const state = {
     ratio: "1:1",
   },
   prompt: "",
+  desktopPromptStage: "idle",
+  desktopPromptStageTimer: null,
+  refineDetails: null,
   landingTourStep: 0,
   selectedVariant: 1,
   activeOverlay: null,
@@ -743,6 +746,12 @@ function templateForPrompt(prompt = "") {
   const normalized = normalizedPromptValue(prompt);
   if (normalized === "create me a poster on glp 1's" || normalized === "create me a poster on glp-1's") {
     return templateCatalog.find((item) => item.id === "poster-glp") || null;
+  }
+  if (
+    normalized === "create a poster on type 2 diabetes" ||
+    normalized === "create me a poster on type 2 diabetes"
+  ) {
+    return templateCatalog.find((item) => item.id === "poster-diabetes") || null;
   }
   return null;
 }
@@ -1297,6 +1306,18 @@ function renderEditorChatHistory({reset = false} = {}) {
     const assistant = document.createElement("div");
     assistant.className = "editor-chat-assistant";
 
+    const generationLoader = document.createElement("div");
+    generationLoader.className = "editor-chat-generation-loader";
+    generationLoader.innerHTML = `
+      <dotlottie-wc src="assets/loaders/ai-chat-loader.lottie" autoplay loop aria-hidden="true"></dotlottie-wc>
+      <div>
+        <strong>Creating your visual...</strong>
+        <span>Reviewing your refined brief</span>
+        <span>Building the visual hierarchy</span>
+        <span>Rendering scientific details</span>
+      </div>
+    `;
+
     const response = document.createElement("p");
     response.className = "editor-chat-assistant-copy";
     response.dataset.editorGenerationResponse = "";
@@ -1354,7 +1375,7 @@ function renderEditorChatHistory({reset = false} = {}) {
       feedback.appendChild(button);
     });
 
-    assistant.append(response, resultCard, suggestions, feedback);
+    assistant.append(generationLoader, response, resultCard, suggestions, feedback);
     session.append(userMessage, assistant);
     thread.appendChild(session);
   }
@@ -1446,7 +1467,85 @@ function renderEditorTitle() {
 function syncConversationPrompt() {
   const value = document.getElementById("landingPromptDesktop")?.value.trim() || state.prompt;
   state.prompt = value;
-  document.getElementById("conversationUserPrompt").textContent = value;
+  const legacyPrompt = document.getElementById("conversationUserPrompt");
+  const flowPrompt = document.getElementById("conversationFlowPrompt");
+  if (legacyPrompt) legacyPrompt.textContent = value;
+  if (flowPrompt) flowPrompt.textContent = value;
+}
+
+function setDesktopPromptStage(stage) {
+  state.desktopPromptStage = stage;
+  const flow = document.getElementById("desktopPromptFlow");
+  const understanding = document.getElementById("desktopPromptUnderstanding");
+  const refine = document.getElementById("desktopRefinePanel");
+  if (understanding) understanding.hidden = stage !== "understanding";
+  if (refine) refine.hidden = stage !== "refine";
+  flow?.classList.toggle("is-refining", stage === "refine");
+}
+
+function populateDesktopRefineDetails() {
+  const title = document.getElementById("refinePosterTitle");
+  const keyInformation = document.getElementById("refineKeyInformation");
+  const isDiabetesPrompt = /type\s*2\s*diabetes/i.test(state.prompt);
+  if (title) {
+    title.value = isDiabetesPrompt
+      ? "How Type 2 Diabetes Develops in the Body"
+      : "The Science of GLP 1s";
+  }
+  if (keyInformation) {
+    keyInformation.value = isDiabetesPrompt
+      ? "Disease progression, insulin resistance, risk factors, warning signs, and blood glucose buildup."
+      : "Mechanism of action, weight loss benefits, and blood sugar regulation.";
+  }
+}
+
+function beginDesktopPromptFlow() {
+  state.isBlankEditor = false;
+  state.hasHistory = true;
+  syncConversationPrompt();
+  state.editorChatSessionPrompt = state.prompt;
+  renderLandingHistoryVisibility();
+  populateDesktopRefineDetails();
+  setScreen("conversation-desktop");
+  setDesktopPromptStage("understanding");
+
+  if (state.desktopPromptStageTimer) clearTimeout(state.desktopPromptStageTimer);
+  state.desktopPromptStageTimer = setTimeout(() => {
+    setDesktopPromptStage("refine");
+    state.desktopPromptStageTimer = null;
+  }, 1500);
+}
+
+function submitDesktopRefineDetails(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const data = new FormData(form);
+  state.refineDetails = {
+    audience: data.get("refineAudience"),
+    keyInformation: document.getElementById("refineKeyInformation")?.value.trim() || "",
+    visualStyle: data.get("refineVisualStyle"),
+    posterTitle: document.getElementById("refinePosterTitle")?.value.trim() || "",
+    palette: data.get("refinePalette"),
+    elements: data.getAll("refineElements"),
+  };
+
+  state.editorRightPanelView = "chat";
+  state.isEditorFrameSelected = false;
+  state.selectedEditorSegmentId = null;
+  state.selectedEditorSegmentType = null;
+  state.imageRotation = 0;
+  state.imageOffsetX = 0;
+  state.imageOffsetY = 0;
+  state.canvasPanX = 0;
+  state.canvasPanY = 0;
+  state.zoom = 100;
+  renderHistory();
+  startImageGeneration();
+  setScreen("editor-desktop");
+  setEditorPanelView("right", "chat");
+  showEditorLeftEditPanel();
+  setCanvasTool("select");
+  renderEditorChatHistory({reset: true});
 }
 
 function syncMobileConversationPrompt() {
@@ -1707,6 +1806,19 @@ function renderEditorCanvas() {
     stageContent?.classList.remove("is-frame-selected");
     stageContent?.classList.add("is-blank-canvas");
     applyBlankCanvasAppearance();
+    if (segmentation) segmentation.innerHTML = "";
+    actionStack?.classList.add("hidden");
+    textActionStack?.classList.add("hidden");
+    updateZoom();
+    renderEditorInspector();
+    return;
+  }
+
+  if (state.isGeneratingImage) {
+    image.removeAttribute("src");
+    image.alt = "";
+    image.className = "editor-canvas-image hidden";
+    stageContent?.classList.remove("is-frame-selected", "is-blank-canvas");
     if (segmentation) segmentation.innerHTML = "";
     actionStack?.classList.add("hidden");
     textActionStack?.classList.add("hidden");
@@ -5273,7 +5385,17 @@ function initActions() {
 
   document.getElementById("landingSubmitDesktop")?.addEventListener("click", () => {
     if (!document.getElementById("landingPromptDesktop").value.trim()) return;
-    handlePromptSubmit("editor-desktop");
+    beginDesktopPromptFlow();
+  });
+
+  document.getElementById("desktopRefineForm")?.addEventListener("submit", submitDesktopRefineDetails);
+  document.getElementById("desktopRefineClose")?.addEventListener("click", () => {
+    if (state.desktopPromptStageTimer) {
+      clearTimeout(state.desktopPromptStageTimer);
+      state.desktopPromptStageTimer = null;
+    }
+    setDesktopPromptStage("idle");
+    setScreen("landing-desktop");
   });
 
   document.getElementById("startFromScratchButton")?.addEventListener("click", () => {

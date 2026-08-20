@@ -13,7 +13,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=72" />
+    <link rel="stylesheet" href="styles.css?v=73" />
   </head>
   <body>
     <div id="app">
@@ -333,6 +333,112 @@
         </section>
 
         <section class="screen" data-screen="conversation-desktop">
+          <div class="desktop-prompt-flow" id="desktopPromptFlow">
+            <aside class="prompt-flow-rail" aria-label="Collapsed Paperpal navigation">
+              <button class="prompt-flow-brand" type="button" data-go-screen="landing-desktop" aria-label="Back to Paperpal Illustrate">
+                <img src="assets/sidebar/pp.svg" alt="" />
+              </button>
+              <nav class="prompt-flow-rail-nav" aria-label="Primary navigation">
+                <button type="button" aria-label="Start new illustration">
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.2 1.4H2.1a.7.7 0 0 0-.7.7v11.1c0 .4.3.7.7.7h4.4M5.2 1.4v2.5c0 .9.7 1.6 1.6 1.6h3.8M11.3 8v6M8.3 11h6"/></svg>
+                </button>
+                <button type="button" aria-label="Home">
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.3 7.1 8 1l6.7 6.1M3 6.2v8h3.3v-4h3.4v4H13v-8"/></svg>
+                </button>
+                <button type="button" aria-label="Apps">
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="5" height="5" rx=".6"/><rect x="9.5" y="1.5" width="5" height="5" rx=".6"/><rect x="1.5" y="9.5" width="5" height="5" rx=".6"/><rect x="9.5" y="9.5" width="5" height="5" rx=".6"/></svg>
+                </button>
+              </nav>
+              <div class="prompt-flow-rail-bottom">
+                <span class="prompt-flow-usage-ring" aria-label="Usage 50 percent"></span>
+                <span class="prompt-flow-avatar" aria-label="Sushrut Baporikar">S</span>
+              </div>
+            </aside>
+
+            <div class="prompt-flow-main">
+              <header class="prompt-flow-topbar">
+                <button class="prompt-flow-prime" type="button">
+                  <span class="prompt-flow-prime-icon" aria-hidden="true">★</span>
+                  Upgrade to Prime
+                </button>
+              </header>
+
+              <main class="prompt-flow-workspace">
+                <div class="prompt-flow-user-message" id="conversationFlowPrompt"></div>
+
+                <section class="prompt-flow-understanding" id="desktopPromptUnderstanding" aria-live="polite">
+                  <div class="prompt-flow-loader-row">
+                    <dotlottie-wc src="assets/loaders/ai-chat-loader.lottie" autoplay loop aria-hidden="true"></dotlottie-wc>
+                    <span>Understanding your prompt...</span>
+                  </div>
+                  <div class="prompt-flow-composer" aria-hidden="true">
+                    <span>Describe what you want to visualize....</span>
+                    <div class="prompt-flow-composer-actions">
+                      <button type="button" tabindex="-1">+</button>
+                      <span>Gallery</span><span>Ratio</span><span>Styles</span><span>Image model</span>
+                      <button class="prompt-flow-send" type="button" tabindex="-1">↵</button>
+                    </div>
+                  </div>
+                  <p class="prompt-flow-disclaimer">AI content should always be reviewed. We do not use your data to improve or train our system.</p>
+                </section>
+
+                <section class="prompt-flow-refine" id="desktopRefinePanel" hidden aria-labelledby="desktopRefineTitle">
+                  <header class="prompt-flow-refine-header">
+                    <h1 id="desktopRefineTitle">Refine Details</h1>
+                    <button type="button" id="desktopRefineClose" aria-label="Close refine details">×</button>
+                  </header>
+                  <form class="prompt-flow-refine-form" id="desktopRefineForm">
+                    <div class="prompt-flow-refine-scroll">
+                      <fieldset>
+                        <legend>Target Audience</legend>
+                        <label><input type="radio" name="refineAudience" value="medical" checked /><span>Medical Professionals (Scientific/Technical)</span></label>
+                        <label><input type="radio" name="refineAudience" value="public" /><span>General Public (Educational/Simple)</span></label>
+                        <label><input type="radio" name="refineAudience" value="patients" /><span>Patients (Focus on benefits and usage)</span></label>
+                      </fieldset>
+
+                      <label class="prompt-flow-field">
+                        <span>Key Information to Include</span>
+                        <textarea id="refineKeyInformation">Mechanism of action, weight loss benefits, and blood sugar regulation.</textarea>
+                      </label>
+
+                      <fieldset>
+                        <legend>Visual Style</legend>
+                        <label><input type="radio" name="refineVisualStyle" value="infographic" checked /><span>Infographic (Icons and charts)</span></label>
+                        <label><input type="radio" name="refineVisualStyle" value="photorealistic" /><span>Photorealistic (Medical 3D renders)</span></label>
+                        <label><input type="radio" name="refineVisualStyle" value="minimalist" /><span>Minimalist (Clean lines and whitespace)</span></label>
+                        <label><input type="radio" name="refineVisualStyle" value="vintage" /><span>Vintage Anatomy (Classic textbook style)</span></label>
+                      </fieldset>
+
+                      <label class="prompt-flow-field">
+                        <span>Poster Title</span>
+                        <input id="refinePosterTitle" type="text" value="The Science of GLP 1s" />
+                      </label>
+
+                      <fieldset>
+                        <legend>Color Palette</legend>
+                        <label><input type="radio" name="refinePalette" value="clinical" checked /><span>Clinical Blue &amp; White</span></label>
+                        <label><input type="radio" name="refinePalette" value="organic" /><span>Organic Green &amp; Teal (Health focused)</span></label>
+                        <label><input type="radio" name="refinePalette" value="vibrant" /><span>Vibrant &amp; High Contrast</span></label>
+                        <label><input type="radio" name="refinePalette" value="earth" /><span>Muted Earth Tones</span></label>
+                      </fieldset>
+
+                      <fieldset>
+                        <legend>Specific Elements to Illustrate</legend>
+                        <label><input type="checkbox" name="refineElements" value="molecular" /><span>Molecular Structure</span></label>
+                        <label><input type="checkbox" name="refineElements" value="digestive" checked /><span>Digestive System/Gut</span></label>
+                        <label><input type="checkbox" name="refineElements" value="brain" checked /><span>Brain/Appetite Receptors</span></label>
+                        <label><input type="checkbox" name="refineElements" value="delivery" /><span>Delivery Method (Injection Pen)</span></label>
+                      </fieldset>
+                    </div>
+                    <footer class="prompt-flow-refine-footer">
+                      <button type="submit">Submit</button>
+                      <p>Reduce credit usage by answering these questions</p>
+                    </footer>
+                  </form>
+                </section>
+              </main>
+            </div>
+          </div>
           <div class="conversation-back-row">
             <button class="editor-back-button" data-go-screen="landing-desktop" aria-label="Back">
               <svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
@@ -2316,6 +2422,6 @@
     </div>
 
     <script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.24/dist/dotlottie-wc.js"></script>
-    <script src="app.js?v=71"></script>
+    <script src="app.js?v=73"></script>
   </body>
 </html>
