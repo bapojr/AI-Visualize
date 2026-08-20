@@ -7719,7 +7719,7 @@ a {
   width: 30px;
   height: 28px;
   place-items: center;
-  background: var(--Gray-1, #fff);
+  background: var(--Gray-2, #f8f9fd);
 }
 
 .editor-blank-canvas-watermark-logo img {
