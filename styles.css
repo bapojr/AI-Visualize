@@ -7639,18 +7639,34 @@ a {
 .editor-canvas-stage-content {
   position: relative;
   display: inline-block;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--Gray-7, #cad5e7);
+  background: var(--blank-canvas-color, #fff);
+  box-shadow: 0 16px 40px rgba(5, 30, 87, 0.08);
   transform-origin: center center;
-  transform: translate(calc(var(--canvas-pan-x, 0px) + var(--editor-image-x, 0px)), calc(var(--canvas-pan-y, 0px) + var(--editor-image-y, 0px))) scale(var(--editor-zoom-scale, 1)) rotate(var(--editor-image-rotation, 0deg));
+  transform: translate(var(--canvas-pan-x, 0px), var(--canvas-pan-y, 0px)) scale(var(--editor-zoom-scale, 1));
   transition: transform 180ms ease;
 }
 
 .editor-canvas-stage-content.is-blank-canvas {
   width: 700px;
   height: 490px;
-  box-sizing: border-box;
-  border: 1px solid var(--Gray-7, #cad5e7);
-  background: var(--blank-canvas-color, #fff);
-  box-shadow: 0 16px 40px rgba(5, 30, 87, 0.08);
+}
+
+.editor-generated-image-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center center;
+  transform: translate(calc(-50% + var(--editor-image-x, 0px)), calc(-50% + var(--editor-image-y, 0px))) rotate(var(--editor-image-rotation, 0deg));
+  transition: transform 180ms ease;
+}
+
+.editor-generated-image-frame.is-moving,
+.editor-canvas-stage-content.is-moving .editor-generated-image-frame {
+  transition: none;
+  user-select: none;
 }
 
 .editor-blank-canvas-dimensions,

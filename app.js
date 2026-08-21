@@ -517,8 +517,8 @@ const state = {
   editorInspectorPromptExpanded: false,
   editorInspectorTemplateId: null,
   editorSegmentStyles: {},
-  blankCanvasPreset: "10:7",
-  blankCanvasWidth: 10,
+  blankCanvasPreset: "12:7",
+  blankCanvasWidth: 12,
   blankCanvasHeight: 7,
   blankCanvasUnit: "in",
   blankCanvasAspectLocked: true,
@@ -833,6 +833,7 @@ async function startImageGeneration() {
   const requestId = state.generationRequestId + 1;
 
   state.generationRequestId = requestId;
+  resetBlankCanvasState();
   state.pendingGeneratedResultTemplate = fallbackTemplate;
   state.isGeneratingImage = true;
   state.generationNotice = "";
@@ -1730,15 +1731,15 @@ function updateEditorToolbar(kind) {
 
 const blankCanvasPresetDimensions = {
   "16:9": {width: 16, height: 9},
-  "10:7": {width: 10, height: 7},
+  "12:7": {width: 12, height: 7},
   "4:3": {width: 4, height: 3},
   "1:1": {width: 8, height: 8},
   "2:3": {width: 6, height: 9},
 };
 
 function resetBlankCanvasState() {
-  state.blankCanvasPreset = "10:7";
-  state.blankCanvasWidth = 10;
+  state.blankCanvasPreset = "12:7";
+  state.blankCanvasWidth = 12;
   state.blankCanvasHeight = 7;
   state.blankCanvasUnit = "in";
   state.blankCanvasAspectLocked = true;
@@ -1771,6 +1772,61 @@ function blankCanvasDisplaySize(width, height) {
   };
 }
 
+function ensureGeneratedImageFrame() {
+  let frame = document.getElementById("editorGeneratedImageFrame");
+  if (frame) return frame;
+
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  const image = document.getElementById("editorCanvasImage");
+  if (!stageContent || !image) return null;
+
+  frame = document.createElement("div");
+  frame.id = "editorGeneratedImageFrame";
+  frame.className = "editor-generated-image-frame";
+  stageContent.insertBefore(frame, image);
+
+  [
+    "editorCanvasImage",
+    "editorImageSegmentation",
+    "editorImageSelectionFrame",
+    "editorRegionDrawingLayer",
+    "editorCropLayer",
+  ].forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) frame.appendChild(element);
+  });
+
+  return frame;
+}
+
+function fitGeneratedImageToCanvas() {
+  const stageContent = document.getElementById("editorCanvasStageContent");
+  const imageFrame = ensureGeneratedImageFrame();
+  const image = document.getElementById("editorCanvasImage");
+  if (
+    !stageContent ||
+    !imageFrame ||
+    !image?.naturalWidth ||
+    !image?.naturalHeight ||
+    (state.imageWidth && state.imageHeight)
+  ) {
+    return;
+  }
+
+  const padding = 24;
+  const availableWidth = Math.max(1, stageContent.clientWidth - padding * 2);
+  const availableHeight = Math.max(1, stageContent.clientHeight - padding * 2);
+  const scale = Math.min(
+    1,
+    availableWidth / image.naturalWidth,
+    availableHeight / image.naturalHeight,
+  );
+
+  state.imageWidth = Math.max(1, Math.round(image.naturalWidth * scale));
+  state.imageHeight = Math.max(1, Math.round(image.naturalHeight * scale));
+  applyImageAppearance();
+}
+
 function syncBlankCanvasDimensionLabel(canvas = state) {
   const label = document.getElementById("editorBlankCanvasDimensionLabel");
   if (!label) return;
@@ -1782,7 +1838,7 @@ function syncBlankCanvasDimensionLabel(canvas = state) {
 
 function applyBlankCanvasAppearance(canvas = state) {
   const stageContent = document.getElementById("editorCanvasStageContent");
-  if (!stageContent || !state.isBlankEditor) return;
+  if (!stageContent) return;
   const width = canvas.width ?? canvas.blankCanvasWidth;
   const height = canvas.height ?? canvas.blankCanvasHeight;
   const color = canvas.color ?? canvas.blankCanvasColor;
@@ -1802,6 +1858,7 @@ function renderEditorCanvas() {
   const canvasStage = document.getElementById("editorCanvasStage");
   const mediaShell = document.getElementById("editorCanvasMediaShell");
   const stageContent = document.getElementById("editorCanvasStageContent");
+  const imageFrame = ensureGeneratedImageFrame();
   const segmentation = document.getElementById("editorImageSegmentation");
   const actionStack = document.getElementById("editorImageActionStack");
   const textActionStack = document.getElementById("editorTextActionStack");
@@ -1816,9 +1873,9 @@ function renderEditorCanvas() {
     state.imageFlipY = 1;
     state.imageWidth = null;
     state.imageHeight = null;
-    if (stageContent) {
-      stageContent.style.width = "";
-      stageContent.style.height = "";
+    if (imageFrame) {
+      imageFrame.style.width = "";
+      imageFrame.style.height = "";
     }
     image.style.width = "";
     image.style.height = "";
@@ -1836,6 +1893,7 @@ function renderEditorCanvas() {
     image.removeAttribute("src");
     image.alt = "";
     image.className = "editor-canvas-image hidden";
+    imageFrame?.classList.add("hidden");
     stageContent?.classList.remove("is-frame-selected");
     stageContent?.classList.add("is-blank-canvas");
     applyBlankCanvasAppearance();
@@ -1851,7 +1909,10 @@ function renderEditorCanvas() {
     image.removeAttribute("src");
     image.alt = "";
     image.className = "editor-canvas-image hidden";
-    stageContent?.classList.remove("is-frame-selected", "is-blank-canvas");
+    imageFrame?.classList.add("hidden");
+    stageContent?.classList.remove("is-frame-selected");
+    stageContent?.classList.add("is-blank-canvas");
+    applyBlankCanvasAppearance();
     if (segmentation) segmentation.innerHTML = "";
     actionStack?.classList.add("hidden");
     textActionStack?.classList.add("hidden");
@@ -1864,12 +1925,9 @@ function renderEditorCanvas() {
     rememberGeneratedEditorUpload(activeTemplate);
   }
   state.currentEditorTemplate = activeTemplate;
-  stageContent?.classList.remove("is-blank-canvas");
-  stageContent?.style.removeProperty("--blank-canvas-color");
-  if (stageContent && !state.imageWidth && !state.imageHeight) {
-    stageContent.style.width = "";
-    stageContent.style.height = "";
-  }
+  imageFrame?.classList.remove("hidden");
+  stageContent?.classList.add("is-blank-canvas");
+  applyBlankCanvasAppearance();
   const croppedImage = state.editorCroppedImages[activeTemplate.id];
   image.src = croppedImage?.src || activeTemplate.image;
   image.alt = activeTemplate.title;
@@ -3618,10 +3676,10 @@ function applyImageAppearance() {
   if (!image) return;
   image.style.opacity = `${state.imageOpacity / 100}`;
   image.style.setProperty("--image-layer", `${state.imageLayer}`);
-  const stageContent = document.getElementById("editorCanvasStageContent");
-  if (stageContent && state.imageWidth && state.imageHeight) {
-    stageContent.style.width = `${state.imageWidth}px`;
-    stageContent.style.height = `${state.imageHeight}px`;
+  const imageFrame = ensureGeneratedImageFrame();
+  if (imageFrame && state.imageWidth && state.imageHeight) {
+    imageFrame.style.width = `${state.imageWidth}px`;
+    imageFrame.style.height = `${state.imageHeight}px`;
     image.style.width = "100%";
     image.style.height = "100%";
   }
@@ -5788,13 +5846,13 @@ function bindBlankCanvasDimensions() {
   });
 
   document.getElementById("editorCanvasSizeReset")?.addEventListener("click", () => {
-    state.blankCanvasDraft = {
-      preset: "10:7",
-      width: 10,
-      height: 7,
-      unit: "in",
-      locked: true,
-      ratio: 10 / 7,
+  state.blankCanvasDraft = {
+    preset: "12:7",
+    width: 12,
+    height: 7,
+    unit: "in",
+    locked: true,
+    ratio: 12 / 7,
       color: "#FFFFFF",
     };
     syncBlankCanvasSizeControls();
@@ -6204,15 +6262,11 @@ function bindEditorImageSettings() {
     state.imageAspectLocked = !state.imageAspectLocked;
     syncEditorImageTransformControls();
   });
-  document.getElementById("editorCanvasImage")?.addEventListener("load", () => {
-    if (!state.imageWidth || !state.imageHeight) {
-      const image = document.getElementById("editorCanvasImage");
-      state.imageWidth = image?.getBoundingClientRect().width || image?.naturalWidth || null;
-      state.imageHeight = image?.getBoundingClientRect().height || image?.naturalHeight || null;
-    }
-    applyImageAppearance();
-    syncEditorImageTransformControls();
-  });
+document.getElementById("editorCanvasImage")?.addEventListener("load", () => {
+  fitGeneratedImageToCanvas();
+  applyImageAppearance();
+  syncEditorImageTransformControls();
+});
 
   syncImageSettingsPanel();
 }
